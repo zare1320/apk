@@ -1,0 +1,514 @@
+package com.example.ui.screens.auth
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.data.database.Pet
+import com.example.viewmodel.MainViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RegisterScreen(
+    viewModel: MainViewModel,
+    onNavigateBack: () -> Unit
+) {
+    var isVetMode by remember { mutableStateOf(true) } // Mode switcher: true for vet, false for pet owner
+
+    // General Fields
+    var fullName by remember { mutableStateOf("") }
+    var phoneNumber by remember { mutableStateOf("") }
+    var otpCode by remember { mutableStateOf("") }
+    var isOtpSent by remember { mutableStateOf(false) }
+    var isOtpVerified by remember { mutableStateOf(false) }
+
+    // Vet-Specific fields
+    var isStudentMode by remember { mutableStateOf(false) } // true if student, false if clinical vet
+    var schoolSelected by remember { mutableStateOf("دانشگاه تهران") }
+    var studentId by remember { mutableStateOf("") }
+    var licenseNumber by remember { mutableStateOf("") }
+    var specialtySelected by remember { mutableStateOf("داخلی حیوانات کوچک") }
+
+    // Pet Owner fields
+    var petName by remember { mutableStateOf("") }
+    var petSpecies by remember { mutableStateOf("dog") } // "dog", "cat", "exotic"
+    var petAge by remember { mutableStateOf("") }
+    var petBreed by remember { mutableStateOf("") }
+    var petWeight by remember { mutableStateOf("") }
+
+    val universityList = listOf(
+        "دانشگاه تهران", "دانشگاه شیراز", "دانشگاه فردوسی مشهد",
+        "دانشگاه علوم تحقیقات", "دانشگاه تبریز", "دانشگاه کار و هنر"
+    )
+
+    val specialtyList = listOf(
+        "داخلی حیوانات کوچک", "جراحی و هوشبری", "کلینیکال پاتولوژی",
+        "رادیولوژی و تصویربرداری", "مامایی و بیماری‌های تولیدمثل"
+    )
+
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("عضویت در سامانه تخصصی", fontSize = 16.sp, fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Role Tab Switcher
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .clip(RoundedCornerShape(25.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .padding(4.dp)
+            ) {
+                // Pet Owner Tab
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(21.dp))
+                        .background(
+                            animateColorAsState(
+                                if (!isVetMode) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                label = ""
+                            ).value
+                        )
+                        .clickable { isVetMode = false }
+                        .padding(horizontal = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "🐾 صاحب پت هستم",
+                        color = if (!isVetMode) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                // Veterinarian/Student Tab
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(21.dp))
+                        .background(
+                            animateColorAsState(
+                                if (isVetMode) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                label = ""
+                            ).value
+                        )
+                        .clickable { isVetMode = true }
+                        .padding(horizontal = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "🩺 پزشک یا دانشجو هستم",
+                        color = if (isVetMode) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                // Form General Inputs
+                OutlinedTextField(
+                    value = fullName,
+                    onValueChange = { fullName = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("نام و نام خانوادگی") },
+                    placeholder = { Text("مثال: دکتر علیرضا رضایی") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = phoneNumber,
+                    onValueChange = { phoneNumber = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("شماره تلفن همراه") },
+                    placeholder = { Text("مثال: 09121234567") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // OTP Verification Flow Simulation
+                if (!isOtpSent) {
+                    Button(
+                        onClick = {
+                            if (phoneNumber.length >= 10) {
+                                isOtpSent = true
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                    ) {
+                        Text("ارسال پیامک تایید هویت (OTP)", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    }
+                } else if (!isOtpVerified) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("کد ۴ رقمی پیامک شده را وارد کنید (شبیه‌ساز: ۱۲۳۴)", fontSize = 11.sp, color = MaterialTheme.colorScheme.primary)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = otpCode,
+                                onValueChange = {
+                                    otpCode = it
+                                    if (it == "1234") {
+                                        isOtpVerified = true
+                                    }
+                                },
+                                modifier = Modifier.width(180.dp),
+                                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                                label = { Text("کد فعال‌سازی") },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                singleLine = true,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                        }
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color(0xFFDCFCE7), RoundedCornerShape(12.dp))
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.Check, contentDescription = "", tint = Color(0xFF15803D))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("شماره همراه شما تایید کد دو عاملی شد.", color = Color(0xFF15803D), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Conditionally display inputs based on role Selected
+                if (isVetMode) {
+                    // Dentist or Vet specifics
+                    Text(
+                        text = "اطلاعات پروانه و صلاحیت علمی پزشک:",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Student / Clinician Sub-Switch
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(44.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .padding(2.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(if (!isStudentMode) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent)
+                                .clickable { isStudentMode = false },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("👨‍⚕️ پروانه و طبابت کلینیکال", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        }
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(if (isStudentMode) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent)
+                                .clickable { isStudentMode = true },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("🎓 رزیدنت یا دانشجوی دکترا", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    if (isStudentMode) {
+                        // School Selection
+                        Text("🎓 مشخصات دانشگاه صادرکننده کارت:", fontSize = 11.sp)
+                         UniversityRowDropdown(
+                            currentSelection = schoolSelected,
+                            allSelections = universityList,
+                            onChoose = { schoolSelected = it }
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        OutlinedTextField(
+                            value = studentId,
+                            onValueChange = { studentId = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("شماره دانشجویی / کد موقت صنفی") },
+                            placeholder = { Text("مثال: ۹۹۰۱۵۴۳") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                    } else {
+                        // Clinician details
+                        OutlinedTextField(
+                            value = licenseNumber,
+                            onValueChange = { licenseNumber = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("شماره پروانه نظام دامپزشکی") },
+                            placeholder = { Text("مثال: ۹۱۰۴۲") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text("🩺 تخصص یا گرایش اصلی کلینیکال:", fontSize = 11.sp)
+                         UniversityRowDropdown(
+                            currentSelection = specialtySelected,
+                            allSelections = specialtyList,
+                            onChoose = { specialtySelected = it }
+                        )
+                    }
+                } else {
+                    // Pet Owner Specific fields
+                    Text(
+                        text = "🦮 ثبت اولین پَت در سامانه:",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    OutlinedTextField(
+                        value = petName,
+                        onValueChange = { petName = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("نام حیوان خانگی (پَت)") },
+                        placeholder = { Text("مثال: فیدو / لوسی") },
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Species chosen
+                    Text("نوع حیوان (گونه زیستی):", fontSize = 11.sp)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        listOf(
+                            Triple("dog", "🐕 سگ", Color(0xFFC084FC)),
+                            Triple("cat", "🐈 گربه", Color(0xFF60A5FA)),
+                            Triple("exotic", "🦜 پرنده/اگزوتیک", Color(0xFF34D399))
+                        ).forEach { (code, label, color) ->
+                            val isSel = petSpecies == code
+                            val bg = if (isSel) color else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(bg)
+                                    .clickable { petSpecies = code }
+                                    .padding(vertical = 12.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    label,
+                                    color = if (isSel) Color.White else Color.Black,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        OutlinedTextField(
+                            value = petWeight,
+                            onValueChange = { petWeight = it },
+                            modifier = Modifier.weight(1f),
+                            label = { Text("وزن (کیلوگرم)") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        OutlinedTextField(
+                            value = petAge,
+                            onValueChange = { petAge = it },
+                            modifier = Modifier.weight(1f),
+                            label = { Text("سن تخمینی (سال)") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    OutlinedTextField(
+                        value = petBreed,
+                        onValueChange = { petBreed = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("نژاد حیوان") },
+                        placeholder = { Text("مثال: پرشین / شیتزو / همستر سوری") },
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Button(
+                    onClick = {
+                        if (fullName.isEmpty() || phoneNumber.isEmpty()) return@Button
+
+                        if (isVetMode) {
+                            val identificationCode = if (isStudentMode) studentId else licenseNumber
+                            viewModel.simulateRegistration(
+                                fullName = fullName,
+                                phoneNumber = phoneNumber,
+                                userType = "vet",
+                                licenseNum = identificationCode,
+                                specOrUni = if (isStudentMode) schoolSelected else specialtySelected
+                            )
+                        } else {
+                            val doubleWeight = petWeight.toDoubleOrNull() ?: 1.0
+                            val intAge = petAge.toIntOrNull() ?: 1
+                            val newPet = Pet(
+                                name = petName.ifEmpty { "پت خانگی" },
+                                species = petSpecies,
+                                breed = petBreed.ifEmpty { "ناپیدا" },
+                                weight = doubleWeight,
+                                age = petAge,
+                                gender = "نر",
+                                isNeutered = false,
+                                ownerName = fullName,
+                                ownerPhone = phoneNumber,
+                                recordNumber = "10011"
+                            )
+                            viewModel.simulateRegistration(
+                                fullName = fullName,
+                                phoneNumber = phoneNumber,
+                                userType = "owner",
+                                licenseNum = "",
+                                specOrUni = ""
+                            )
+                            viewModel.addNewPatient(newPet)
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .testTag("submit_button"),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("ثبت‌نام نهایی و ورود به داشبورد اختصاصی", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun UniversityRowDropdown(
+    currentSelection: String,
+    allSelections: List<String>,
+    onChoose: (String) -> Unit
+) {
+    var isExpanded by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .clickable { isExpanded = !isExpanded }
+            .padding(14.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("▼", fontSize = 11.sp, color = Color.Gray)
+            Text(currentSelection, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        }
+
+        DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
+            allSelections.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(item, fontSize = 13.sp, textAlign = TextAlign.Right) },
+                    onClick = {
+                        onChoose(item)
+                        isExpanded = false
+                    }
+                )
+            }
+        }
+    }
+}
