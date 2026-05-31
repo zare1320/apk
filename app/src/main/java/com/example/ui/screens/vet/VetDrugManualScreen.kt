@@ -634,81 +634,117 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                 ) {
                                     Column(
                                         modifier = Modifier.padding(14.dp),
-                                        horizontalAlignment = Alignment.Start
+                                        verticalArrangement = Arrangement.spacedBy(10.dp)
                                     ) {
-                                        // Heading
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                        ) {
-                                            Text("⚠️", fontSize = 16.sp)
-                                            Text(
-                                                text = "راهنمای عوارض و منع مصرف تخصصی دامپزشکی",
-                                                fontWeight = FontWeight.ExtraBold,
-                                                fontSize = 12.sp,
-                                                color = MaterialTheme.colorScheme.error
-                                            )
+                                        // 1.1.1 Farsi Section: Title (Right-to-Left, Right-aligned)
+                                        CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.Start
+                                            ) {
+                                                Text("⚠️", fontSize = 16.sp)
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Text(
+                                                    text = "راهنمای عوارض و منع مصرف تخصصی دامپزشکی",
+                                                    fontWeight = FontWeight.ExtraBold,
+                                                    fontSize = 12.sp,
+                                                    color = MaterialTheme.colorScheme.error
+                                                )
+                                            }
                                         }
-                                        
-                                        Spacer(modifier = Modifier.height(10.dp))
 
-                                        // Scientific Title
-                                        Text(
-                                            text = "فرمولاسیون علمی: ${drug.nameScientific}",
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-                                        )
-                                        
+                                        // 1.1.2 English Section: Scientific Formulation & Name (Left-to-Right, Left-aligned)
+                                        CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr) {
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .clip(RoundedCornerShape(8.dp))
+                                                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.04f))
+                                                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.SpaceBetween
+                                            ) {
+                                                Text(
+                                                    text = "Scientific Formula:",
+                                                    fontSize = 11.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = MaterialTheme.colorScheme.secondary
+                                                )
+                                                Text(
+                                                    text = drug.nameScientific,
+                                                    fontSize = 12.sp,
+                                                    fontWeight = FontWeight.ExtraBold,
+                                                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                    textAlign = TextAlign.Start
+                                                )
+                                            }
+                                        }
+
                                         HorizontalDivider(
-                                            modifier = Modifier.padding(vertical = 8.dp),
                                             color = MaterialTheme.colorScheme.error.copy(alpha = 0.15f)
                                         )
 
-                                        // Contraindications (منع مصرف)
-                                        Text(
-                                            text = "🚫 موارد منع مصرف بالینی قطعی:",
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.ExtraBold,
-                                            color = Color(0xFFC2410C) // Tailwind Orange 700
-                                        )
-                                        Text(
-                                            text = details.contraindications,
-                                            fontSize = 11.sp,
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                            modifier = Modifier.padding(start = 12.dp, top = 2.dp, bottom = 8.dp),
-                                            textAlign = TextAlign.Start
-                                        )
+                                        // 1.1.3 Farsi Section: Contraindications, Side Effects, Pearls (Right-to-Left, Right-aligned)
+                                        CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                                            Column(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalAlignment = Alignment.Start,
+                                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                                            ) {
+                                                // Contraindications (منع مصرف)
+                                                Column(modifier = Modifier.fillMaxWidth()) {
+                                                    Text(
+                                                        text = "🚫 موارد منع مصرف بالینی قطعی:",
+                                                        fontSize = 11.sp,
+                                                        fontWeight = FontWeight.ExtraBold,
+                                                        color = Color(0xFFC2410C) // Tailwind Orange 700
+                                                    )
+                                                    Text(
+                                                        text = details.contraindications,
+                                                        fontSize = 11.sp,
+                                                        color = MaterialTheme.colorScheme.onSurface,
+                                                        modifier = Modifier.padding(start = 12.dp, top = 2.dp),
+                                                        textAlign = TextAlign.Right
+                                                    )
+                                                }
 
-                                        // Side Effects (عوارض جانبی عمده)
-                                        Text(
-                                            text = "🚨 عوارض جانبی گزارش شده:",
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.ExtraBold,
-                                            color = Color(0xFFB91C1C) // Tailwind Red 700
-                                        )
-                                        Text(
-                                            text = details.sideEffects,
-                                            fontSize = 11.sp,
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                            modifier = Modifier.padding(start = 12.dp, top = 2.dp, bottom = 8.dp),
-                                            textAlign = TextAlign.Start
-                                        )
+                                                // Side Effects (عوارض جانبی عمده)
+                                                Column(modifier = Modifier.fillMaxWidth()) {
+                                                    Text(
+                                                        text = "🚨 عوارض جانبی گزارش شده:",
+                                                        fontSize = 11.sp,
+                                                        fontWeight = FontWeight.ExtraBold,
+                                                        color = Color(0xFFB91C1C) // Tailwind Red 700
+                                                    )
+                                                    Text(
+                                                        text = details.sideEffects,
+                                                        fontSize = 11.sp,
+                                                        color = MaterialTheme.colorScheme.onSurface,
+                                                        modifier = Modifier.padding(start = 12.dp, top = 2.dp),
+                                                        textAlign = TextAlign.Right
+                                                    )
+                                                }
 
-                                        // Clinical Pearl (نکات کلینییکال)
-                                        Text(
-                                            text = "💡 نکته مهارتی و کلیدی دامپزشک:",
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.ExtraBold,
-                                            color = Color(0xFF0369A1) // Tailwind Sky 700
-                                        )
-                                        Text(
-                                            text = details.clinicalPearls,
-                                            fontSize = 11.sp,
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                            modifier = Modifier.padding(start = 12.dp, top = 2.dp),
-                                            textAlign = TextAlign.Start
-                                        )
+                                                // Clinical Pearl (نکات کلینییکال)
+                                                Column(modifier = Modifier.fillMaxWidth()) {
+                                                    Text(
+                                                        text = "💡 نکته مهارتی و کلیدی دامپزشک:",
+                                                        fontSize = 11.sp,
+                                                        fontWeight = FontWeight.ExtraBold,
+                                                        color = Color(0xFF0369A1) // Tailwind Sky 700
+                                                    )
+                                                    Text(
+                                                        text = details.clinicalPearls,
+                                                        fontSize = 11.sp,
+                                                        color = MaterialTheme.colorScheme.onSurface,
+                                                        modifier = Modifier.padding(start = 12.dp, top = 2.dp),
+                                                        textAlign = TextAlign.Right
+                                                    )
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
