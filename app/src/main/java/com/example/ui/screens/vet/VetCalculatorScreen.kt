@@ -114,7 +114,7 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
                     CalorieCalculatorView(activePet = activeExaminedPet, initWeight = weightInput, selectedSpecies = selectedSpecies)
                 }
                 "زمان زایمان" -> {
-                    GestationCalculatorView()
+                    GestationCalculatorView(viewModel)
                 }
                 "سن معادل انسان" -> {
                     HumanAgeCalculatorView(initWeight = weightInput)
@@ -2759,47 +2759,824 @@ fun getBcsListInfo(): List<BcsChartItem> {
 }
 
 // 4. Mating & Gestation Clock
+data class LocalPatient(
+    val id: String,
+    val petName: String,
+    val ownerName: String,
+    val age: String,
+    val species: String,
+    val sex: String,
+    val notes: String
+)
+
+fun getFormattedDateWithOffset(baseDate: java.util.Date?, daysSelected: Int): String {
+    if (baseDate == null) return "-"
+    val cal = java.util.Calendar.getInstance()
+    cal.time = baseDate
+    cal.add(java.util.Calendar.DAY_OF_YEAR, daysSelected)
+    
+    val day = cal.get(java.util.Calendar.DAY_OF_MONTH)
+    val suffix = getDayOfMonthSuffix(day)
+    
+    val dayFormat = java.text.SimpleDateFormat("EEEE, MMMM d", java.util.Locale.ENGLISH)
+    val yearFormat = java.text.SimpleDateFormat("yyyy", java.util.Locale.ENGLISH)
+    
+    return "${dayFormat.format(cal.time)}$suffix ${yearFormat.format(cal.time)}"
+}
+
+fun getDayOfMonthSuffix(n: Int): String {
+    if (n in 11..13) return "th"
+    return when (n % 10) {
+        1 -> "st"
+        2 -> "nd"
+        3 -> "rd"
+        else -> "th"
+    }
+}
+
 @Composable
-fun GestationCalculatorView() {
-    var daysSinceMating by remember { mutableStateOf("10") }
-    val days = daysSinceMating.toIntOrNull() ?: 10
-    val totalGestation = 63 // average gestation for dogs/cats
-    val remaining = totalGestation - days
+fun CustomField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.padding(horizontal = 2.dp)) {
+        Text(
+            text = label,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        androidx.compose.foundation.text.BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Normal
+            ),
+            singleLine = true,
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    if (value.isEmpty()) {
+                        Text(placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), fontSize = 12.sp)
+                    }
+                    innerTextField()
+                }
+            }
+        )
+    }
+}
 
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+@Composable
+fun CustomDropdownField(
+    label: String,
+    selectedValue: String,
+    options: List<String>,
+    onSelect: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Column(modifier = modifier.padding(horizontal = 2.dp)) {
+        Text(
+            text = label,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Box {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                    .clickable { expanded = true }
+                    .padding(horizontal = 10.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(selectedValue, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+            ) {
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option, color = MaterialTheme.colorScheme.onSurface) },
+                        onClick = {
+                            onSelect(option)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SpeciesToggle(
+    isCanine: Boolean,
+    onToggle: (Boolean) -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
         modifier = Modifier
-            .fillMaxWidth()
-            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
+            .padding(horizontal = 10.dp, vertical = 5.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text("📅 برآورد زمان زایمان و تقویم بارداری (Gestation)", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, fontSize = 14.sp)
-            Spacer(modifier = Modifier.height(12.dp))
-
-            OutlinedTextField(
-                value = daysSinceMating,
-                onValueChange = { daysSinceMating = it },
-                label = { Text("روزهای سپری شده از جفت‌گیری") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
+        Text("🐕", fontSize = 14.sp)
+        Box(
+            modifier = Modifier
+                .width(40.dp)
+                .height(22.dp)
+                .clip(RoundedCornerShape(11.dp))
+                .background(if (isCanine) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline)
+                .clickable { onToggle(!isCanine) }
+                .padding(2.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(18.dp)
+                    .clip(RoundedCornerShape(9.dp))
+                    .background(Color.White)
+                    .align(if (isCanine) Alignment.CenterStart else Alignment.CenterEnd)
             )
+        }
+        Text("🐈", fontSize = 14.sp)
+    }
+}
 
+@Composable
+fun GestationCalculatorView(viewModel: MainViewModel) {
+    var patientId by remember { mutableStateOf("") }
+    var petName by remember { mutableStateOf("") }
+    var ownerName by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("") }
+    var species by remember { mutableStateOf("Canine") }
+    var sex by remember { mutableStateOf("Male") }
+    var addPatientNotes by remember { mutableStateOf(false) }
+    var patientNotes by remember { mutableStateOf("") }
+    var viewPatients by remember { mutableStateOf(false) }
+    
+    val savedPatients = remember {
+        mutableStateListOf(
+            LocalPatient("101", "Max", "John Doe", "3", "Canine", "Male", "Healthy, regular gestation tracking"),
+            LocalPatient("102", "Bella", "Jane Smith", "2", "Feline", "Female", "First litter")
+        )
+    }
+
+    val dbPets by viewModel.allPets.collectAsState()
+    val activeExaminedPet by viewModel.activeExaminedPet.collectAsState()
+
+    var isCanine by remember { mutableStateOf(true) }
+
+    // Init form from activeExaminedPet if available
+    LaunchedEffect(activeExaminedPet) {
+        activeExaminedPet?.let { pet ->
+            patientId = if (pet.recordNumber.isNotEmpty()) pet.recordNumber else pet.id.toString()
+            petName = pet.name
+            ownerName = pet.ownerName
+            age = pet.age
+            val localSpec = if (pet.species.lowercase() == "cat" || pet.species.lowercase() == "feline") "Feline" else "Canine"
+            species = localSpec
+            isCanine = (localSpec == "Canine")
+            sex = if (pet.gender == "ماده" || pet.gender.lowercase() == "female") "Female" else "Male"
+            patientNotes = if (pet.healthStatus.isNotEmpty()) pet.healthStatus else ""
+            addPatientNotes = pet.healthStatus.isNotEmpty()
+        }
+    }
+
+    val combinedPatients = remember(dbPets, savedPatients) {
+        val list = mutableListOf<LocalPatient>()
+        dbPets.forEach { pet ->
+            val localSpec = if (pet.species.lowercase() == "cat" || pet.species.lowercase() == "feline") "Feline" else "Canine"
+            val localSex = if (pet.gender == "ماده" || pet.gender.lowercase() == "female") "Female" else "Male"
+            list.add(
+                LocalPatient(
+                    id = if (pet.recordNumber.isNotEmpty()) pet.recordNumber else pet.id.toString(),
+                    petName = pet.name,
+                    ownerName = pet.ownerName,
+                    age = pet.age,
+                    species = localSpec,
+                    sex = localSex,
+                    notes = if (pet.healthStatus.isNotEmpty()) pet.healthStatus else ""
+                )
+            )
+        }
+        savedPatients.forEach { local ->
+            if (list.none { it.petName.lowercase() == local.petName.lowercase() }) {
+                list.add(local)
+            }
+        }
+        list
+    }
+
+    var conceptionDate by remember { mutableStateOf<java.util.Date?>(null) }
+    
+    val today = java.util.Date()
+    val todayFormat = java.text.SimpleDateFormat("EEEE, MMMM d", java.util.Locale.ENGLISH)
+    val yearFormat = java.text.SimpleDateFormat("yyyy", java.util.Locale.ENGLISH)
+    val todayDay = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_MONTH)
+    val todaySuffix = getDayOfMonthSuffix(todayDay)
+    val formattedToday = "Today's Date: ${todayFormat.format(today)}$todaySuffix ${yearFormat.format(today)}"
+
+    CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp)
+        ) {
+            // Patients Card
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp)),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column {
+                    // Title Header
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f))
+                            .padding(vertical = 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Patients / مشخصات بیمار",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    
+                    Column(modifier = Modifier.padding(14.dp)) {
+                        // View Toggle & Save New Button Row
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                modifier = Modifier.clickable { viewPatients = !viewPatients }
+                            ) {
+                                Checkbox(
+                                    checked = viewPatients,
+                                    onCheckedChange = { viewPatients = it }
+                                )
+                                Text("View Patients", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
+                            }
+                            
+                            OutlinedButton(
+                                onClick = {
+                                    if (petName.isNotEmpty() || patientId.isNotEmpty()) {
+                                        val newId = patientId.ifEmpty { (100 + combinedPatients.size).toString() }
+                                        val newPatient = LocalPatient(
+                                            id = newId,
+                                            petName = petName.ifEmpty { "Unnamed" },
+                                            ownerName = ownerName.ifEmpty { "Unknown" },
+                                            age = age.ifEmpty { "1" },
+                                            species = species,
+                                            sex = sex,
+                                            notes = patientNotes.ifEmpty { "No notes" }
+                                        )
+                                        savedPatients.add(newPatient)
+                                        
+                                        // Save to persistent database
+                                        val genderFa = if (sex == "Female") "ماده" else "نر"
+                                        val speciesFa = if (species == "Feline") "cat" else "dog"
+                                        viewModel.addNewPatient(
+                                            com.example.data.database.Pet(
+                                                name = petName.ifEmpty { "Unnamed" },
+                                                species = speciesFa,
+                                                breed = "Cross",
+                                                weight = 1.0,
+                                                age = age.ifEmpty { "1" },
+                                                gender = genderFa,
+                                                ownerName = ownerName.ifEmpty { "Unknown" },
+                                                healthStatus = patientNotes.ifEmpty { "سالم" },
+                                                recordNumber = newId
+                                            )
+                                        )
+                                        
+                                        patientId = ""
+                                        petName = ""
+                                        ownerName = ""
+                                        age = ""
+                                        patientNotes = ""
+                                        addPatientNotes = false
+                                    }
+                                },
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.primary,
+                                    containerColor = Color.Transparent
+                                ),
+                                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+                            ) {
+                                Text("Save New", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                        
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
+                        // Form Row 1: ID, Pet Name, Owner
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            CustomField(
+                                label = "ID #",
+                                value = patientId,
+                                onValueChange = { patientId = it },
+                                placeholder = "ID",
+                                modifier = Modifier.weight(1f)
+                            )
+                            CustomField(
+                                label = "Pet Name",
+                                value = petName,
+                                onValueChange = { petName = it },
+                                placeholder = "Pet Name",
+                                modifier = Modifier.weight(1f)
+                            )
+                            CustomField(
+                                label = "Owner",
+                                value = ownerName,
+                                onValueChange = { ownerName = it },
+                                placeholder = "Owner Name",
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.height(10.dp))
+                        
+                        // Form Row 2: Age, Species, Sex
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            CustomField(
+                                label = "Age",
+                                value = age,
+                                onValueChange = { age = it },
+                                placeholder = "Age",
+                                modifier = Modifier.weight(1f)
+                            )
+                            CustomDropdownField(
+                                label = "Species",
+                                selectedValue = species,
+                                options = listOf("Canine", "Feline"),
+                                onSelect = {
+                                    species = it
+                                    isCanine = (it == "Canine")
+                                },
+                                modifier = Modifier.weight(1.2f)
+                            )
+                            CustomDropdownField(
+                                label = "Sex",
+                                selectedValue = sex,
+                                options = listOf("Male", "Female"),
+                                onSelect = { sex = it },
+                                modifier = Modifier.weight(1.2f)
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.height(10.dp))
+                        
+                        // Add Patient Notes Checkbox
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Checkbox(
+                                checked = addPatientNotes,
+                                onCheckedChange = { addPatientNotes = it }
+                            )
+                            Text("Add Patient Notes", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        
+                        if (addPatientNotes) {
+                            Spacer(modifier = Modifier.height(6.dp))
+                            androidx.compose.foundation.text.BasicTextField(
+                                value = patientNotes,
+                                onValueChange = { patientNotes = it },
+                                textStyle = androidx.compose.ui.text.TextStyle(
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                ),
+                                decorationBox = { innerTextField ->
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(8.dp))
+                                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                                            .padding(10.dp),
+                                        contentAlignment = Alignment.CenterStart
+                                    ) {
+                                        if (patientNotes.isEmpty()) {
+                                            Text("Enter patient notes here...", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), fontSize = 12.sp)
+                                        }
+                                        innerTextField()
+                                    }
+                                }
+                            )
+                        }
+                        
+                        // View Patients Table
+                        if (viewPatients) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outlineVariant))
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("Patient Records:", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Spacer(modifier = Modifier.height(6.dp))
+                            combinedPatients.forEach { record ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp)
+                                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
+                                        .padding(8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text("${record.petName} (${record.species}) - ID: ${record.id}", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                                        Text("Owner: ${record.ownerName} | Age: ${record.age} | Sex: ${record.sex}", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        if (record.notes.isNotEmpty()) {
+                                            Text("Notes: ${record.notes}", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        }
+                                    }
+                                    Text(
+                                        text = "✏️",
+                                        fontSize = 14.sp,
+                                        modifier = Modifier
+                                            .clickable {
+                                                patientId = record.id
+                                                petName = record.petName
+                                                ownerName = record.ownerName
+                                                age = record.age
+                                                species = record.species
+                                                isCanine = (record.species == "Canine")
+                                                sex = record.sex
+                                                patientNotes = record.notes
+                                                addPatientNotes = record.notes.isNotEmpty()
+                                            }
+                                            .padding(6.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outlineVariant))
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text("وضعیت تقویمی جنین و آمادگی زایمان:", fontSize = 12.sp, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text("طول بارداری متعارف سگ/گربه: ۶۳ روز", fontSize = 12.sp)
-            Text("زمان مانده تا زایمان: $remaining روز کل", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
-
-            // Diagnostic indicators
-            val stageDesc = when {
-                days < 21 -> "مرحله لقاح و جایگزینی رویان در دیواره رحم (رژیم غذایی معمولی)"
-                days < 45 -> "مرحله استخوان‌سازی جنین و ضربان قلب (ضرورت افزایش دریافت پروتئین)"
-                else -> "تکمیل نهایی جنین و آمادگی زایمان (تامین جعبه زایمان گرم و مراقبت دمای مداوم)"
+            // Due Date Card
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp)),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    // Due Date Header Bar
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("📅", fontSize = 18.sp)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = if (petName.isNotEmpty()) "Due Date for $petName" else "Due Date",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        
+                        SpeciesToggle(isCanine = isCanine, onToggle = {
+                            isCanine = it
+                            species = if (it) "Canine" else "Feline"
+                        })
+                    }
+                    
+                    Spacer(modifier = Modifier.height(14.dp))
+                    
+                    Text(
+                        text = formattedToday,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    
+                    Spacer(modifier = Modifier.height(14.dp))
+                    
+                    Text(
+                        text = if (petName.isNotEmpty()) "Choose Conception Date for $petName - ${if (isCanine) "Canine" else "Feline"}" else "Choose Conception Date - ${if (isCanine) "Canine" else "Feline"}",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        val context = androidx.compose.ui.platform.LocalContext.current
+                        val sdfDisplay = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.ENGLISH)
+                        val dateBtnText = if (conceptionDate == null) "Select date" else sdfDisplay.format(conceptionDate!!)
+                        
+                        Box(
+                            modifier = Modifier
+                                .weight(1.3f)
+                                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                                .clickable {
+                                    val calendar = java.util.Calendar.getInstance()
+                                    if (conceptionDate != null) {
+                                        calendar.time = conceptionDate!!
+                                    }
+                                    android.app.DatePickerDialog(
+                                        context,
+                                        { _, year, month, dayOfMonth ->
+                                            val selectedCal = java.util.Calendar.getInstance()
+                                            selectedCal.set(java.util.Calendar.YEAR, year)
+                                            selectedCal.set(java.util.Calendar.MONTH, month)
+                                            selectedCal.set(java.util.Calendar.DAY_OF_MONTH, dayOfMonth)
+                                            conceptionDate = selectedCal.time
+                                        },
+                                        calendar.get(java.util.Calendar.YEAR),
+                                        calendar.get(java.util.Calendar.MONTH),
+                                        calendar.get(java.util.Calendar.DAY_OF_MONTH)
+                                    ).show()
+                                }
+                                .padding(horizontal = 10.dp, vertical = 8.dp),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Text(
+                                text = dateBtnText,
+                                fontSize = 12.sp,
+                                color = if (conceptionDate == null) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f) else MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.width(12.dp))
+                        
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1.7f),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            Text("Days since Conception: ", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            
+                            val daysValueString = if (conceptionDate == null) "" else {
+                                val diffMs = today.time - conceptionDate!!.time
+                                val diffDays = (diffMs / (1000 * 60 * 60 * 24)).toInt()
+                                diffDays.coerceAtLeast(0).toString()
+                            }
+                            
+                            Box(
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(MaterialTheme.colorScheme.primaryContainer),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = daysValueString,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(14.dp))
+                    
+                    Text(
+                        text = "Canine: Gestation range: 57-65 days, Average: 63 days.",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Feline: Gestation range: 60-67 days, Average: 63-65 days.",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Medium
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outlineVariant))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Likely Due Date Row
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = if (petName.isNotEmpty()) "Likely Due Date for $petName" else "Likely Due Date",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        
+                        val avgGestation = if (isCanine) 63 else 64
+                        val likelyDueDateText = getFormattedDateWithOffset(conceptionDate, avgGestation)
+                        
+                        Box(
+                            modifier = Modifier
+                                .widthIn(min = 220.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(MaterialTheme.colorScheme.primary)
+                                .padding(horizontal = 16.dp, vertical = 10.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = likelyDueDateText,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Early Due Date & Late Due Date Row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = if (petName.isNotEmpty()) "Early Due Date ($petName)" else "Early Due Date",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            
+                            val earlyOffset = if (isCanine) 57 else 60
+                            val earlyDateText = getFormattedDateWithOffset(conceptionDate, earlyOffset)
+                            
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(10.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), RoundedCornerShape(10.dp))
+                                    .padding(vertical = 10.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = earlyDateText,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                        
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = if (petName.isNotEmpty()) "Late Due Date ($petName)" else "Late Due Date",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            
+                            val lateOffset = if (isCanine) 65 else 67
+                            val lateDateText = getFormattedDateWithOffset(conceptionDate, lateOffset)
+                            
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(10.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), RoundedCornerShape(10.dp))
+                                    .padding(vertical = 10.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = lateDateText,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("راهنمای گام کنونی: $stageDesc", fontSize = 11.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outlineVariant))
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Pregnancy Info Card
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp)),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("🐾", fontSize = 18.sp)
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Pregnancy Info*",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    val bulletPoints = listOf(
+                        "Fertilization occurs in the oviducts in both the bitch and queen. Implantation of zygotes in the uterus occurs at ~18 days in the bitch and 14 days in the queen.",
+                        "Palpable at 21 days and these swellings double in diameter every 7 days. After day 35-38, they become indistinct, and palpation becomes difficult until late pregnancy.",
+                        "the fetal skeleton begins to calcify as early as day 28, it is not detectable by routine radiography until approximately day 42-45 and is quite prominent by day 47-48. Radiography at this time is not teratogenic. Late gestational radiography, >55 days is the best method to determine litter size.",
+                        "Ultrasonography is best performed at 25-35 days gestation. Before 21 days, \"false-negative\" results are seen.",
+                        "Doppler-type instruments allow one to \"hear\" the fetal heart, which beats 2–3 times faster than that of the dam. Placental sounds may also be heard.",
+                        "Ultrasonography is especially helpful in differentiating pregnancy from other causes of uterine distention (eg. hydrometra, pyometra, mucometra)."
+                    )
+                    
+                    bulletPoints.forEach { point ->
+                        Row(modifier = Modifier.padding(vertical = 4.dp)) {
+                            Text("•", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = point,
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                lineHeight = 16.sp
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+                    Text(
+                        text = "*Source Link",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .clickable { uriHandler.openUri("https://www.merckvetmanual.com/") }
+                            .padding(vertical = 4.dp)
+                    )
+                }
+            }
         }
     }
 }
@@ -2839,7 +3616,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                         .padding(8.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("سگ‌سانان", color = if (selectedAnimal == "dog") Color.White else Color.Black, fontSize = 12.sp)
+                    Text("سگ‌سانان", color = if (selectedAnimal == "dog") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                 }
                 Box(
                     modifier = Modifier
@@ -2850,7 +3627,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                         .padding(8.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("گربه‌سانان", color = if (selectedAnimal == "cat") Color.White else Color.Black, fontSize = 12.sp)
+                    Text("گربه‌سانان", color = if (selectedAnimal == "cat") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                 }
             }
 
@@ -2866,10 +3643,10 @@ fun HumanAgeCalculatorView(initWeight: String) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text("نتایج معادل‌سازی سنی:", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Text("نتایج معادل‌سازی سنی:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text("سن فیزیکی پت: $age سال کامل", fontSize = 12.sp)
+            Text("سن فیزیکی پت: $age سال کامل", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text("سن معادل در انسان: حدود $humanAge ساله!", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
         }
     }
