@@ -109,7 +109,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
             }
         }
 
-        CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+        CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
             Crossfade(targetState = activeProfileSection) { section ->
                 when (section) {
                     "اصلی" -> {

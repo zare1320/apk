@@ -307,7 +307,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                     // Record Number
                     OutlinedTextField(
                         value = recordNumber,

@@ -264,7 +264,7 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
 
                                 Spacer(modifier = Modifier.height(12.dp))
 
-                                CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                                CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                                     OutlinedTextField(
                                         value = chiefComplaintText,
                                         onValueChange = { chiefComplaintText = it },
@@ -348,7 +348,7 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
 
                                 Spacer(modifier = Modifier.height(12.dp))
 
-                                CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                                CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                         OutlinedTextField(
                                             value = labWbcInput,

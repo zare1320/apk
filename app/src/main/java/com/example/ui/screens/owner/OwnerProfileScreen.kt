@@ -85,7 +85,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
             }
         }
 
-        CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+        CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
             Crossfade(targetState = activeOwnerSection) { section ->
                 when (section) {
                     "اصلی" -> {

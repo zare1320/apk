@@ -113,7 +113,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                     Text("🐾 مشخصات حیوان دلبند شما:", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                    CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                         OutlinedTextField(
                             value = newPetName,
                             onValueChange = { newPetName = it },
@@ -303,7 +303,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
 
                         Divider(modifier = Modifier.padding(vertical = 10.dp))
 
-                        CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                        CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween

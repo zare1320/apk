@@ -259,7 +259,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
             }
 
             // Quick search bar
-            CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+            CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
@@ -361,7 +361,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                         Text("➕ ثبت داروی جدید در نسخه دمو", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                        CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                             OutlinedTextField(
                                 value = newGeneric,
                                 onValueChange = { newGeneric = it },
@@ -637,7 +637,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                         verticalArrangement = Arrangement.spacedBy(10.dp)
                                     ) {
                                         // 1.1.1 Farsi Section: Title (Right-to-Left, Right-aligned)
-                                        CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                                        CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                                             Row(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 verticalAlignment = Alignment.CenterVertically,
@@ -687,7 +687,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                         )
 
                                         // 1.1.3 Farsi Section: Contraindications, Side Effects, Pearls (Right-to-Left, Right-aligned)
-                                        CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                                        CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                                             Column(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 horizontalAlignment = Alignment.Start,

@@ -101,7 +101,7 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+        CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
             // Interactive Display
             when (activeCalculator) {
                 "مایع‌درمانی" -> {

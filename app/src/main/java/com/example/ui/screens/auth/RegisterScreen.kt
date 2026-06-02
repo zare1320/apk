@@ -149,7 +149,7 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+            CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                 // Form General Inputs
                 OutlinedTextField(
                     value = fullName,

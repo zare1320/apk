@@ -116,7 +116,7 @@ fun OwnerPrescriptionsScreen(viewModel: MainViewModel) {
                         modifier = Modifier.padding(16.dp),
                         horizontalAlignment = Alignment.End
                     ) {
-                        CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                        CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,

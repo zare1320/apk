@@ -116,7 +116,7 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
                     Text("⏰ زمان‌بندی رویداد سلامتی جدید", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                    CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                         // Pet selection drop simulation
                         if (ownerPets.isEmpty()) {
                             Text("ابتدا باید یک پت در تب داشبورد اضافه کنید.", color = Color.Gray, fontSize = 11.sp)
@@ -264,7 +264,7 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
                         modifier = Modifier.padding(14.dp),
                         horizontalAlignment = Alignment.End
                     ) {
-                        CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                        CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,

@@ -35,6 +35,7 @@ import com.example.ui.screens.vet.VetDashboardScreen
 import com.example.ui.screens.vet.VetDiagnosisTreatmentScreen
 import com.example.ui.screens.vet.VetDrugManualScreen
 import com.example.ui.screens.vet.VetProfileScreen
+import androidx.compose.ui.unit.LayoutDirection
 import com.example.ui.theme.MyApplicationTheme
 import com.example.viewmodel.MainViewModel
 
@@ -62,10 +63,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             val themeMode by viewModel.themeMode.collectAsState()
             val activeSession by viewModel.activeSession.collectAsState()
+            val currentLanguage by viewModel.currentLanguage.collectAsState()
+
+            val layoutDirection = if (currentLanguage == "en") LayoutDirection.Ltr else LayoutDirection.Rtl
 
             var authScreenState by remember { mutableStateOf("login") } // "login" or "register"
 
-            MyApplicationTheme(darkTheme = themeMode == "dark") {
+            MyApplicationTheme(
+                darkTheme = themeMode == "dark",
+                layoutDirection = layoutDirection
+            ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

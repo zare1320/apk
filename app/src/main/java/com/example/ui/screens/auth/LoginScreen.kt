@@ -108,7 +108,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(40.dp))
 
             // Input Column (RTL visual ordering)
-            CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+            CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                 OutlinedTextField(
                     value = phoneNumber,
                     onValueChange = {

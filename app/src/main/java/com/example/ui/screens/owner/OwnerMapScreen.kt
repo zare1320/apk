@@ -137,7 +137,7 @@ fun OwnerMapScreen(viewModel: MainViewModel) {
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                    CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                         OutlinedTextField(
                             value = forumMessage,
                             onValueChange = { forumMessage = it },
@@ -295,7 +295,7 @@ fun OwnerMapScreen(viewModel: MainViewModel) {
                     Text("🏢 مشخصات مرکز انتخاب شده:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                    CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                         Text("عنوان مرکز: ${poi.name}", fontSize = 13.sp, fontWeight = FontWeight.Bold)
                         Text("دسته: ${poi.category}", fontSize = 11.sp, color = Color.Gray)
                         Text("نشانی: ${poi.address}", fontSize = 11.sp)
