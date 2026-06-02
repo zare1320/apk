@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -76,30 +77,56 @@ fun OwnerPrescriptionsScreen(viewModel: MainViewModel) {
         )
 
         if (ownerPrescriptions.isEmpty()) {
+            val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
             Card(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+                shape = RoundedCornerShape(24.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 32.dp)
+                    .padding(vertical = 16.dp)
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f), RoundedCornerShape(24.dp))
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("💊", fontSize = 48.sp)
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("💊", fontSize = 32.sp)
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        "هیچ نسخه دارویی صادر نشده است",
+                        text = "هیچ نسخه صادر شده‌ای یافت نشد",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        "اگر دامپزشک نسخه‌ای صادر کرده، مطمئن شوید شماره موبایل ثبت شده در پرونده در داشبورد پزشک دقیقاً همان شماره اکانت شما باشد.",
+                        text = "پرونده‌های درمانی و نسخه‌ها به صورت خودکار بر اساس شماره موبایل شما همگام‌سازی می‌شوند. اطمینان حاصل کنید دامپزشک شماره شما را دقیق وارد کرده باشد.",
                         fontSize = 11.sp,
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(top = 4.dp)
+                        modifier = Modifier.padding(horizontal = 8.dp)
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = {
+                            clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(ownerPhoneNum))
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Filled.Share, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("کپی شماره موبایل برای ارائه به پزشک", fontSize = 11.sp)
+                    }
                 }
             }
         } else {
