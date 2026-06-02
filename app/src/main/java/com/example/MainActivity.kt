@@ -11,6 +11,22 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.filled.MedicalServices
+import androidx.compose.material.icons.filled.Healing
+import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.outlined.Dashboard
+import androidx.compose.material.icons.outlined.MedicalServices
+import androidx.compose.material.icons.outlined.Healing
+import androidx.compose.material.icons.outlined.Calculate
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Assignment
+import androidx.compose.material.icons.outlined.CalendarToday
+import androidx.compose.material.icons.outlined.Map
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -201,18 +217,24 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                 windowInsets = WindowInsets.navigationBars
             ) {
                 listOf(
-                    Triple("داشبورد", "🐾", "داشبورد"),
-                    Triple("دارونامه", "💊", "دارونامه"),
-                    Triple("تشخیص و درمان", "🩺", "تشخیص"),
-                    Triple("ابزار محاسبه‌گر", "🧮", "محاسبه‌گر"),
-                    Triple("پروفایل", "👤", "پروفایل")
-                ).forEach { (tab, emoji, label) ->
-                    val isSelected = activeVetTab == tab
+                    NavItem("داشبورد", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, "داشبورد"),
+                    NavItem("دارونامه", Icons.Filled.MedicalServices, Icons.Outlined.MedicalServices, "دارونامه"),
+                    NavItem("تشخیص و درمان", Icons.Filled.Healing, Icons.Outlined.Healing, "تشخیص"),
+                    NavItem("ابزار محاسبه‌گر", Icons.Filled.Calculate, Icons.Outlined.Calculate, "محاسبه‌گر"),
+                    NavItem("پروفایل", Icons.Filled.Person, Icons.Outlined.Person, "پروفایل")
+                ).forEach { item ->
+                    val isSelected = activeVetTab == item.tab
                     NavigationBarItem(
                         selected = isSelected,
-                        onClick = { activeVetTab = tab },
-                        icon = { Text(emoji, fontSize = 20.sp) },
-                        label = { Text(label, fontSize = 9.sp, fontWeight = FontWeight.Bold) }
+                        onClick = { activeVetTab = item.tab },
+                        icon = {
+                            Icon(
+                                imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                                contentDescription = item.label,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        },
+                        label = { Text(item.label, fontSize = 9.sp, fontWeight = FontWeight.Bold) }
                     )
                 }
             }
@@ -331,18 +353,24 @@ fun OwnerLayoutContainer(viewModel: MainViewModel) {
                 windowInsets = WindowInsets.navigationBars
             ) {
                 listOf(
-                    Triple("داشبورد", "🐾", "داشبورد"),
-                    Triple("نسخه", "📋", "نسخه"),
-                    Triple("تقویم", "📅", "تقویم"),
-                    Triple("نقشه", "📍", "نقشه"),
-                    Triple("پروفایل", "👤", "پروفایل")
-                ).forEach { (tab, emoji, label) ->
-                    val isSelected = activeOwnerTab == tab
+                    NavItem("داشبورد", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, "داشبورد"),
+                    NavItem("نسخه", Icons.Filled.Assignment, Icons.Outlined.Assignment, "نسخه"),
+                    NavItem("تقویم", Icons.Filled.CalendarToday, Icons.Outlined.CalendarToday, "تقویم"),
+                    NavItem("نقشه", Icons.Filled.Map, Icons.Outlined.Map, "نقشه"),
+                    NavItem("پروفایل", Icons.Filled.Person, Icons.Outlined.Person, "پروفایل")
+                ).forEach { item ->
+                    val isSelected = activeOwnerTab == item.tab
                     NavigationBarItem(
                         selected = isSelected,
-                        onClick = { activeOwnerTab = tab },
-                        icon = { Text(emoji, fontSize = 20.sp) },
-                        label = { Text(tab, fontSize = 9.sp, fontWeight = FontWeight.Bold) }
+                        onClick = { activeOwnerTab = item.tab },
+                        icon = {
+                            Icon(
+                                imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                                contentDescription = item.label,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        },
+                        label = { Text(item.label, fontSize = 9.sp, fontWeight = FontWeight.Bold) }
                     )
                 }
             }
@@ -365,3 +393,10 @@ fun OwnerLayoutContainer(viewModel: MainViewModel) {
         }
     }
 }
+
+data class NavItem(
+    val tab: String,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector,
+    val label: String
+)

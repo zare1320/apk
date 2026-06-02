@@ -91,12 +91,12 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                     "اصلی" -> {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             OwnerProfileMenuItem(
-                                emoji = "⚙️",
+                                icon = Icons.Filled.Settings,
                                 title = "تنظیمات برنامه (تغییر تم، زبان و ریست)",
                                 onClick = { activeOwnerSection = "تنظیمات" }
                             )
                             OwnerProfileMenuItem(
-                                emoji = "🔗",
+                                icon = Icons.Filled.Info,
                                 title = "لینک‌های کاربردی و حامیان حیوانات",
                                 onClick = { activeOwnerSection = "لینک‌ها" }
                             )
@@ -269,7 +269,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
 
 @Composable
 fun OwnerProfileMenuItem(
-    emoji: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
     onClick: () -> Unit
 ) {
@@ -289,7 +289,12 @@ fun OwnerProfileMenuItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(emoji, fontSize = 18.sp)
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(22.dp)
+            )
             Text(
                 text = title,
                 fontSize = 13.sp,

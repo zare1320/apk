@@ -115,22 +115,22 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                     "اصلی" -> {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             ProfileMenuItem(
-                                emoji = "📋",
+                                icon = Icons.Filled.List,
                                 title = "نسخه‌های دارویی ذخیره‌شده (${allPrescriptions.size} نسخه)",
                                 onClick = { activeProfileSection = "نسخه‌ها" }
                             )
                             ProfileMenuItem(
-                                emoji = "⚙️",
+                                icon = Icons.Filled.Settings,
                                 title = "تنظیمات برنامه (تغییر تم، زبان و ریست)",
                                 onClick = { activeProfileSection = "تنظیمات" }
                             )
                             ProfileMenuItem(
-                                emoji = "📚",
+                                icon = Icons.Filled.Info,
                                 title = "فهرست رفرنس‌های علمی معتبر",
                                 onClick = { activeProfileSection = "منابع" }
                             )
                             ProfileMenuItem(
-                                emoji = "🔗",
+                                icon = Icons.Filled.Share,
                                 title = "لینک‌های کاربردی و سازمان‌های همکار",
                                 onClick = { activeProfileSection = "لینک‌ها" }
                             )
@@ -362,7 +362,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
 
 @Composable
 fun ProfileMenuItem(
-    emoji: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
     onClick: () -> Unit
 ) {
@@ -382,7 +382,12 @@ fun ProfileMenuItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(emoji, fontSize = 18.sp)
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(22.dp)
+            )
             Text(
                 text = title,
                 fontSize = 13.sp,
