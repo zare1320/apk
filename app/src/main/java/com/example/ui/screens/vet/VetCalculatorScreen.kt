@@ -46,7 +46,7 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
     }
 
     val calculatorsList = listOf(
-        "مایع‌درمانی", "انتقال خون", "محاسبه کالری غذا", "زمان زایمان", "سن معادل انسان", "تریاژ تروما", "کاهش میزان درد"
+        "مایع‌درمانی", "انتقال خون", "محاسبه کالری غذا", "زمان زایمان", "سن معادل انسان", "تریاژ تروما"
     )
 
     Column(
@@ -121,9 +121,6 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
                 }
                 "تریاژ تروما" -> {
                     TraumaTriageView()
-                }
-                "کاهش میزان درد" -> {
-                    PainScoreView()
                 }
             }
         }
@@ -5766,49 +5763,4 @@ fun TraumaTriageView() {
     }
 }
 
-// 7. CSU Pain estimation
-@Composable
-fun PainScoreView() {
-    var vocalBy by remember { mutableStateOf(false) }
-    var postureBy by remember { mutableStateOf(false) }
-    var touchBy by remember { mutableStateOf(false) }
 
-    val painScore = (if (vocalBy) 1 else 0) + (if (postureBy) 1 else 0) + (if (touchBy) 2 else 0)
-
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text("😿 سنجش درد بر اساس معیار جامعه درد کانادا (CSU)", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, fontSize = 14.sp)
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = vocalBy, onCheckedChange = { vocalBy = it })
-                Text("نالیدن حین جابجایی یا میاو/پارس‌های دردناک", fontSize = 11.sp)
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = postureBy, onCheckedChange = { postureBy = it })
-                Text("کمر قوز کرده متمایل به خواب شکم روی زمین (Prayer position)", fontSize = 11.sp)
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = touchBy, onCheckedChange = { touchBy = it })
-                Text("فرار یا تلاش به گاز گرفتگی حین لمس موضعی زخم (امتیاز ۲)", fontSize = 11.sp)
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            val painRating = when (painScore) {
-                0 -> "فاقد درد (بدون بیقراری)"
-                1 -> "درد خفیف (سفارش ملوکسیکام موضعی)"
-                2 -> "درد متوسط (سفارش مخدرهای خوراکی ترامادول تضعیف شده)"
-                else -> "درد شدید ⚠️ (احتمال شوک قلبی، سفارش دگزامتازون به پیوست پتدین مسکن فوری)"
-            }
-
-            Text("شاخص تخمینی شدت درد: $painScore از ۴", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-            Text("توصیه دندان‌پزشکی تگ: $painRating", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
-        }
-    }
-}
