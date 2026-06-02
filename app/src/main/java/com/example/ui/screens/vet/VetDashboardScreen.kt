@@ -615,7 +615,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                     Box(
                         modifier = Modifier
                             .size(72.dp)
-                            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f), androidx.compose.foundation.shape.CircleShape),
+                            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f), androidx.compose.foundation.shape.CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Text("🩺", fontSize = 32.sp)
@@ -629,12 +629,24 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "برای شروع پذیرش و ثبت اولین بیمار کلینیک، ابتدا در بالای صفحه گونه حیوان (سگ/گربه/اگزوتیک) را انتخاب نموده و فرم مشخصات مراجع را تکمیل نمایید.",
+                        text = "هم‌اکنون می‌توانید ویژگی‌های بالینی، دارویی و سوابق رکوردهای مراجع جدید را ثبت کنید تا تاریخچه کلینیکی او به صورت یکپارچه ذخیره شود.",
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(horizontal = 8.dp)
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = {
+                            viewModel.selectSpecies("dog")
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("ثبت و معاینه یک بیمار جدید", fontSize = 11.sp)
+                    }
                 }
             }
         }
