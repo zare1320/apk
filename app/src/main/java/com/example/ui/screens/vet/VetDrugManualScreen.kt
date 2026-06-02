@@ -304,7 +304,9 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                             .background(bgCol)
                             .border(1.dp, borderCol, RoundedCornerShape(12.dp))
                             .clickable { selectedCategory = catName }
-                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                            .defaultMinSize(minHeight = 48.dp)
+                            .padding(horizontal = 14.dp, vertical = 8.dp),
+                        contentAlignment = Alignment.Center
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -389,10 +391,12 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                     val col = if (isSel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
                                     Box(
                                         modifier = Modifier
-                                            .clip(RoundedCornerShape(6.dp))
+                                            .clip(RoundedCornerShape(8.dp))
                                             .background(col)
                                             .clickable { newCategory = name }
-                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                            .defaultMinSize(minHeight = 48.dp)
+                                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                                        contentAlignment = Alignment.Center
                                     ) {
                                         Text(name, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                                     }

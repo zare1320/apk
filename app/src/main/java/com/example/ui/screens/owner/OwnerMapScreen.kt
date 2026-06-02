@@ -192,7 +192,9 @@ fun OwnerMapScreen(viewModel: MainViewModel) {
                         .clip(RoundedCornerShape(8.dp))
                         .background(bg)
                         .clickable { selectedFilter = flt }
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                        .defaultMinSize(minHeight = 48.dp)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(flt, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = tc)
                 }

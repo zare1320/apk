@@ -135,7 +135,9 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
                                                 selectedPetId = pet.id
                                                 selectedPetName = pet.name
                                             }
-                                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                                            .defaultMinSize(minHeight = 48.dp)
+                                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                                        contentAlignment = Alignment.Center
                                     ) {
                                         Text(pet.name, fontSize = 10.sp, color = if (isChosen) Color.White else Color.Black)
                                     }
@@ -157,7 +159,8 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
                                         .clip(RoundedCornerShape(8.dp))
                                         .background(bg)
                                         .clickable { eventType = type }
-                                        .padding(vertical = 8.dp),
+                                        .defaultMinSize(minHeight = 48.dp)
+                                        .padding(horizontal = 4.dp, vertical = 8.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(type, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = if (isChosen) Color.White else Color.Black)

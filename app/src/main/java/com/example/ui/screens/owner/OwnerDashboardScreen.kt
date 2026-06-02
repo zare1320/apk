@@ -145,7 +145,8 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                                         .clip(RoundedCornerShape(8.dp))
                                         .background(bg)
                                         .clickable { newPetSpecies = code }
-                                        .padding(vertical = 10.dp),
+                                        .defaultMinSize(minHeight = 48.dp)
+                                        .padding(horizontal = 4.dp, vertical = 10.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
@@ -207,7 +208,8 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                                         .clip(RoundedCornerShape(8.dp))
                                         .background(bg)
                                         .clickable { newPetGender = gen }
-                                        .padding(vertical = 8.dp),
+                                        .defaultMinSize(minHeight = 48.dp)
+                                        .padding(horizontal = 4.dp, vertical = 8.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(gen, fontSize = 11.sp, color = if (isSel) Color.White else Color.Black, fontWeight = FontWeight.Bold)

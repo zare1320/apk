@@ -421,21 +421,37 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                                 horizontalArrangement = Arrangement.SpaceAround,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .clickable(enabled = isSpeciesChosen) { petGender = "نر" }
+                                        .defaultMinSize(minHeight = 48.dp)
+                                        .padding(horizontal = 12.dp)
+                                ) {
                                     RadioButton(
                                         selected = petGender == "نر",
-                                        onClick = { petGender = "نر" },
+                                        onClick = null,
                                         enabled = isSpeciesChosen
                                     )
-                                    Text("نر", fontSize = 11.sp, modifier = Modifier.clickable { petGender = "نر" })
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("نر", fontSize = 11.sp)
                                 }
-                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .clickable(enabled = isSpeciesChosen) { petGender = "ماده" }
+                                        .defaultMinSize(minHeight = 48.dp)
+                                        .padding(horizontal = 12.dp)
+                                ) {
                                     RadioButton(
                                         selected = petGender == "ماده",
-                                        onClick = { petGender = "ماده" },
+                                        onClick = null,
                                         enabled = isSpeciesChosen
                                     )
-                                    Text("ماده", fontSize = 11.sp, modifier = Modifier.clickable { petGender = "ماده" })
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("ماده", fontSize = 11.sp)
                                 }
                             }
                         }

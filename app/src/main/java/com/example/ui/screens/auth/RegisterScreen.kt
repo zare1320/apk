@@ -370,7 +370,8 @@ fun RegisterScreen(
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(bg)
                                     .clickable { petSpecies = code }
-                                    .padding(vertical = 12.dp),
+                                    .defaultMinSize(minHeight = 48.dp)
+                                    .padding(horizontal = 4.dp, vertical = 12.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
