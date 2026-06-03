@@ -68,6 +68,8 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
     var currentSubScreen by remember { mutableStateOf("home") } // "home", "historical", "physical", "lab", "combine"
     var selectedCategoryDetail by remember { mutableStateOf<String?>(null) } // e.g. "general"
     var selectedHistoricalSign by remember { mutableStateOf<String?>(null) }
+    var selectedPhysicalCategoryDetail by remember { mutableStateOf<String?>(null) }
+    var selectedPhysicalSign by remember { mutableStateOf<String?>(null) }
     
     var searchQuery by remember { mutableStateOf("") }
     var showProDialog by remember { mutableStateOf(false) }
@@ -741,37 +743,386 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                         }
 
                         "physical" -> {
-                            // Physical signs category page
-                            Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    IconButton(onClick = { currentSubScreen = "home" }) {
-                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = accentTeal)
-                                    }
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("PHYSICAL SIGNS", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = accentTeal)
-                                }
+                            // Elegant design-focused Physical Signs Screen matching screenshots perfectly
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                            ) {
+                                val categories = listOf(
+                                    Triple("General signs", "general", "علائم عمومی بالینی"),
+                                    Triple("Cardiorespiratory signs", "cardio", "علائم قلبی تنفسی و عروقی"),
+                                    Triple("Gastrointestinal signs", "gastro", "علائم مرتبط با دستگاه گوارش"),
+                                    Triple("Neurological signs", "neuro", "آسیب‌ها و علائم سیستم عصبی"),
+                                    Triple("Orthopaedic signs", "ortho", "مشکلات حرکتی، استخوان و مفاصل"),
+                                    Triple("Urogenital signs", "uro", "نابهنجاری‌های سیستم ادراری تناسلی"),
+                                    Triple("Ophthalmological signs", "ophthalm", "تظاهرات بالینی و علائم چشم"),
+                                    Triple("Dermatological signs", "derm", "آسیب‌های پوست، مو و لایه‌های خارجی")
+                                )
 
-                                Card(
-                                    colors = CardDefaults.cardColors(containerColor = cardBgColor),
-                                    shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth().border(1.dp, strokeColor, RoundedCornerShape(12.dp)).padding(bottom = 16.dp)
-                                ) {
-                                    Column(modifier = Modifier.padding(16.dp)) {
-                                        Text("Physical examination findings", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = primaryText)
+                                if (selectedPhysicalCategoryDetail == null) {
+                                    // 1. Show List of Physical Signs categories with Persian descriptions
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 12.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        IconButton(onClick = { currentSubScreen = "home" }) {
+                                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = accentTeal)
+                                        }
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            "PHYSICAL SIGNS",
+                                            fontSize = 15.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = accentTeal
+                                        )
+                                    }
+
+                                    // Primary descriptive card matching design
+                                    Card(
+                                        colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                        shape = RoundedCornerShape(12.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .border(1.dp, strokeColor, RoundedCornerShape(12.dp))
+                                            .padding(bottom = 16.dp)
+                                    ) {
+                                        Column(modifier = Modifier.padding(16.dp)) {
+                                            Text(
+                                                "Physical signs",
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 15.sp,
+                                                color = primaryText
+                                            )
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                "Select a category to obtain the corresponding physical signs.",
+                                                fontSize = 12.sp,
+                                                color = secondaryText
+                                            )
+                                        }
+                                    }
+
+                                    // Draw categories in 1-column list matching historical layout
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                                    ) {
+                                        categories.forEach { (label, tag, labelFa) ->
+                                            CategoryRowItem(
+                                                title = label,
+                                                subtitle = labelFa,
+                                                tag = tag,
+                                                bgColor = cardBgColor,
+                                                strokeColor = strokeColor,
+                                                textColor = primaryText,
+                                                linkColor = accentTeal,
+                                                secondaryTextColor = secondaryText,
+                                                onClick = {
+                                                    selectedPhysicalCategoryDetail = tag
+                                                    selectedPhysicalSign = null
+                                                }
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    // Categories detail inside select category
+                                    val currentCatName = categories.firstOrNull { it.second == selectedPhysicalCategoryDetail }?.first ?: ""
+                                    
+                                    if (selectedPhysicalSign == null) {
+                                        // 2. Show List of physical signs in this category
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 12.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            IconButton(onClick = { selectedPhysicalCategoryDetail = null }) {
+                                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = accentTeal)
+                                            }
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Column {
+                                                Text(
+                                                    "PHYSICAL SIGNS",
+                                                    fontSize = 15.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = accentTeal
+                                                )
+                                                Text(
+                                                    "($currentCatName)",
+                                                    fontSize = 12.sp,
+                                                    color = secondaryText
+                                                )
+                                            }
+                                        }
+
+                                        // Information Instruction card matching design
+                                        Card(
+                                            colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                            shape = RoundedCornerShape(12.dp),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .border(1.dp, strokeColor, RoundedCornerShape(12.dp))
+                                                .padding(bottom = 16.dp)
+                                        ) {
+                                            Column(modifier = Modifier.padding(16.dp)) {
+                                                Text(
+                                                    "Physical signs",
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 15.sp,
+                                                    color = primaryText
+                                                )
+                                                Spacer(modifier = Modifier.height(4.dp))
+                                                Text(
+                                                    "Select a physical sign to obtain the corresponding differential diagnosis.",
+                                                    fontSize = 12.sp,
+                                                    color = secondaryText
+                                                )
+                                            }
+                                        }
+
+                                        // Set display physical signs
+                                        val displaySigns = when (selectedPhysicalCategoryDetail) {
+                                            "general" -> listOf(
+                                                Triple("failure_to_grow", "Failure to grow", "عدم رشد یا کندی رشد بالینی"),
+                                                Triple("fever", "Fever", "تب (دمای فوق فیزیولوژیک پاسخ به پیروژن)"),
+                                                Triple("hypothermia", "Hypothermia", "کاهش دمای مرکزی بدن بیمار"),
+                                                Triple("lymphadenopathy", "Lymphadenopathy", "تورم غدد لنفاوی سطحی"),
+                                                Triple("obesity", "Weight gain / Obesity", "چاقی مفرط و انباشت چربی عروقی"),
+                                                Triple("weight_loss", "Weight loss", "لاغری مفرط و کاهش وزن مزمن بیمار")
+                                            )
+                                            "cardio" -> listOf(
+                                                Triple("cyanosis", "Cyanosis", "کبودی مخاطات دهان و ملتحمه چشم"),
+                                                Triple("hypertension", "Hypertension, systemic", "افزایش سنکوپ‌زای فشار خون سیستمیک"),
+                                                Triple("hypotension", "Hypotension, systemic", "کم‌فشاری بحرانی شریانی بدن بیمار"),
+                                                Triple("shock", "Shock", "کلاپس عروقی و پرفیوژن ناکافی بافت‌ها"),
+                                                Triple("pallor", "Pallor", "بی‌رنگی و سفیدشدن غشاهای مخاطی لثه")
+                                            )
+                                            "gastro" -> listOf(
+                                                Triple("jaundice", "Jaundice / Icterus", "زردی صلب چشم و پوست بدن حیوان"),
+                                                Triple("voice_change", "Voice change", "تغییر تن صدای حیوان بر اثر فلجی لارنژیت")
+                                            )
+                                            "neuro" -> listOf(
+                                                Triple("restlessness", "Restlessness", "بی‌قراری حرکتی و کلافگی بیمار")
+                                            )
+                                            "ortho" -> listOf(
+                                                Triple("lameness", "Lameness", "لنگش خفیف و ملایم اندام حرکتی جفت"),
+                                                Triple("joint_swelling", "Joint swelling", "تورم مفصلی و تاندونیت")
+                                            )
+                                            "uro" -> listOf(
+                                                Triple("anuria", "Anuria", "قطع ادرار کامل یا کم ادراری شدید"),
+                                                Triple("hematuria", "Hematuria", "وجود گلبول قرمز و خون در ادرار")
+                                            )
+                                            "ophthalm" -> listOf(
+                                                Triple("miosis", "Miosis", "انقباض حداکثری مردمک چشم بیمار"),
+                                                Triple("mydriasis", "Mydriasis", "گشادی پایدار مردمک یک یا هر دو چشم")
+                                            )
+                                            "derm" -> listOf(
+                                                Triple("pruritus", "Pruritus", "خارش، مالش و خراشیدگی پوست اندام‌ها"),
+                                                Triple("petechiae", "Petechiae / Ecchymoses", "پورپورا و خونریزی ریز جلدی"),
+                                                Triple("edema", "Peripheral edema", "ادم پیرامونی و تجمع مایعات"),
+                                                Triple("hyperemia", "Hyperemia", "قرمزی و پرفشار شدن سطح مویرگ پوست")
+                                            )
+                                            else -> listOf()
+                                        }
+
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 12.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                "Contents",
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 15.sp,
+                                                color = primaryText
+                                            )
+                                            Box(
+                                                modifier = Modifier
+                                                    .height(24.dp)
+                                                    .width(36.dp)
+                                                    .background(accentTeal, RoundedCornerShape(12.dp)),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = displaySigns.size.toString(),
+                                                    color = Color.White,
+                                                    fontSize = 11.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.height(8.dp))
+
+                                        Column(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                                        ) {
+                                            displaySigns.forEach { (id, nameEn, nameFa) ->
+                                                Card(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .border(1.dp, strokeColor, RoundedCornerShape(12.dp))
+                                                        .clickable { selectedPhysicalSign = id },
+                                                    colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                                    shape = RoundedCornerShape(12.dp)
+                                                ) {
+                                                    Row(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .padding(horizontal = 14.dp, vertical = 14.dp),
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        horizontalArrangement = Arrangement.SpaceBetween
+                                                    ) {
+                                                        Row(
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Box(
+                                                                modifier = Modifier
+                                                                    .size(36.dp)
+                                                                    .background(accentTeal.copy(alpha = 0.11f), CircleShape),
+                                                                contentAlignment = Alignment.Center
+                                                            ) {
+                                                                Icon(
+                                                                    imageVector = Icons.Default.Description,
+                                                                    contentDescription = null,
+                                                                    tint = accentTeal,
+                                                                    modifier = Modifier.size(18.dp)
+                                                                )
+                                                            }
+                                                            Spacer(modifier = Modifier.width(14.dp))
+                                                            Column {
+                                                                Text(
+                                                                    text = nameEn,
+                                                                    fontWeight = FontWeight.Bold,
+                                                                    fontSize = 14.sp,
+                                                                    color = primaryText
+                                                                )
+                                                                Text(
+                                                                    text = nameFa,
+                                                                    fontSize = 11.sp,
+                                                                    color = secondaryText
+                                                                )
+                                                            }
+                                                        }
+                                                        Icon(
+                                                            imageVector = Icons.Default.ChevronRight,
+                                                            contentDescription = "Open Details",
+                                                            tint = secondaryText,
+                                                            modifier = Modifier.size(20.dp)
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        // 3. Show Details of the selected physical sign (alike historical)
+                                        val currentSignId = selectedPhysicalSign ?: ""
+                                        val fallbackName = physicalSignsDb.firstOrNull { it.id.equals(currentSignId, ignoreCase = true) }?.name 
+                                            ?: currentSignId.replace("_", " ").replaceFirstChar { it.uppercase() }
+                                        val signDetail = getPhysicalSignDetail(currentSignId, fallbackName)
+
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 12.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            IconButton(onClick = { selectedPhysicalSign = null }) {
+                                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = accentTeal)
+                                            }
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Column {
+                                                Text(
+                                                    "PHYSICAL SIGNS",
+                                                    fontSize = 15.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = accentTeal
+                                                )
+                                                Text(
+                                                    "($currentCatName)",
+                                                    fontSize = 12.sp,
+                                                    color = secondaryText
+                                                )
+                                            }
+                                        }
+
                                         Spacer(modifier = Modifier.height(4.dp))
-                                        Text("Select vital anomalies observed during clinical diagnosis.", fontSize = 12.sp, color = secondaryText)
-                                    }
-                                }
 
-                                // Grid of physical examination
-                                FlowRow(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), maxItemsInEachRow = 2) {
-                                    CategoryGridItem("Vital anomalies", "vital", false, cardBgColor, strokeColor, primaryText, accentTeal, secondaryText, { selectedCategoryDetail = "vital" }, Modifier.weight(1f).padding(bottom = 12.dp))
-                                    CategoryGridItem("Mucous Membranes", "mucous", false, cardBgColor, strokeColor, primaryText, accentTeal, secondaryText, { selectedCategoryDetail = "mucous" }, Modifier.weight(1f).padding(bottom = 12.dp))
-                                    CategoryGridItem("Neurological (PRO)", "neuro_pro", true, cardBgColor, strokeColor, primaryText, accentTeal, secondaryText, { showProDialog = true }, Modifier.weight(1f).padding(bottom = 12.dp))
-                                    CategoryGridItem("Palpation findings (PRO)", "palp_pro", true, cardBgColor, strokeColor, primaryText, accentTeal, secondaryText, { showProDialog = true }, Modifier.weight(1f).padding(bottom = 12.dp))
+                                        // Prominent Sign Name Banner matching original design
+                                        Card(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .border(1.dp, strokeColor, RoundedCornerShape(4.dp)),
+                                            colors = CardDefaults.cardColors(
+                                                containerColor = if (isDark) Color(0xFF2C2523) else Color(0xFFEFEBE9)
+                                            ),
+                                            shape = RoundedCornerShape(4.dp)
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(vertical = 12.dp),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = signDetail.name.uppercase(),
+                                                    color = if (isDark) Color(0xFFD7CCC8) else Color(0xFF4E342E),
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 15.sp,
+                                                    letterSpacing = 1.2.sp
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.height(16.dp))
+
+                                        Column(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                                        ) {
+                                            ExpandableDetailCard(
+                                                title = "DEFINITION",
+                                                content = signDetail.definition,
+                                                primaryText = primaryText,
+                                                secondaryText = secondaryText,
+                                                cardBgColor = cardBgColor,
+                                                strokeColor = strokeColor
+                                            )
+
+                                            ExpandableDetailCard(
+                                                title = "FREQUENT CAUSES",
+                                                content = signDetail.frequentCauses,
+                                                primaryText = primaryText,
+                                                secondaryText = secondaryText,
+                                                cardBgColor = cardBgColor,
+                                                strokeColor = strokeColor
+                                            )
+
+                                            ExpandableDetailCard(
+                                                title = "OTHER CAUSES",
+                                                content = signDetail.otherCauses,
+                                                primaryText = primaryText,
+                                                secondaryText = secondaryText,
+                                                cardBgColor = cardBgColor,
+                                                strokeColor = strokeColor
+                                            )
+
+                                            ExpandableDetailCard(
+                                                title = "BIBLIOGRAPHIC REFERENCES",
+                                                content = signDetail.bibliographicReferences,
+                                                primaryText = primaryText,
+                                                secondaryText = secondaryText,
+                                                cardBgColor = cardBgColor,
+                                                strokeColor = strokeColor
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1573,6 +1924,176 @@ val historicalSignsDb = listOf(
         definition = "An involuntary decrease in body weight, representing negative energy balance due to low intake, malabsorption, or chronic illnesses.",
         frequentCauses = "• Chronic Systemic Diseases\nChronic Kidney Disease (CKD)\nDiabetes Mellitus\nHyperthyroidism\nNeoplasia",
         otherCauses = "• Gastrointestinal\nInflammatory Bowel Disease (IBD)\nMalabsorption / Maldigestion\n\n• Dental / Masticatory pain\nAdvanced periodontal disease",
+        bibliographicReferences = "1. Small Animal Gastroenterology.\n2. Textbook of Veterinary Internal Medicine."
+    )
+)
+
+data class PhysicalSignDetail(
+    val id: String,
+    val name: String,
+    val definition: String,
+    val frequentCauses: String,
+    val otherCauses: String,
+    val bibliographicReferences: String
+)
+
+fun getPhysicalSignDetail(id: String, fallbackName: String): PhysicalSignDetail {
+    val existing = physicalSignsDb.firstOrNull { it.id.equals(id, ignoreCase = true) }
+    if (existing != null) return existing
+    
+    return PhysicalSignDetail(
+        id = id,
+        name = fallbackName,
+        definition = "Clinical physical examination finding of $fallbackName observed during patient inspection, palpation, percussion, or auscultation.",
+        frequentCauses = "• Primary Dysfunction\nSpecific localized tissue injury or clinical pathology\n\n• Systemic Reaction\nCompromised physiological feedback loop",
+        otherCauses = "• Congenital / Genetic Factors\nRare underlying breed predisposition\n\n• Idiopathic causes\nAsymptomatic or transient abnormality",
+        bibliographicReferences = "1. Textbook of Veterinary Internal Medicine.\n2. Clinical Veterinary Advisor."
+    )
+}
+
+val physicalSignsDb = listOf(
+    PhysicalSignDetail(
+        id = "cyanosis",
+        name = "Cyanosis",
+        definition = "A bluish or purplish discoloration of the skin or mucous membranes due to high levels of deoxygenated hemoglobin in the blood.",
+        frequentCauses = "• Respiratory conditions\nPneumonia\nUpper airway obstruction\nTracheal collapse\n\n• Cardiovascular conditions\nCongestive heart failure\nCongenital heart defects",
+        otherCauses = "• Toxic exposures\nMethemoglobinemia (e.g., acetaminophen toxicity)\n\n• Environmental factors\nSevere hypothermia",
+        bibliographicReferences = "1. Small Animal Critical Care Medicine.\n2. Manual of Canine and Feline Cardiology."
+    ),
+    PhysicalSignDetail(
+        id = "failure_to_grow",
+        name = "Failure to grow",
+        definition = "Inadequate gains in body weight and physical development in pediatric/young animals compared to breed and age expectations.",
+        frequentCauses = "• Nutritional deficiencies\nInadequate quantity or quality of food\n\n• Intoxication & Parasitism\nIntestinal worms (roundworms/hookworms)",
+        otherCauses = "• Congenital shunts\nPortosystemic Shunts (PSS)\n\n• Endocrine conditions\nPituitary Dwarfism",
+        bibliographicReferences = "1. Pediatrics of the Dog and Cat.\n2. Small Animal Clinical Nutrition."
+    ),
+    PhysicalSignDetail(
+        id = "fever",
+        name = "Fever",
+        definition = "An elevation of the core body temperature above the normal range established for dogs (37.5-39.2°C) or cats (38.0-39.2°C), typically as a response to pyrogens.",
+        frequentCauses = "• Systemic Infection\nViral (e.g., FIP, Canine Distemper)\nBacterial (e.g., Pyometra, Abscesses)",
+        otherCauses = "• Immune-mediated\nImmune-mediated hemolytic anemia (IMHA)\n\n• Neoplastic conditions\nLymphoma",
+        bibliographicReferences = "1. Greene's Infectious Diseases of the Dog and Cat.\n2. Textbook of Veterinary Internal Medicine."
+    ),
+    PhysicalSignDetail(
+        id = "hyperemia",
+        name = "Hyperemia",
+        definition = "An excess of blood in the vessels supplying an organ or other part of the body, manifested as bright red mucous membranes or skin redness.",
+        frequentCauses = "• Local Inflammation\nAllergic reactions\nLocal infections / trauma\n\n• Systemic conditions\nSepsis / Septic shock (hyperdynamic phase)",
+        otherCauses = "• Heatstroke / Hyperthermia\nExtreme core temperature elevation\n\n• Toxicity\nCarbon monoxide inhalation",
+        bibliographicReferences = "1. Textbook of Veterinary Internal Medicine, 8th Edition.\n2. Manual of Veterinary Skin Diseases."
+    ),
+    PhysicalSignDetail(
+        id = "hypertension",
+        name = "Hypertension, systemic",
+        definition = "A sustained elevation of systemic arterial blood pressure, commonly diagnosed secondary to organ pathologies in older companion animals.",
+        frequentCauses = "• Chronic Kidney Disease (CKD)\nGlomerular or tubulointerstitial diseases\n\n• Endocrine diseases\nHyperadrenocorticism (Cushing's)\nHyperthyroidism (especially cats)",
+        otherCauses = "• Primary / Idiopathic hypertension\nDiagnosis of exclusion\n\n• Pheochromocytoma\nCatecholamine-secreting tumor",
+        bibliographicReferences = "1. ACVIM Consensus Statement on Systemic Hypertension.\n2. Canine and Feline Nephrology and Urology."
+    ),
+    PhysicalSignDetail(
+        id = "hypotension",
+        name = "Hypotension, systemic",
+        definition = "An abnormally low systemic arterial blood pressure, leading to compromised tissue perfusion and potential organ failure.",
+        frequentCauses = "• Shock states\nHypovolemic (hemorrhage/dehydration)\nDistributive (sepsis, anaphylaxis)\n\n• Anesthetic agents\nOverdosage or cardiorespiratory depression",
+        otherCauses = "• Cardiac arrest / Failure\nEnd-stage cardiomyopathy or valvular diseases",
+        bibliographicReferences = "1. Small Animal Critical Care Medicine.\n2. Veterinary Emergency and Critical Care Manual."
+    ),
+    PhysicalSignDetail(
+        id = "hypothermia",
+        name = "Hypothermia",
+        definition = "An abnormal decrease in core body temperature below normal ranges, causing metabolic depression and cardiac arrhythmias in severe cases.",
+        frequentCauses = "• Environmental exposure\nCold climates / lack of shelter\n\n• Under anesthesia\nAnesthetic-induced thermal dysregulation",
+        otherCauses = "• Endocrine disorders\nHypothyroidism (dogs)\nHypoadrenocorticism\n\n• Multi-organ Failure\nUremic crisis",
+        bibliographicReferences = "1. Textbook of Veterinary Internal Medicine.\n2. Veterinary Emergency Medicine Guide."
+    ),
+    PhysicalSignDetail(
+        id = "jaundice",
+        name = "Jaundice / Icterus",
+        definition = "Yellow discoloration of the sclera, mucous membranes, or skin resulting from hyperbilirubinemia.",
+        frequentCauses = "• Pre-hepatic (Hemolysis)\nImmune-Mediated Hemolytic Anemia (IMHA)\nBlood parasites (e.g., Babesia)\n\n• Hepatic disease\nFeline Hepatic Lipidosis\nCholangiohepatitis\nToxic hepatopathy",
+        otherCauses = "• Post-hepatic obstruction\nPancreatitis obstructing Common Bile Duct\nCholelithiasis / Bile duct carcinoma\nDuodenal foreign body",
+        bibliographicReferences = "1. BSAVA Manual of Canine and Feline Gastroenterology.\n2. Textbook of Veterinary Internal Medicine."
+    ),
+    PhysicalSignDetail(
+        id = "lymphadenopathy",
+        name = "Lymphadenopathy",
+        definition = "An enlargement of one or more lymph nodes, which can be localized or generalized, and painful or painless on palpation.",
+        frequentCauses = "• Local Lymphadenitis\nLocalized infections (bacterial or fungal)\n\n• Generalized Lymphadenopathy\nSystemic infectious diseases (Leishmania, Ehrlichia)\nLymphosarcoma / Lymphoma",
+        otherCauses = "• Metastatic neoplasia\nSpread from primary solid tumors\n\n• Immune-mediated triggers\nReactive hyperplasia",
+        bibliographicReferences = "1. Small Animal Clinical Oncology, 6th Edition.\n2. Pathologic Basis of Veterinary Disease."
+    ),
+    PhysicalSignDetail(
+        id = "pallor",
+        name = "Pallor",
+        definition = "An unusual paleness of the mucous membranes (e.g., gums), indicating decreased red blood cells or reduced peripheral blood flow.",
+        frequentCauses = "• Anemia\nBlood loss (internal/external)\nHemolysis (IMHA)\nUnderproduction (CKD, Bone marrow failure)\n\n• Poor Perfusion\nHypovolemic or cardiogenic shock",
+        otherCauses = "• Hypothermia\nSystemic peripheral vasoconstriction",
+        bibliographicReferences = "1. Small Animal Internal Medicine.\n2. Manual of Veterinary Hematology."
+    ),
+    PhysicalSignDetail(
+        id = "edema",
+        name = "Peripheral edema",
+        definition = "An accumulation of fluid in the interstitial space of peripheral tissues, primarily affecting limbs, ventrum, or submandibular regions.",
+        frequentCauses = "• Hypoalbuminemia\nProtein-Losing Enteropathy (PLE)\nProtein-Losing Nephropathy (PLN)\nSevere hepatic insufficiency",
+        otherCauses = "• Increased Hydrostatic Pressure\nRight-sided congestive heart failure\nLocal lymphatic or venous obstruction",
+        bibliographicReferences = "1. Textbook of Veterinary Internal Medicine.\n2. Fluid, Electrolyte, and Acid-Base Disorders in Small Animal Practice."
+    ),
+    PhysicalSignDetail(
+        id = "petechiae",
+        name = "Petechiae / Ecchymoses",
+        definition = "Pinpoint-sized (petechiae) or larger (ecchymoses) purpuric spots on mucous membranes or skin, indicating capillary hemorrhage.",
+        frequentCauses = "• Thrombocytopenia\nImmune-Mediated Thrombocytopenia (IMTP)\nVector-borne diseases (Anaplasma, Ehrlichia)\nBone marrow suppression",
+        otherCauses = "• Platelet Dysfunction (Thrombocytopathia)\nVon Willebrand disease\n\n• Vasculitis\nInfectious agents or drug reactions",
+        bibliographicReferences = "1. Veterinary Hematology and Clinical Chemistry.\n2. Small Animal Emergency and Critical Care Medicine."
+    ),
+    PhysicalSignDetail(
+        id = "pruritus",
+        name = "Pruritus",
+        definition = "An unpleasant sensation on the skin that provokes the urge to scratch, lick, bite, or rub, leading to secondary excoriations.",
+        frequentCauses = "• Parasites\nFlea bite hypersensitivity\nSarcoptic mange (scabies)\nOtodectic mange\n\n• Allergic Skin Diseases\nAtopic dermatitis\nAdverse food reactions (food allergy)",
+        otherCauses = "• Secondary Infections\nBacterial pyoderma\nMalassezia dermatitis",
+        bibliographicReferences = "1. Muller and Kirk's Small Animal Dermatology.\n2. BSAVA Manual of Canine and Feline Dermatology."
+    ),
+    PhysicalSignDetail(
+        id = "restlessness",
+        name = "Restlessness",
+        definition = "An inability to remain at rest, lie down quietly, or settle down, often caused by severe distress, pain, or systemic discomfort.",
+        frequentCauses = "• Pain\nVisceral pain (Gastrointestinal distress/GDV)\nOrthopedic/Neurologic pain\n\n• Dyspnea\nHypoxia or laboring to breathe",
+        otherCauses = "• Toxic ingestions\nMethylxanthines (chocolate, caffeine)\n\n• Neuromuscular triggers\nHypocalcemia (eclampsia)",
+        bibliographicReferences = "1. BSAVA Manual of Canine and Feline Behavioral Medicine.\n2. Handbook of Veterinary Pain Management."
+    ),
+    PhysicalSignDetail(
+        id = "shock",
+        name = "Shock",
+        definition = "A clinical state characterized by inadequate cellular energy production, typically due to low oxygen delivery or poor tissue perfusion.",
+        frequentCauses = "• Hypovolemic Shock\nSevere blood loss / Dehydration\n\n• Cardiogenic Shock\nAdvanced dilated cardiomyopathy (DCM) or valve failure",
+        otherCauses = "• Distributive / Septic Shock\nAnaphylactic reaction\nSevere systemic inflammatory response (SIRS)",
+        bibliographicReferences = "1. Small Animal Critical Care Medicine.\n2. Veterinary Emergency and Critical Care Journal."
+    ),
+    PhysicalSignDetail(
+        id = "voice_change",
+        name = "Voice change",
+        definition = "Changes in the sound, pitch, or amplitude of an animal's bark, meow, or whine, indicating laryngeal or vocal cord anomalies.",
+        frequentCauses = "• Laryngeal Disease\nLaryngeal paralysis (e.g., GOLPP in older Labradors)\nDirect laryngitis (infectious or mechanical)",
+        otherCauses = "• Nerve dysfunction or pressure\nThyroid carcinoma invading recurrent laryngeal nerve\n\n• Trauma\nTight collar neck injury",
+        bibliographicReferences = "1. Textbook of Veterinary Internal Medicine.\n2. Small Animal Surgical Emergencies."
+    ),
+    PhysicalSignDetail(
+        id = "obesity",
+        name = "Weight gain / Obesity",
+        definition = "The accumulation of excess body fat resulting in a state where body weight exceeds optimal ranges by more than 15-20%.",
+        frequentCauses = "• Excess Caloric Intake\nOverfeeding, high-fat table scraps\nLack of regular exercise",
+        otherCauses = "• Endocrine Disorders\nHypothyroidism (dogs)\nHyperadrenocorticism (Cushing's)",
+        bibliographicReferences = "1. Small Animal Clinical Nutrition, 5th Edition.\n2. Canine and Feline Endocrinology."
+    ),
+    PhysicalSignDetail(
+        id = "weight_loss",
+        name = "Weight loss",
+        definition = "An involuntary decrease in body weight over time, representing a chronic negative energy balance.",
+        frequentCauses = "• Metabolic and Systemic Pathology\nDiabetes Mellitus\nChronic Kidney Disease (CKD)\nHyperthyroidism (cats)\nNeoplasia",
+        otherCauses = "• Gastrointestinal diseases\nExocrine Pancreatic Insufficiency (EPI)\nInflammatory Bowel Disease (IBD)",
         bibliographicReferences = "1. Small Animal Gastroenterology.\n2. Textbook of Veterinary Internal Medicine."
     )
 )
