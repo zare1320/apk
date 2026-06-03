@@ -281,9 +281,9 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                                     // Professional Doctor Illustration Image with fallback layout
                                     Box(
                                         modifier = Modifier
-                                            .size(200.dp)
+                                            .size(0.dp)
                                             .clip(CircleShape)
-                                            .border(1.dp, strokeColor, CircleShape),
+                                            .border(0.dp, Color.Transparent, CircleShape),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Image(
