@@ -23,16 +23,14 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun HumanAgeCalculatorView(initWeight: String) {
     val isDark = isSystemInDarkTheme()
-    
-    // Monochrome Noir Theme Colors
-    val bgColor = if (isDark) Color(0xFF121212) else Color.White
-    val surfaceColor = if (isDark) Color(0xFF1E1E1E) else Color(0xFFF8FAFC)
-    val strokeColor = if (isDark) Color(0xFF3A3A3A) else Color(0xFFE2E8F0)
-    val primaryText = if (isDark) Color.White else Color(0xFF0F172A)
-    val secondaryText = if (isDark) Color(0xFF94A3B8) else Color(0xFF475569)
-    val highlightColor = if (isDark) Color.White else Color.Black
-    val onHighlightColor = if (isDark) Color.Black else Color.White
-    val linkColor = if (isDark) Color(0xFF93C5FD) else Color(0xFF2563EB)
+    val bgColor = MaterialTheme.colorScheme.background
+    val surfaceColor = if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f) else MaterialTheme.colorScheme.surface
+    val strokeColor = MaterialTheme.colorScheme.outlineVariant
+    val primaryText = MaterialTheme.colorScheme.onSurface
+    val secondaryText = MaterialTheme.colorScheme.onSurfaceVariant
+    val highlightColor = MaterialTheme.colorScheme.primary
+    val onHighlightColor = MaterialTheme.colorScheme.onPrimary
+    val linkColor = MaterialTheme.colorScheme.primary
 
     val context = androidx.compose.ui.platform.LocalContext.current
     val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
@@ -441,7 +439,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(if (isDark) Color(0xFF1E1E1E) else Color(0xFFF1F5F9))
+                                .background(MaterialTheme.colorScheme.secondaryContainer)
                                 .padding(vertical = 6.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -501,7 +499,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                         agingTableData.forEachIndexed { index, rowData ->
                             val isRowDark = index % 2 != 0
                             val rowBgColor = if (isRowDark) {
-                                if (isDark) Color(0xFF181818) else Color(0xFFF9FAFB)
+                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
                             } else {
                                 bgColor
                             }
