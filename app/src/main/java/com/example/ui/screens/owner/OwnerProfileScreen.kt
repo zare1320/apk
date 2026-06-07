@@ -34,6 +34,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
     val activeSession by viewModel.activeSession.collectAsState()
     val currentTheme by viewModel.themeMode.collectAsState()
     val currentLang by viewModel.currentLanguage.collectAsState()
+    val activeSubscription by viewModel.activeSubscription.collectAsState()
 
     var activeOwnerSection by remember { mutableStateOf("اصلی") } // "اصلی", "تنظیمات", "لینک‌ها"
 
@@ -41,6 +42,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
     var showEditProfileDialog by remember { mutableStateOf(false) }
     var showPasswordDialog by remember { mutableStateOf(false) }
     var showDevicesDialog by remember { mutableStateOf(false) }
+    var showSubscriptionDialog by remember { mutableStateOf(false) }
     var showHelpDialog by remember { mutableStateOf(false) }
     var showAboutDialog by remember { mutableStateOf(false) }
     var showTermsDialog by remember { mutableStateOf(false) }
@@ -228,6 +230,24 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                             title = "دستگاه‌های متصل",
                                             iconEmoji = "💻",
                                             onClick = { showDevicesDialog = true }
+                                        )
+                                        HorizontalDivider(color = dividerColor, thickness = 1.dp)
+                                        val subEmoji = when(activeSubscription) {
+                                            "free" -> "🎁"
+                                            "silver" -> "🥈"
+                                            "diamond" -> "💎"
+                                            else -> "🏆"
+                                        }
+                                        val subTitle = when(activeSubscription) {
+                                            "free" -> "رایگان"
+                                            "silver" -> "نقره‌ای (۳ ماهه)"
+                                            "diamond" -> "الماس (یکساله)"
+                                            else -> "طلایی (۶ ماهه)"
+                                        }
+                                        OwnerProfileMenuItemRedesigned(
+                                            title = "مدیریت اشتراک: $subTitle $subEmoji",
+                                            iconEmoji = "🛡️",
+                                            onClick = { showSubscriptionDialog = true }
                                         )
                                     }
                                 }
@@ -706,6 +726,115 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                     dismissButton = {
                         TextButton(onClick = { showSupportDialog = false }) {
                             Text("بستن")
+                        }
+                    }
+                )
+            }
+
+            if (showSubscriptionDialog) {
+                var selectedPlanTemp by remember { mutableStateOf(activeSubscription) }
+                AlertDialog(
+                    onDismissRequest = { showSubscriptionDialog = false },
+                    title = { 
+                        Text(
+                            text = "مدیریت اشتراک پت‌کلاب", 
+                            fontWeight = FontWeight.Bold, 
+                            fontSize = 16.sp,
+                            color = textColor,
+                            textAlign = TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth()
+                        ) 
+                    },
+                    text = {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            Text(
+                                "لطفاً یکی از اشتراک‌های زیر را انتخاب کنید:", 
+                                fontSize = 12.sp, 
+                                color = mutedTextColor,
+                                modifier = Modifier.padding(bottom = 6.dp)
+                            )
+                            
+                            val plans = listOf(
+                                Triple("free", "🎁 اشتراک رایگان", "امکانات اولیه بدون انقضا"),
+                                Triple("silver", "🥈 اشتراک نقره‌ای (۳ ماه اعتبار)", "با امکان ثبت تا ۵۰ نسخه و دسترسی ۲۴ ساعته"),
+                                Triple("gold", "🏆 اشتراک طلایی (۶ ماه اعتبار)", "نسخه‌های نامحدود ابری، هوش مصنوعی دوزینگ دامی"),
+                                Triple("diamond", "💎 اشتراک الماس (یکسال اعتبار)", "پشتیبانی VIP، همه‌ی امکانات نسخه پرو + وبینارها")
+                            )
+
+                            plans.forEach { (planId, planName, planDesc) ->
+                                val isSelected = selectedPlanTemp == planId
+                                val planBg = if (isSelected) {
+                                    if (isDark) Color(0xFF1E2F4C) else Color(0xFFE0ECFC)
+                                } else {
+                                    cardBgColor
+                                }
+                                val planBorder = if (isSelected) {
+                                    Color(0xFFEF4444) // Cute Pink/Red accents for Owner Profile
+                                } else {
+                                    borderColor
+                                }
+
+                                Card(
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = CardDefaults.cardColors(containerColor = planBg),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .border(2.dp, planBorder, RoundedCornerShape(12.dp))
+                                        .clickable { selectedPlanTemp = planId }
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(12.dp)
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = planName,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 13.sp,
+                                                color = if (isSelected) Color(0xFFEF4444) else textColor
+                                            )
+                                            RadioButton(
+                                                selected = isSelected,
+                                                onClick = { selectedPlanTemp = planId },
+                                                colors = RadioButtonDefaults.colors(selectedColor = Color(0xFFEF4444))
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = planDesc,
+                                            fontSize = 11.sp,
+                                            color = mutedTextColor,
+                                            lineHeight = 16.sp
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = { 
+                                viewModel.setSubscription(selectedPlanTemp)
+                                showSubscriptionDialog = false 
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
+                        ) {
+                            Text("تایید و فعال‌سازی", fontWeight = FontWeight.Bold)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showSubscriptionDialog = false }) {
+                            Text("انصراف")
                         }
                     }
                 )

@@ -20,6 +20,9 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
     private val _currentLanguage = MutableStateFlow("fa") // "fa", "en", "ar"
     val currentLanguage: StateFlow<String> = _currentLanguage.asStateFlow()
 
+    private val _activeSubscription = MutableStateFlow("gold") // "free", "silver", "gold", "diamond"
+    val activeSubscription: StateFlow<String> = _activeSubscription.asStateFlow()
+
     // --- Vet Mode: Examined Pet State (Dashboard) ---
     private val _selectedSpecies = MutableStateFlow<String?>(null) // "dog", "cat", "exotic"
     val selectedSpecies: StateFlow<String?> = _selectedSpecies.asStateFlow()
@@ -69,6 +72,10 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
 
     fun setLanguage(lang: String) {
         _currentLanguage.value = lang
+    }
+
+    fun setSubscription(sub: String) {
+        _activeSubscription.value = sub
     }
 
     fun selectSpecies(species: String?) {

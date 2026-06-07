@@ -12,7 +12,8 @@ data class UserSession(
     val identification: String = "", // Professional ID / Student ID
     val workplaceOrUni: String = "", // Workplace or University
     val specialty: String = "", // Vet specialty
-    val isLoggedIn: Boolean = false
+    val isLoggedIn: Boolean = false,
+    val coins: Int = 100
 )
 
 @Entity(tableName = "pets")

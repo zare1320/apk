@@ -36,6 +36,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
     val allPrescriptions by viewModel.allPrescriptions.collectAsState()
     val currentTheme by viewModel.themeMode.collectAsState()
     val currentLang by viewModel.currentLanguage.collectAsState()
+    val activeSubscription by viewModel.activeSubscription.collectAsState()
 
     var activeProfileSection by remember { mutableStateOf("اصلی") } // "اصلی", "نسخه‌ها", "تنظیمات", "لینک‌ها", "منابع"
 
@@ -249,15 +250,35 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                                 .padding(14.dp),
                                             horizontalAlignment = Alignment.Start
                                         ) {
-                                            // Golden Diamond Badge
+                                            // Dynamic Badge and Color according to activeSubscription
+                                            val subEmoji = when(activeSubscription) {
+                                                "free" -> "🆓"
+                                                "silver" -> "🥈"
+                                                "diamond" -> "💎"
+                                                else -> "🏆"
+                                            }
+                                            val subTitle = when(activeSubscription) {
+                                                "free" -> "اشتراک رایگان"
+                                                "silver" -> "اشتراک نقره‌ای"
+                                                "diamond" -> "اشتراک الماس"
+                                                else -> "اشتراک طلایی"
+                                            }
+                                            val subAccentColor = when(activeSubscription) {
+                                                "free" -> Color(0xFF10B981)
+                                                "silver" -> Color(0xFF64748B)
+                                                "diamond" -> Color(0xFF3B82F6)
+                                                else -> Color(0xFFFBBF24)
+                                            }
+                                            val badgeBg = if (isDark) subAccentColor.copy(alpha = 0.2f) else subAccentColor.copy(alpha = 0.15f)
+
                                             Box(
                                                 modifier = Modifier
                                                     .size(36.dp)
-                                                    .background(if (isDark) Color(0xFF3E3626) else Color(0xFFFEF3C7), CircleShape)
-                                                    .border(1.dp, Color(0xFFFBBF24), CircleShape),
+                                                    .background(badgeBg, CircleShape)
+                                                    .border(1.dp, subAccentColor, CircleShape),
                                                 contentAlignment = Alignment.Center
                                             ) {
-                                                Text("💎", fontSize = 18.sp)
+                                                Text(subEmoji, fontSize = 18.sp)
                                             }
                                             Spacer(modifier = Modifier.height(14.dp))
                                             Text(
@@ -267,7 +288,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                             )
                                             Spacer(modifier = Modifier.height(2.dp))
                                             Text(
-                                                text = "اشتراک طلایی",
+                                                text = subTitle,
                                                 fontSize = 14.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = textColor
@@ -320,13 +341,13 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                             }
                                             Spacer(modifier = Modifier.height(14.dp))
                                             Text(
-                                                text = "امتیاز پی‌کِلاپ",
+                                                text = "امتیاز وت‌کلاب",
                                                 fontSize = 11.sp,
                                                 color = mutedTextColor
                                             )
                                             Spacer(modifier = Modifier.height(2.dp))
                                             Text(
-                                                text = "۵۹۵۳ سکه",
+                                                text = "${(activeSession?.coins ?: 100).toPersianDigits()} سکه",
                                                 fontSize = 14.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = textColor
@@ -1074,31 +1095,109 @@ fun VetProfileScreen(viewModel: MainViewModel) {
             }
 
             if (showSubscriptionDialog) {
+                var selectedPlanTemp by remember { mutableStateOf(activeSubscription) }
                 AlertDialog(
                     onDismissRequest = { showSubscriptionDialog = false },
-                    title = { Text("مدیریت اشتراک پت‌کلاب", fontWeight = FontWeight.Bold) },
+                    title = { 
+                        Text(
+                            text = "مدیریت اشتراک پت‌کلاب", 
+                            fontWeight = FontWeight.Bold, 
+                            fontSize = 16.sp,
+                            color = textColor,
+                            textAlign = TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth()
+                        ) 
+                    },
                     text = {
-                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            Text("نوع اشتراک شما: اشتراک طلایی (Vet Premium)", fontWeight = FontWeight.Bold, color = Color(0xFFD69E2E))
-                            Text("تاریخ اتمام اعتبار: ۲۹ اسفند ۱۴۰۵", fontSize = 12.sp, color = textColor)
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = dividerColor)
-                            Text("مزایای فعال اشتراک:", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textColor)
-                            Text("• نسخه‌های نامحدود کلینیکال و ابری", fontSize = 12.sp, color = textColor)
-                            Text("• دسترسی پیشرفته به سیستم تشخیص تفریقی هوشمند دوزینگ", fontSize = 12.sp, color = textColor)
-                            Text("• ۳۰٪ تخفیف خرید گجت‌های هوشمند پت", fontSize = 12.sp, color = textColor)
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            Text(
+                                "لطفاً یکی از اشتراک‌های زیر را انتخاب کنید:", 
+                                fontSize = 12.sp, 
+                                color = mutedTextColor,
+                                modifier = Modifier.padding(bottom = 6.dp)
+                            )
+                            
+                            val plans = listOf(
+                                Triple("free", "🎁 اشتراک رایگان", "امکانات اولیه بدون انقضا"),
+                                Triple("silver", "🥈 اشتراک نقره‌ای (۳ ماه اعتبار)", "با امکان ثبت تا ۵۰ نسخه و دسترسی ۲۴ ساعته"),
+                                Triple("gold", "🏆 اشتراک طلایی (۶ ماه اعتبار)", "نسخه‌های نامحدود ابری، هوش مصنوعی دوزینگ دامی"),
+                                Triple("diamond", "💎 اشتراک الماس (یکسال اعتبار)", "پشتیبانی VIP، همه‌ی امکانات نسخه پرو + وبینارها")
+                            )
+
+                            plans.forEach { (planId, planName, planDesc) ->
+                                val isSelected = selectedPlanTemp == planId
+                                val planBg = if (isSelected) {
+                                    if (isDark) Color(0xFF1E2F4C) else Color(0xFFE0ECFC)
+                                } else {
+                                    cardBgColor
+                                }
+                                val planBorder = if (isSelected) {
+                                    Color(0xFF3B82F6)
+                                } else {
+                                    borderColor
+                                }
+
+                                Card(
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = CardDefaults.cardColors(containerColor = planBg),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .border(2.dp, planBorder, RoundedCornerShape(12.dp))
+                                        .clickable { selectedPlanTemp = planId }
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(12.dp)
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = planName,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 13.sp,
+                                                color = if (isSelected) Color(0xFF3B82F6) else textColor
+                                            )
+                                            RadioButton(
+                                                selected = isSelected,
+                                                onClick = { selectedPlanTemp = planId },
+                                                colors = RadioButtonDefaults.colors(selectedColor = Color(0xFF3B82F6))
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = planDesc,
+                                            fontSize = 11.sp,
+                                            color = mutedTextColor,
+                                            lineHeight = 16.sp
+                                        )
+                                    }
+                                }
+                            }
                         }
                     },
                     confirmButton = {
                         Button(
-                            onClick = { showSubscriptionDialog = false },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD69E2E))
+                            onClick = { 
+                                viewModel.setSubscription(selectedPlanTemp)
+                                showSubscriptionDialog = false 
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))
                         ) {
-                            Text("تمدید اشتراک")
+                            Text("تایید و فعال‌سازی", fontWeight = FontWeight.Bold)
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { showSubscriptionDialog = false }) {
-                            Text("بستن")
+                            Text("انصراف")
                         }
                     }
                 )
@@ -1107,7 +1206,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
             if (showRewardsDialog) {
                 AlertDialog(
                     onDismissRequest = { showRewardsDialog = false },
-                    title = { Text("کیف پول و جوایز پی‌کلوپ", fontWeight = FontWeight.Bold) },
+                    title = { Text("کیف پول و جوایز وت‌کلاب", fontWeight = FontWeight.Bold) },
                     text = {
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             Row(
@@ -1115,7 +1214,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("۵۹۵۳", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFFD69E2E))
+                                Text((activeSession?.coins ?: 100).toPersianDigits(), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFFD69E2E))
                                 Text("امتياز کل سکه‌ها", fontWeight = FontWeight.Medium, color = textColor)
                             }
                             Text("با ثبت نسخه و استفاده منظم از ویژگی‌های برنامه، سکه‌های هدیه جمع‌آوری کنید و کد تخفیف بگیرید.", fontSize = 12.sp, color = mutedTextColor)
@@ -1463,4 +1562,13 @@ fun PrescriptionCardRedesigned(prescription: Prescription, onDelete: () -> Unit)
             }
         }
     }
+}
+
+private fun Int.toPersianDigits(): String {
+    val english = "0123456789"
+    val persian = "۰۱۲۳۴۵۶۷۸۹"
+    return this.toString().map { char ->
+        val index = english.indexOf(char)
+        if (index != -1) persian[index] else char
+    }.joinToString("")
 }

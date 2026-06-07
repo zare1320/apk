@@ -5,7 +5,7 @@ import androidx.room.*
 
 @Database(
     entities = [UserSession::class, Pet::class, Prescription::class, CalendarEvent::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
