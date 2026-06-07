@@ -19,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
@@ -53,18 +54,105 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
     var isAddingNewRecord by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
 
-    // Populate standard lists of breed based on species
+    // Populate standard lists of breed based on species in Persian and English
     val breedOptions = when (activeSpecies) {
-        "dog" -> listOf("شیتزو (Shih Tzu)", "ژرمن شپرد (German Shepherd)", "هاسکی (Husky)", "پودل (Poodle)", "بومی / دورگه")
-        "cat" -> listOf("پرشین (Persian)", "بریتیش فولد (British Fold)", "دی‌اس‌اچ (DSH)", "سیامی (Siamese)")
+        "dog" -> listOf(
+            "شیتزو (Shih Tzu)",
+            "ژرمن شپرد (German Shepherd)",
+            "هاسکی سیبرین (Siberian Husky)",
+            "پودل (Poodle)",
+            "پمرانین (Pomeranian)",
+            "گلدن رتریور (Golden Retriever)",
+            "پاگ (Pug)",
+            "بولداگ (Bulldog)",
+            "روتوایلر (Rottweiler)",
+            "دوبرمن (Doberman)",
+            "پیتبول (Pitbull)",
+            "سرابی (Sarabi Mastiff)",
+            "تریر (Terrier)",
+            "داکسهوند (Dachshund)",
+            "ساموید (Samoyed)",
+            "گریت دین (Great Dane)",
+            "باکسر (Boxer)",
+            "بیگل (Beagle)",
+            "چاو چاو (Chow Chow)",
+            "کوکر اسپنیل (Cocker Spaniel)",
+            "بومی / دورگه (Mixed Breed)"
+        )
+        "cat" -> listOf(
+            "پرشین (Persian)",
+            "دی‌اس‌اچ (DSH)",
+            "اسکاتیش فولد (Scottish Fold)",
+            "بریتیش فولد (British Fold)",
+            "بریتیش شورت‌هر (British Shorthair)",
+            "دی‌ال‌اچ (DLH)",
+            "سیامی (Siamese)",
+            "راگدول (Ragdoll)",
+            "مین کون (Maine Coon)",
+            "اسفینکس (Sphynx)",
+            "راشن بلو (Russian Blue)",
+            "بنگال (Bengal)",
+            "آنگورای ترکی (Turkish Angora)",
+            "بیرمن (Birman)",
+            "بومی / دورگه (Mixed Breed)"
+        )
         "exotic" -> when (activeExotic) {
-            "bird" -> listOf("عروس هلندی (Cockatiel)", "مرغ عشق (Budgerigar)", "کاسکو (Grey Parrot)", "کانور")
-            "rodent" -> listOf("همستر روسی", "خوکچه هندی", "خرگوش لوپ", "سنجاب")
-            "aquatic" -> listOf("ماهی قرمز (Goldfish)", "گوپی", "فایتر (Betta)", "دیسکس")
-            "amphibian" -> listOf("لاک‌پشت لاک‌نرم", "سمندر لرستانی", "قورباغه درختی")
-            else -> listOf("نامشخص")
+            "bird" -> listOf(
+                "عروس هلندی (Cockatiel)",
+                "مرغ عشق (Budgerigar)",
+                "کاسکو (Grey Parrot)",
+                "کانور (Conure)",
+                "طوطی برزیلی (Lovebird)",
+                "قناری (Canary)",
+                "فنچ (Finch)",
+                "طوطی ملنگو (Ringneck)",
+                "کاکادو (Cockatoo)",
+                "ماکائو (Macaw)"
+            )
+            "rodent" -> listOf(
+                "همستر روسی (Russian Hamster)",
+                "خوکچه هندی (Guinea Pig)",
+                "خرگوش لوپ (Lop Rabbit)",
+                "سنجاب (Squirrel)",
+                "خرگوش هلندی (Dutch Rabbit)",
+                "همستر سوری (Syrian Hamster)",
+                "چینچیلا (Chinchilla)",
+                "جوجه تیغی (Hedgehog)"
+            )
+            "aquatic" -> listOf(
+                "ماهی قرمز (Goldfish)",
+                "گوپی (Guppy)",
+                "فایتر (Betta)",
+                "دیسکس (Discus)",
+                "آنجل (Angel Fish)",
+                "مولی (Molly)",
+                "کوی (Koi)"
+            )
+            "amphibian" -> listOf(
+                "لاک‌پشت لاک‌نرم (Softshell Turtle)",
+                "سمندر لرستانی (Lorestan Newt)",
+                "قورباغه درختی سبز (Green Tree Frog)",
+                "لاک‌پشت گوش‌قرمز (Red-eared Slider)",
+                "ایگوانا (Iguana)",
+                "آفتاب‌پرست (Chameleon)",
+                "مار ذرت (Corn Snake)"
+            )
+            else -> listOf("نامشخص", "دوزیست (Amphibian)")
         }
         else -> emptyList()
+    }
+
+    var isBreedDropdownExpanded by remember { mutableStateOf(false) }
+    var breedTextFieldFocused by remember { mutableStateOf(false) }
+
+    val filteredBreeds = remember(petBreed, breedOptions) {
+        if (petBreed.isEmpty()) {
+            breedOptions
+        } else {
+            breedOptions.filter {
+                it.contains(petBreed, ignoreCase = true)
+            }
+        }
     }
 
     // Prefill form if activeExaminedPet changes
@@ -341,19 +429,49 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Breed selection with quick pill filters
-                    OutlinedTextField(
-                        value = petBreed,
-                        onValueChange = { petBreed = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("نژاد پت * (الزامی)") },
-                        placeholder = { Text("مثال: شیتزو") },
-                        enabled = isSpeciesChosen,
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp)
-                    )
+                    // Breed selection with quick pill filters and intelligent autocomplete
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        OutlinedTextField(
+                            value = petBreed,
+                            onValueChange = { newValue ->
+                                petBreed = newValue
+                                isBreedDropdownExpanded = isSpeciesChosen && newValue.isNotEmpty()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .onFocusChanged { focusState ->
+                                    breedTextFieldFocused = focusState.isFocused
+                                    if (focusState.isFocused && isSpeciesChosen && petBreed.isNotEmpty()) {
+                                        isBreedDropdownExpanded = true
+                                    }
+                                },
+                            label = { Text("نژاد پت * (الزامی)") },
+                            placeholder = { Text("مثال: شیتزو") },
+                            enabled = isSpeciesChosen,
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
+                        )
 
-                    if (isSpeciesChosen && breedOptions.isNotEmpty()) {
+                        DropdownMenu(
+                            expanded = isBreedDropdownExpanded && filteredBreeds.isNotEmpty() && filteredBreeds.any { it != petBreed },
+                            onDismissRequest = { isBreedDropdownExpanded = false },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 240.dp)
+                        ) {
+                            filteredBreeds.forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option, fontSize = 13.sp) },
+                                    onClick = {
+                                        petBreed = option
+                                        isBreedDropdownExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    if (isSpeciesChosen && filteredBreeds.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text("پیشنهادهای نژاد بر اساس گونه:", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         FlowRow(
@@ -362,12 +480,15 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                                 .padding(top = 4.dp),
                             horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
-                            breedOptions.forEach { option ->
+                            filteredBreeds.take(15).forEach { option ->
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(6.dp))
                                         .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f))
-                                        .clickable { petBreed = option }
+                                        .clickable { 
+                                            petBreed = option 
+                                            isBreedDropdownExpanded = false
+                                        }
                                         .padding(horizontal = 8.dp, vertical = 4.dp)
                                 ) {
                                     Text(option, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSecondaryContainer)

@@ -19,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
@@ -48,6 +49,76 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
     var newPetAge by remember { mutableStateOf("") }
     var newPetGender by remember { mutableStateOf("نر") }
     var newPetSpecies by remember { mutableStateOf("dog") } // "dog", "cat", "exotic"
+
+    // Populate standard lists of breed based on species in Persian and English for Owner registration
+    val ownerBreedOptions = when (newPetSpecies) {
+        "dog" -> listOf(
+            "شیتزو (Shih Tzu)",
+            "ژرمن شپرد (German Shepherd)",
+            "هاسکی سیبرین (Siberian Husky)",
+            "پودل (Poodle)",
+            "پمرانین (Pomeranian)",
+            "گلدن رتریور (Golden Retriever)",
+            "پاگ (Pug)",
+            "بولداگ (Bulldog)",
+            "روتوایلر (Rottweiler)",
+            "دوبرمن (Doberman)",
+            "پیتبول (Pitbull)",
+            "سرابی (Sarabi Mastiff)",
+            "تریر (Terrier)",
+            "داکسهوند (Dachshund)",
+            "ساموید (Samoyed)",
+            "گریت دین (Great Dane)",
+            "باکسر (Boxer)",
+            "بیگل (Beagle)",
+            "چاو چاو (Chow Chow)",
+            "کوکر اسپنیل (Cocker Spaniel)",
+            "بومی / دورگه (Mixed Breed)"
+        )
+        "cat" -> listOf(
+            "پرشین (Persian)",
+            "دی‌اس‌اچ (DSH)",
+            "اسکاتیش فولد (Scottish Fold)",
+            "بریتیش فولد (British Fold)",
+            "بریتیش شورت‌هر (British Shorthair)",
+            "دی‌ال‌اچ (DLH)",
+            "سیامی (Siamese)",
+            "راگدول (Ragdoll)",
+            "مین کون (Maine Coon)",
+            "اسفینکس (Sphynx)",
+            "راشن بلو (Russian Blue)",
+            "بنگال (Bengal)",
+            "آنگورای ترکی (Turkish Angora)",
+            "بیرمن (Birman)",
+            "بومی / دورگه (Mixed Breed)"
+        )
+        "exotic" -> listOf(
+            "عروس هلندی (Cockatiel)",
+            "مرغ عشق (Budgerigar)",
+            "کاسکو (Grey Parrot)",
+            "همستر روسی (Russian Hamster)",
+            "خوکچه هندی (Guinea Pig)",
+            "خرگوش لوپ (Lop Rabbit)",
+            "ماهی قرمز (Goldfish)",
+            "گوپی (Guppy)",
+            "لاک‌پشت گوش‌قرمز (Red-eared Slider)",
+            "آنجل (Angel Fish)"
+        )
+        else -> emptyList()
+    }
+
+    var isBreedDropdownExpanded by remember { mutableStateOf(false) }
+    var breedTextFieldFocused by remember { mutableStateOf(false) }
+
+    val filteredBreeds = remember(newPetBreed, ownerBreedOptions) {
+        if (newPetBreed.isEmpty()) {
+            ownerBreedOptions
+        } else {
+            ownerBreedOptions.filter {
+                it.contains(newPetBreed, ignoreCase = true)
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -184,15 +255,73 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        OutlinedTextField(
-                            value = newPetBreed,
-                            onValueChange = { newPetBreed = it },
-                            modifier = Modifier.fillMaxWidth(),
-                            label = { Text("نژاد حیوان") },
-                            placeholder = { Text("پرشین / هاسکی") },
-                            singleLine = true,
-                            shape = RoundedCornerShape(12.dp)
-                        )
+                        // Breed selection with quick pill filters and intelligent autocomplete
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            OutlinedTextField(
+                                value = newPetBreed,
+                                onValueChange = { newValue ->
+                                    newPetBreed = newValue
+                                    isBreedDropdownExpanded = newValue.isNotEmpty()
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .onFocusChanged { focusState ->
+                                        breedTextFieldFocused = focusState.isFocused
+                                        if (focusState.isFocused && newPetBreed.isNotEmpty()) {
+                                            isBreedDropdownExpanded = true
+                                        }
+                                    },
+                                label = { Text("نژاد حیوان") },
+                                placeholder = { Text("پرشین / هاسکی") },
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+
+                            DropdownMenu(
+                                expanded = isBreedDropdownExpanded && filteredBreeds.isNotEmpty() && filteredBreeds.any { it != newPetBreed },
+                                onDismissRequest = { isBreedDropdownExpanded = false },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = 200.dp)
+                            ) {
+                                filteredBreeds.forEach { option ->
+                                    DropdownMenuItem(
+                                        text = { Text(option, fontSize = 13.sp) },
+                                        onClick = {
+                                            newPetBreed = option
+                                            isBreedDropdownExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        if (filteredBreeds.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text("پیشنهادهای نژاد بر اساس گونه:", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            @OptIn(ExperimentalLayoutApi::class)
+                            FlowRow(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 4.dp),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                filteredBreeds.take(12).forEach { option ->
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f))
+                                            .clickable { 
+                                                newPetBreed = option 
+                                                isBreedDropdownExpanded = false
+                                            }
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    ) {
+                                        Text(option, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                                    }
+                                }
+                            }
+                        }
 
                         Spacer(modifier = Modifier.height(8.dp))
 
