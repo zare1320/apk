@@ -27,6 +27,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ui.screens.DogVectorIcon
+import com.example.ui.screens.CatVectorIcon
+import com.example.ui.screens.ExoticVectorIcon
 import com.example.data.database.Pet
 import com.example.viewmodel.MainViewModel
 
@@ -196,7 +199,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        Text("نوع حیوان (گونه زیستی):", fontSize = 11.sp)
+                        Text("نوع حیوان (گونه زیستی):", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -204,28 +207,44 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             listOf(
-                                Triple("dog", "🐕 سگ", Color(0xFFC084FC)),
-                                Triple("cat", "🐈 گربه", Color(0xFF60A5FA)),
-                                Triple("exotic", "🦜 پرنده/اگزوتیک", Color(0xFF34D399))
+                                Triple("dog", "سگ", Color(0xFFC084FC)),
+                                Triple("cat", "گربه", Color(0xFF60A5FA)),
+                                Triple("exotic", "پرنده/اگزوتیک", Color(0xFF34D399))
                             ).forEach { (code, label, color) ->
                                 val isSel = newPetSpecies == code
-                                val bg = if (isSel) color else MaterialTheme.colorScheme.surface
+                                val bg = if (isSel) color else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                                 Box(
                                     modifier = Modifier
                                         .weight(1f)
-                                        .clip(RoundedCornerShape(8.dp))
+                                        .clip(RoundedCornerShape(12.dp))
                                         .background(bg)
+                                        .border(
+                                            width = if (isSel) 0.dp else 1.dp,
+                                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                                            shape = RoundedCornerShape(12.dp)
+                                        )
                                         .clickable { newPetSpecies = code }
                                         .defaultMinSize(minHeight = 48.dp)
                                         .padding(horizontal = 4.dp, vertical = 10.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text(
-                                        label,
-                                        color = if (isSel) Color.White else Color.Black,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        when (code) {
+                                            "dog" -> DogVectorIcon(modifier = Modifier.size(18.dp), tint = if (isSel) Color.White else color)
+                                            "cat" -> CatVectorIcon(modifier = Modifier.size(18.dp), tint = if (isSel) Color.White else color)
+                                            else -> ExoticVectorIcon(modifier = Modifier.size(18.dp), tint = if (isSel) Color.White else color)
+                                        }
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            label,
+                                            color = if (isSel) Color.White else MaterialTheme.colorScheme.onSurface,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
                                 }
                             }
                         }

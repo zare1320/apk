@@ -28,6 +28,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ui.screens.SharedSpeciesCircleButton
 import com.example.data.database.Pet
 import com.example.viewmodel.MainViewModel
 
@@ -198,8 +199,8 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             // Dog circle
-            SpeciesCircleButton(
-                emoji = "🐕",
+            SharedSpeciesCircleButton(
+                speciesKey = "dog",
                 label = "سگ",
                 isSelected = activeSpecies == "dog",
                 onClick = {
@@ -209,8 +210,8 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
             )
 
             // Cat circle
-            SpeciesCircleButton(
-                emoji = "🐈",
+            SharedSpeciesCircleButton(
+                speciesKey = "cat",
                 label = "گربه",
                 isSelected = activeSpecies == "cat",
                 onClick = {
@@ -220,8 +221,8 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
             )
 
             // Exotic circle
-            SpeciesCircleButton(
-                emoji = "🦎",
+            SharedSpeciesCircleButton(
+                speciesKey = "exotic",
                 label = "اگزوتیک پت",
                 isSelected = activeSpecies == "exotic",
                 onClick = {
@@ -911,40 +912,5 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun SpeciesCircleButton(
-    emoji: String,
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    val bgCol by animateColorAsState(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
-    val textCol by animateColorAsState(if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface)
-    val outlineCol by animateColorAsState(if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable { onClick() }
-    ) {
-        Box(
-            modifier = Modifier
-                .size(75.dp)
-                .clip(CircleShape)
-                .background(bgCol)
-                .border(3.dp, outlineCol, CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(emoji, fontSize = 36.sp)
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = label,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            color = textCol
-        )
     }
 }

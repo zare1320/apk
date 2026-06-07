@@ -84,14 +84,7 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Weight helper info
-        Text(
-            text = "وزن مبنا جهت اجرای فرمول‌ها: ${weightInput.ifEmpty { "1.0" }} کیلوگرم",
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-        )
 
-        Spacer(modifier = Modifier.height(12.dp))
 
         CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
             // Interactive Display

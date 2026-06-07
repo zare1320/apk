@@ -89,17 +89,44 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
             DiagnosticSign("anorexia", "Anorexia", "بی‌اشتهایی حاد", "general", listOf("کلسی‌ویروس گربه‌سانان (FCV)", "پاروویروس سگ‌سانان (CPV)")),
             DiagnosticSign("weight_loss", "Weight Loss", "کاهش وزن مفرط", "general", listOf("راینوتراکئیت ویروسی گربه", "دم خیس")),
             
-            DiagnosticSign("cough", "Dry Coughing", "سرفه خشک", "cardio", listOf("سرفه کنل (سیاه‌سرفه سگ)", "دیستمپر سگ")),
-            DiagnosticSign("dyspnea", "Dyspnea / Laboured Breathing", "تنگی نفس شدید", "cardio", listOf("راینوتراکئیت ویروسی گربه", "بند آمدن تخم")),
-            DiagnosticSign("sneezing", "Sneezing Attacks", "عطسه‌های مکرر", "cardio", listOf("راینوتراکئیت ویروسی گربه", "کلسی‌ویروس گربه‌سانان")),
+            // Cardiorespiratory signs (7 items - Screenshot 1)
+            DiagnosticSign("collapse", "Collapse / Syncope", "سنکوپ / کلاپس عروقی", "cardio", listOf("شوک و افت فشار شریانی", "بیماری‌های دریچه‌ای قلبی", "آریتمی شدید قلبی")),
+            DiagnosticSign("cough_cats", "Cough in cats", "سرفه در گربه‌ها", "cardio", listOf("آسم گربه‌سانان (Feline Asthma)", "برونشیت مزمن ریوی", "عفونت‌های ویروسی تنفسی")),
+            DiagnosticSign("cough_dogs", "Cough in dogs", "سرفه در سگ‌ها", "cardio", listOf("سرفه کنل (Kennel Cough)", "کلاپس نای (Tracheal Collapse)", "نارسایی احتقانی قلب (CHF)")),
+            DiagnosticSign("epistaxis", "Epistaxis", "خون‌دماغ شدن (اپیستاکسی)", "cardio", listOf("سندرم‌های انعقادی خون", "مسمومیت با جونده‌کش ضد انعقاد", "انگل‌های خونی Ehrlichia")),
+            DiagnosticSign("hemoptysis", "Hemoptysis", "خون‌ریزی ریوی", "cardio", listOf("پنومونی نکروزه شریانی", "آمبولی و ترومبوز ریه", "عفونت کرم قلب پیشرفته")),
+            DiagnosticSign("reverse_sneezing", "Reverse sneezing", "عطسه معکوس", "cardio", listOf("سندرم راه هوایی براکی‌سفالیک", "تحریک ناشی از گرد و خاک محیطی")),
+            DiagnosticSign("sneezing_nasal", "Sneezing / Nasal discharge", "عطسه و ترشحات بینی", "cardio", listOf("راینوتراکئیت ویروسی گربه", "کلسی‌ویروس گربه‌سانان", "آسپرژیلوزیس سینوسی")),
             
-            DiagnosticSign("vomiting", "Vomiting", "استفراغ شدید", "gastro", listOf("پاروویروس سگ‌سانان (CPV)", "پنلوکوپنی گربه‌ها")),
-            DiagnosticSign("diarrhea", "Watery Diarrhea", "اسهال حاد", "gastro", listOf("پاروویروس سگ‌سانان (CPV)", "پنلوکوپنی گربه‌ها", "دم خیس")),
-            DiagnosticSign("bloody_stool", "Bloody Stool", "اسهال خونی جهنده", "gastro", listOf("پاروویروس سگ‌سانان (CPV)", "پنلوکوپنی گربه‌ها")),
+            // Gastrointestinal signs (19 items - Screenshot 2 & 3)
+            DiagnosticSign("abdominal_distension", "Abdominal distension", "اتساع شکمی", "gastro", listOf("پیچش و اتساع معده (GDV)", "آسیت یا آب‌آوردگی شکم", "خونریزی داخلی ناشی از پارگی طحال")),
+            DiagnosticSign("constipation_obstipation", "Constipation / Obstipation", "یبوست و انسداد مجرای کولون", "gastro", listOf("سندرم مگاکولون گربه‌ها", "بلع جسم خارجی انسدادی", "انسداد فتق پرینه در سگ نر")),
+            DiagnosticSign("diarrhea", "Diarrhea", "اسهال عمومی", "gastro", listOf("تهوع و اسهال معمولی", "بروز انگل‌های گوارشی", "گاستروآنتریت خودمختار")),
+            DiagnosticSign("diarrhea_acute", "Diarrhea (acute)", "اسهال حاد", "gastro", listOf("پاروویروس سگ‌سانان (CPV)", "پنلوکوپنی گربه (FPV)", "مسمومیت قارچی یا غذایی حاد")),
+            DiagnosticSign("diarrhea_chronic", "Diarrhea (chronic)", "اسهال مزمن", "gastro", listOf("بیماری التهاب روده (IBD)", "سوءجذب روده باریک", "انگل ژیاردیا یا کریپتوسپوریدیوم")),
+            DiagnosticSign("dysphagia", "Dysphagia", "سختی در بلع غذا", "gastro", listOf("اجسام خارجی حلقی مری", "استوماتیت لنفوسیتیک گربه‌ها", "آسیب عصب زبانی حلقی")),
+            DiagnosticSign("fecal_incontinence", "Fecal incontinence", "بی‌اختیاری در دفع مدفوع", "gastro", listOf("بیماری تخریب دیسک بین مهره‌ای", "فیستول مقعدی در نژاد ژرمن", "فلجی اسفنکتر خارجی")),
+            DiagnosticSign("flatulence", "Flatulence", "باد شکم و گوارش سخت", "gastro", listOf("تخمیر باکتریایی جیره پر کربوهیدرات", "رشد بیش از حد باکتری روده (SIBO)")),
+            DiagnosticSign("gagging_retching", "Gagging / Retching", "عق زدن بیهوده و سخت", "gastro", listOf("انسداد مری با استخوان یا شئی", "کلاپس نای ضربانی")),
+            DiagnosticSign("halitosis", "Halitosis", "بوی بد دهان", "gastro", listOf("پریودنتیت حاد و پوسیدگی ریشه دندان", "اورمی ناشی از نارسایی کلیوی")),
+            DiagnosticSign("hematemesis", "Hematemesis", "استفراغ خونی", "gastro", listOf("زخم معده عمیق ناشی از NSAID", "مسمومیت با حلال‌های اسیدی")),
+            DiagnosticSign("hematochezia", "Hematochezia", "دفع خون روشن در مدفوع", "gastro", listOf("کولیت کولون نزولی", "آلودگی شدید به کرم شلاقی")),
+            DiagnosticSign("melena", "Melena", "مدفوع تیره و هضم شده", "gastro", listOf("خونریزی دوازدهه یا معده بیمار", "مصرف کورتون همراه مسکن ممنوعه")),
+            DiagnosticSign("ptyalism", "Ptyalism / Pseudoptyalism", "بزاق جاری و آب دهان زیاد", "gastro", listOf("مسمومیت با سموم ارگانوفسفره", "تهوع شدید مسافرتی", "سوختگی شیمیایی لثه")),
+            DiagnosticSign("regurgitation", "Regurgitation", "رگورژیتاسیون (برگشت غیر فعال)", "gastro", listOf("مگاازوفاگوس مادرزادی یا اکتسابی", "التهاب ازوفاژیت مری")),
+            DiagnosticSign("tenesmus_dyschezia", "Tenesmus / Dyschezia", "تلاش دردناک بی‌ثمر جهت دفع", "gastro", listOf("بزرگ‌شدگی پروستات سگ (BPH)", "فتق لترال پرینه", "آبسه غدد مقعدی")),
+            DiagnosticSign("vomiting", "Vomiting", "استفراغ عمومی", "gastro", listOf("پانکراتیت حاد", "تورم معده خودمختار", "نارسایی ترشحی کبد")),
+            DiagnosticSign("vomiting_acute", "Vomiting (acute)", "استفراغ حاد", "gastro", listOf("انسداد روده با اسباب بازی یا جوراب", "پاروویروس گوارشی")),
+            DiagnosticSign("vomiting_chronic", "Vomiting (chronic)", "استفراغ مزمن", "gastro", listOf("نارسایی ثانویه کلیه بیمار", "هایپرپلازی سست پیلور معده")),
             
-            DiagnosticSign("seizures", "Seizures / Convulsions", "تشنج‌های مکرر", "neuro", listOf("دیستمپر سگ (CDV)", "هاری")),
-            DiagnosticSign("ataxia", "Ataxia / Loss of Balance", "عدم تعادل و سستی پا", "neuro", listOf("دیستمپر سگ (CDV)")),
-            DiagnosticSign("tremors", "Myoclonus / Muscle Tremors", "لرزش عضلانی عصبی", "neuro", listOf("دیستمپر سگ (CDV)")),
+            DiagnosticSign("deafness", "Deafness", "ناشنوایی حاد یا مزمن بیمار", "neuro", listOf("عفونت شدید مجرای گوش داخلی", "مسمومیت دارویی با جنتامایسین")),
+            DiagnosticSign("head_pressing", "Head pressing", "فشار دادن سر به سطوح (هدپرسینگ)", "neuro", listOf("انسفالوپاتی کبدی پیشرفته", "تومور یا التهاب مغزی مننژیت")),
+            DiagnosticSign("myoclonus", "Myoclonus", "میوکلونوس عمیق عضلاتی", "neuro", listOf("ویروس دیستمپر حاد سگ‌سانان (CDV)", "پاسخ تحریک رفلکسی نخاع")),
+            DiagnosticSign("myotonia", "Myotonia", "سفتی پایدار عضلانی (میوتونی)", "neuro", listOf("اختلال کانال کلسیم موروثی اورگانیک", "انقباض مداوم عصب محرک")),
+            DiagnosticSign("nystagmus", "Nystagmus", "انحراف و لرزش مردمک چشم (نیستاگموس)", "neuro", listOf("سندرم وستیبولار گرانشی", "سایتوتوکسیسیتی مترونیدازول")),
+            DiagnosticSign("seizures", "Seizures", "تشنج شدید و صرع", "neuro", listOf("صرع ایدیوپاتیک و ارگانیک گربه و سگ", "هیپوگلیسمی بحرانی خون")),
+            DiagnosticSign("stupor_coma", "Stupor / Coma", "بهت‌زدگی عمیق یا کما", "neuro", listOf("تروما شدید و ضربه ضرباتی مغزی", "شوک بحرانی پایپلاین عروقی")),
+            DiagnosticSign("tremors", "Tremors", "لرزش عمومی یا موضعی شیورینگ", "neuro", listOf("مسمومیت ارگانوفسفره کشاورزی", "کاهش بحرانی کلسیم سرم (اکلامپسی)")),
 
             DiagnosticSign("lameness", "Lameness / Limping", "لنگش و دشواری حرکت", "ortho", listOf("شکستگی استخوان", "آرتریت مزمن")),
             DiagnosticSign("bone_pain", "Joint / Bone Pain", "درد شدید مفصل و استخوان", "ortho", listOf("آرتریت مزمن")),
@@ -546,87 +573,101 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                                             signsList.filter { it.category == selectedCategoryDetail }.map { Triple(it.id, it.nameEn, it.nameFa) }
                                         }
 
-                                        Row(
+                                        // Master Card layout encompassing Contents and the list items (Screenshot 1 & 2)
+                                        Card(
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .padding(vertical = 12.dp),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
+                                                .border(1.dp, strokeColor, RoundedCornerShape(16.dp))
+                                                .padding(bottom = 16.dp),
+                                            colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                            shape = RoundedCornerShape(16.dp)
                                         ) {
-                                            Text(
-                                                "Contents",
-                                                fontWeight = FontWeight.Bold,
-                                                fontSize = 15.sp,
-                                                color = primaryText
-                                            )
-                                            Box(
-                                                modifier = Modifier
-                                                    .height(24.dp)
-                                                    .width(36.dp)
-                                                    .background(accentTeal, RoundedCornerShape(12.dp)),
-                                                contentAlignment = Alignment.Center
+                                            Column(
+                                                modifier = Modifier.padding(16.dp)
                                             ) {
-                                                Text(
-                                                    text = displaySigns.size.toString(),
-                                                    color = Color.White,
-                                                    fontSize = 11.sp,
-                                                    fontWeight = FontWeight.Bold
-                                                )
-                                            }
-                                        }
-
-                                        Spacer(modifier = Modifier.height(8.dp))
-
-                                        Column(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                                        ) {
-                                            displaySigns.forEach { (id, nameEn, nameFa) ->
-                                                Card(
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .border(1.dp, strokeColor, RoundedCornerShape(12.dp))
-                                                        .clickable { selectedHistoricalSign = id },
-                                                    colors = CardDefaults.cardColors(containerColor = cardBgColor),
-                                                    shape = RoundedCornerShape(12.dp)
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                                    verticalAlignment = Alignment.CenterVertically
                                                 ) {
-                                                    Row(
+                                                    Text(
+                                                        "Contents",
+                                                        fontWeight = FontWeight.Bold,
+                                                        fontSize = 16.sp,
+                                                        color = primaryText
+                                                    )
+                                                    Box(
                                                         modifier = Modifier
-                                                            .fillMaxWidth()
-                                                            .padding(horizontal = 14.dp, vertical = 14.dp),
-                                                        verticalAlignment = Alignment.CenterVertically,
-                                                        horizontalArrangement = Arrangement.SpaceBetween
+                                                            .size(width = 36.dp, height = 28.dp)
+                                                            .background(accentTeal, RoundedCornerShape(14.dp)),
+                                                        contentAlignment = Alignment.Center
                                                     ) {
-                                                        Row(
-                                                            verticalAlignment = Alignment.CenterVertically
+                                                        Text(
+                                                            text = displaySigns.size.toString(),
+                                                            color = Color.White,
+                                                            fontSize = 12.sp,
+                                                            fontWeight = FontWeight.Bold
+                                                        )
+                                                    }
+                                                }
+
+                                                Spacer(modifier = Modifier.height(16.dp))
+
+                                                Column(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                                                ) {
+                                                    displaySigns.forEach { (id, nameEn, nameFa) ->
+                                                        Card(
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .border(1.dp, strokeColor.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                                                .clickable { selectedHistoricalSign = id },
+                                                            colors = CardDefaults.cardColors(
+                                                                containerColor = if (isDark) MaterialTheme.colorScheme.surface.copy(alpha = 0.3f) else Color.White
+                                                            ),
+                                                            shape = RoundedCornerShape(12.dp)
                                                         ) {
-                                                            Box(
+                                                            Row(
                                                                 modifier = Modifier
-                                                                    .size(36.dp)
-                                                                    .background(accentTeal.copy(alpha = 0.11f), CircleShape),
-                                                                contentAlignment = Alignment.Center
+                                                                    .fillMaxWidth()
+                                                                    .padding(horizontal = 14.dp, vertical = 14.dp),
+                                                                verticalAlignment = Alignment.CenterVertically,
+                                                                horizontalArrangement = Arrangement.SpaceBetween
                                                             ) {
+                                                                Row(
+                                                                    verticalAlignment = Alignment.CenterVertically
+                                                                ) {
+                                                                    Box(
+                                                                        modifier = Modifier
+                                                                            .size(36.dp)
+                                                                            .background(accentTeal.copy(alpha = 0.11f), CircleShape)
+                                                                            .border(1.dp, accentTeal.copy(alpha = 0.3f), CircleShape),
+                                                                        contentAlignment = Alignment.Center
+                                                                    ) {
+                                                                        Icon(
+                                                                            imageVector = Icons.Default.Description,
+                                                                            contentDescription = null,
+                                                                            tint = accentTeal,
+                                                                            modifier = Modifier.size(18.dp)
+                                                                        )
+                                                                    }
+                                                                    Spacer(modifier = Modifier.width(14.dp))
+                                                                    Text(
+                                                                        text = nameEn,
+                                                                        fontWeight = FontWeight.Bold,
+                                                                        fontSize = 14.sp,
+                                                                        color = primaryText
+                                                                    )
+                                                                }
                                                                 Icon(
-                                                                    imageVector = Icons.Default.Description,
-                                                                    contentDescription = null,
-                                                                    tint = accentTeal,
-                                                                    modifier = Modifier.size(18.dp)
+                                                                    imageVector = Icons.Default.ChevronRight,
+                                                                    contentDescription = "Open Details",
+                                                                    tint = secondaryText,
+                                                                    modifier = Modifier.size(20.dp)
                                                                 )
                                                             }
-                                                            Spacer(modifier = Modifier.width(14.dp))
-                                                            Text(
-                                                                text = nameEn,
-                                                                fontWeight = FontWeight.Bold,
-                                                                fontSize = 14.sp,
-                                                                color = primaryText
-                                                            )
                                                         }
-                                                        Icon(
-                                                            imageVector = Icons.Default.ChevronRight,
-                                                            contentDescription = "Open Details",
-                                                            tint = secondaryText,
-                                                            modifier = Modifier.size(20.dp)
-                                                        )
                                                     }
                                                 }
                                             }
