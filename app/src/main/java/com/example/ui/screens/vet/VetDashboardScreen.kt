@@ -144,6 +144,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
 
     var isBreedDropdownExpanded by remember { mutableStateOf(false) }
     var breedTextFieldFocused by remember { mutableStateOf(false) }
+    var showBreedGuidelines by remember { mutableStateOf(false) }
 
     val filteredBreeds = remember(petBreed, breedOptions) {
         if (petBreed.isEmpty()) {
@@ -472,26 +473,69 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                     }
 
                     if (isSpeciesChosen && filteredBreeds.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text("پیشنهادهای نژاد بر اساس گونه:", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        FlowRow(
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 4.dp),
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable { showBreedGuidelines = !showBreedGuidelines }
+                                .padding(vertical = 4.dp, horizontal = 6.dp)
                         ) {
-                            filteredBreeds.take(15).forEach { option ->
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f))
-                                        .clickable { 
-                                            petBreed = option 
-                                            isBreedDropdownExpanded = false
-                                        }
-                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = if (showBreedGuidelines) "🏷️ پنهان کردن لیست نژادهای پیشنهادی" else "💡 مشاهده نژادهای پیشنهادی این گونه",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        AnimatedVisibility(visible = showBreedGuidelines) {
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(10.dp)
                                 ) {
-                                    Text(option, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                                    Text(
+                                        text = "پیشنهادهای نژاد برای کمک به ثبت سریع‌تر:",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    FlowRow(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                                    ) {
+                                        filteredBreeds.take(24).forEach { option ->
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(6.dp))
+                                                    .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f))
+                                                    .clickable { 
+                                                        petBreed = option 
+                                                        isBreedDropdownExpanded = false
+                                                    }
+                                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                            ) {
+                                                Text(option, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
