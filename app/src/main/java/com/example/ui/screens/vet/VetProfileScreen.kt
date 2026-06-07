@@ -56,11 +56,19 @@ fun VetProfileScreen(viewModel: MainViewModel) {
     // Interactivity state copies
     var editedName by remember { mutableStateOf("مسعود زارع") }
     var editedPhone by remember { mutableStateOf("۰۹۲۱ ۱۰۹ ۷۷۳۶") }
+    var identification by remember { mutableStateOf("") }
+    var workplaceOrUni by remember { mutableStateOf("") }
+    var specialty by remember { mutableStateOf("") }
+    var isStudent by remember { mutableStateOf(false) }
 
     LaunchedEffect(activeSession) {
-        if (activeSession != null) {
-            editedName = activeSession?.fullName ?: "مسعود زارع"
-            editedPhone = activeSession?.phoneNumber ?: "۰۹۲۱ ۱۰۹ ۷۷۳۶"
+        activeSession?.let {
+            editedName = it.fullName
+            editedPhone = it.phoneNumber
+            identification = it.identification
+            workplaceOrUni = it.workplaceOrUni
+            specialty = it.specialty
+            isStudent = it.workplaceOrUni.isNotEmpty() && it.specialty.isEmpty()
         }
     }
 
@@ -178,6 +186,19 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                                     color = mutedTextColor,
                                                     fontWeight = FontWeight.Medium
                                                 )
+                                                if (identification.isNotEmpty() || workplaceOrUni.isNotEmpty() || specialty.isNotEmpty()) {
+                                                    Spacer(modifier = Modifier.height(4.dp))
+                                                    Text(
+                                                        text = if (isStudent) {
+                                                            "🎓 دانشجو/رزیدنت: $workplaceOrUni | کد: $identification"
+                                                        } else {
+                                                            "🩺 پزشک متخصص: $specialty | پروانه: $identification"
+                                                        },
+                                                        fontSize = 11.sp,
+                                                        color = Color(0xFF3B82F6),
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                }
                                             }
                                         }
 
@@ -748,11 +769,32 @@ fun VetProfileScreen(viewModel: MainViewModel) {
             if (showEditProfileDialog) {
                 var nameInput by remember { mutableStateOf(editedName) }
                 var phoneInput by remember { mutableStateOf(editedPhone) }
+                var isStudentInput by remember { mutableStateOf(isStudent) }
+                var idInput by remember { mutableStateOf(identification) }
+                var workplaceInput by remember { mutableStateOf(workplaceOrUni.ifEmpty { "دانشگاه تهران" }) }
+                var specialtyInput by remember { mutableStateOf(specialty.ifEmpty { "داخلی حیوانات کوچک" }) }
+
+                var isUniDropdownExpanded by remember { mutableStateOf(false) }
+                var isSpecialtyDropdownExpanded by remember { mutableStateOf(false) }
+
+                val universityList = listOf(
+                    "دانشگاه تهران", "دانشگاه شیراز", "دانشگاه فردوسی مشهد",
+                    "دانشگاه علوم تحقیقات", "دانشگاه تبریز", "دانشگاه کار و هنر"
+                )
+
+                val specialtyList = listOf(
+                    "داخلی حیوانات کوچک", "جراحی و هوشبری", "کلینیکال پاتولوژی",
+                    "رادیولوژی و تصویربرداری", "مامایی و بیماری‌های تولیدمثل"
+                )
+
                 AlertDialog(
                     onDismissRequest = { showEditProfileDialog = false },
                     title = { Text("ویرایش اطلاعات حساب کاربری", fontWeight = FontWeight.Bold, fontSize = 16.sp) },
                     text = {
-                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier.verticalScroll(rememberScrollState())
+                        ) {
                             OutlinedTextField(
                                 value = nameInput,
                                 onValueChange = { nameInput = it },
@@ -767,6 +809,144 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth()
                             )
+
+                            Text(
+                                text = "نوع کاربری صنفی:",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF3B82F6)
+                            )
+
+                            // Student vs Practitioner Toggle Row
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(44.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(if (isDark) Color(0xFF1E293B) else Color(0xFFEDF2F7))
+                                    .padding(2.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight()
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(if (!isStudentInput) Color(0xFF3B82F6) else Color.Transparent)
+                                        .clickable { isStudentInput = false },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        "👨‍⚕️ پزشک کلینیسین",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (!isStudentInput) Color.White else (if (isDark) Color.White else Color.Black)
+                                    )
+                                }
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight()
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(if (isStudentInput) Color(0xFF3B82F6) else Color.Transparent)
+                                        .clickable { isStudentInput = true },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        "🎓 دانشجو یا رزیدنت",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isStudentInput) Color.White else (if (isDark) Color.White else Color.Black)
+                                    )
+                                }
+                            }
+
+                            if (isStudentInput) {
+                                // School selection drop-down selector
+                                Text("🎓 دانشگاه محل تحصیل:", fontSize = 11.sp)
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .border(1.dp, if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1), RoundedCornerShape(12.dp))
+                                        .background(cardBgColor)
+                                        .clickable { isUniDropdownExpanded = true }
+                                        .padding(12.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(workplaceInput, fontSize = 13.sp, color = textColor)
+                                        Text("▼", fontSize = 10.sp, color = Color.Gray)
+                                    }
+
+                                    DropdownMenu(
+                                        expanded = isUniDropdownExpanded,
+                                        onDismissRequest = { isUniDropdownExpanded = false }
+                                    ) {
+                                        universityList.forEach { uni ->
+                                            DropdownMenuItem(
+                                                text = { Text(uni, fontSize = 13.sp) },
+                                                onClick = {
+                                                    workplaceInput = uni
+                                                    isUniDropdownExpanded = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+
+                                OutlinedTextField(
+                                    value = idInput,
+                                    onValueChange = { idInput = it },
+                                    label = { Text("شماره دانشجویی / کد موقت") },
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            } else {
+                                // Practitioner details
+                                OutlinedTextField(
+                                    value = idInput,
+                                    onValueChange = { idInput = it },
+                                    label = { Text("شماره نظام دامپزشکی") },
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+
+                                Text("🩺 تخصص کلینیکال اصلی:", fontSize = 11.sp)
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .border(1.dp, if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1), RoundedCornerShape(12.dp))
+                                        .background(cardBgColor)
+                                        .clickable { isSpecialtyDropdownExpanded = true }
+                                        .padding(12.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(specialtyInput, fontSize = 13.sp, color = textColor)
+                                        Text("▼", fontSize = 10.sp, color = Color.Gray)
+                                    }
+
+                                    DropdownMenu(
+                                        expanded = isSpecialtyDropdownExpanded,
+                                        onDismissRequest = { isSpecialtyDropdownExpanded = false }
+                                    ) {
+                                        specialtyList.forEach { spec ->
+                                            DropdownMenuItem(
+                                                text = { Text(spec, fontSize = 13.sp) },
+                                                onClick = {
+                                                    specialtyInput = spec
+                                                    isSpecialtyDropdownExpanded = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                         }
                     },
                     confirmButton = {
@@ -774,6 +954,19 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                             onClick = {
                                 editedName = nameInput
                                 editedPhone = phoneInput
+                                isStudent = isStudentInput
+                                identification = idInput
+                                workplaceOrUni = if (isStudentInput) workplaceInput else ""
+                                specialty = if (!isStudentInput) specialtyInput else ""
+
+                                viewModel.updateSession(
+                                    fullName = nameInput,
+                                    phoneNumber = phoneInput,
+                                    identification = idInput,
+                                    workplaceOrUni = if (isStudentInput) workplaceInput else "",
+                                    specialty = if (!isStudentInput) specialtyInput else ""
+                                )
+
                                 showEditProfileDialog = false
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))

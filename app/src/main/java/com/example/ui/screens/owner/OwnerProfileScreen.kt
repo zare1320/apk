@@ -512,6 +512,10 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                             onClick = {
                                 editedName = nameInput
                                 editedPhone = phoneInput
+                                viewModel.updateSession(
+                                    fullName = nameInput,
+                                    phoneNumber = phoneInput
+                                )
                                 showEditProfileDialog = false
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))

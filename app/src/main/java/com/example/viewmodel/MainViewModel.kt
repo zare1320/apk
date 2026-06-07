@@ -222,6 +222,31 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
         }
     }
 
+    fun updateSession(
+        fullName: String,
+        phoneNumber: String,
+        identification: String = "",
+        workplaceOrUni: String = "",
+        specialty: String = ""
+    ) {
+        viewModelScope.launch {
+            val currentSession = repository.getActiveSessionSync()
+            if (currentSession != null) {
+                val updatedSession = currentSession.copy(
+                    fullName = fullName,
+                    phoneNumber = phoneNumber,
+                    identification = identification,
+                    workplaceOrUni = workplaceOrUni,
+                    specialty = specialty
+                )
+                if (currentSession.phoneNumber != phoneNumber) {
+                    repository.logout()
+                }
+                repository.insertSession(updatedSession.copy(isLoggedIn = true))
+            }
+        }
+    }
+
     fun savePrescription(
         drug: DrugItem,
         dosageVal: Double,
