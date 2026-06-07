@@ -271,43 +271,28 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
             shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                horizontalAlignment = Alignment.End
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+            CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    Text(
-                        text = "📋 فرم ثبت اطلاعات حیوان مورد معاینه",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (isSpeciesChosen) MaterialTheme.colorScheme.primary else Color.Gray
-                    )
-
-                    if (isSpeciesChosen) {
-                        Row(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(MaterialTheme.colorScheme.secondaryContainer)
-                                .clickable { isAddingNewRecord = !isAddingNewRecord }
-                                .padding(horizontal = 10.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(Icons.Default.Add, contentDescription = "", modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(if (isAddingNewRecord) "ثبت پرونده جدید" else "ویرایش پرونده قبل", fontSize = 11.sp)
-                        }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "📋 فرم ثبت اطلاعات حیوان مورد معاینه",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isSpeciesChosen) MaterialTheme.colorScheme.primary else Color.Gray,
+                            textAlign = TextAlign.Right
+                        )
                     }
-                }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
+                    Spacer(modifier = Modifier.height(16.dp))
                     // Record Number
                     OutlinedTextField(
                         value = recordNumber,

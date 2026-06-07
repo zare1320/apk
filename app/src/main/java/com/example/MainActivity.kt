@@ -142,73 +142,79 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                     .statusBarsPadding()
                     .padding(horizontal = 16.dp, vertical = 14.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Top
                     ) {
+                        // Right side: Doctor circle icon + profile info in front of it (to the left in RTL)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            // Circular doctor icon
+                            Box(
+                                modifier = Modifier
+                                    .size(45.dp)
+                                    .background(Color.White, androidx.compose.foundation.shape.CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("👨‍⚕️", fontSize = 24.sp)
+                            }
+
+                            // User Info column
+                            Column(
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.Start
+                            ) {
+                                val isStudent = session?.workplaceOrUni?.contains("دانشگاه") == true && session?.fullName?.contains("دکتر") == false
+                                val displayName = session?.fullName?.replace("دکتر ", "")?.replace("دکتر", "")?.ifEmpty { "مسعود زارع" } ?: "مسعود زارع"
+                                val userTitle = if (isStudent) {
+                                    "دانشجوی گرامی $displayName"
+                                } else {
+                                    "آقای دکتر $displayName"
+                                }
+                                val workplaceOrUni = session?.workplaceOrUni?.ifEmpty { "بیمارستان تخصصی پارس" } ?: "بیمارستان تخصصی پارس"
+
+                                Text(
+                                    text = userTitle,
+                                    color = Color.White,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = workplaceOrUni,
+                                    color = Color.White.copy(alpha = 0.85f),
+                                    fontSize = 10.sp
+                                )
+                            }
+                        }
+
+                        // Left side: Theme switcher icon
                         Box(
                             modifier = Modifier
                                 .size(36.dp)
-                                .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(8.dp)),
+                                .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(50.dp))
+                                .clickable { viewModel.toggleTheme() },
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("🏥", fontSize = 18.sp)
+                            Text(if (themeMode == "dark") "☀️" else "🌙", fontSize = 16.sp)
                         }
-                        Text(
-                            text = "دستیار حرفه‌ای دامپزشکی",
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
                     }
 
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(50.dp))
-                            .clickable { viewModel.toggleTheme() },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(if (themeMode == "dark") "☀️" else "🌙", fontSize = 16.sp)
-                    }
-                }
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "خوش آمدید، دکتر ${session?.fullName ?: ""}",
-                            color = Color.White.copy(alpha = 0.85f),
-                            fontSize = 10.sp
-                        )
-                        Text(
-                            text = session?.workplaceOrUni?.ifEmpty { "بیمارستان تخصصی پارس" } ?: "بیمارستان تخصصی پارس",
-                            color = Color.White,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .background(Color.White, RoundedCornerShape(50.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("👨‍⚕️", fontSize = 20.sp)
-                    }
+                    // Text "دستیار حرفه‌ای دامپزشکی" brought under application user details
+                    Text(
+                        text = "دستیار حرفه‌ای دامپزشکی",
+                        color = Color.White,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Right // Force right alignment for Persian
+                    )
                 }
             }
         },
