@@ -546,7 +546,8 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                     // Age & Gender
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         OutlinedTextField(
                             value = petAge,
@@ -560,69 +561,163 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                         )
 
                         Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
-                                .padding(8.dp)
+                            modifier = Modifier.weight(1f)
                         ) {
-                            Text("جنسیت", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                text = "جنسیت پت *",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isSpeciesChosen) MaterialTheme.colorScheme.primary else Color.Gray,
+                                modifier = Modifier.padding(start = 2.dp, bottom = 4.dp)
+                            )
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceAround,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                                    .background(
+                                        color = if (isSpeciesChosen) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f),
+                                        shape = RoundedCornerShape(12.dp)
+                                    )
+                                    .border(
+                                        width = 1.dp,
+                                        color = if (isSpeciesChosen) MaterialTheme.colorScheme.outline.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                                        shape = RoundedCornerShape(12.dp)
+                                    )
+                                    .padding(4.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
+                                // "نر" option button
+                                Box(
                                     modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight()
                                         .clip(RoundedCornerShape(8.dp))
-                                        .clickable(enabled = isSpeciesChosen) { petGender = "نر" }
-                                        .defaultMinSize(minHeight = 48.dp)
-                                        .padding(horizontal = 12.dp)
+                                        .background(
+                                            if (petGender == "نر" && isSpeciesChosen) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                                            else Color.Transparent
+                                        )
+                                        .border(
+                                            width = if (petGender == "نر" && isSpeciesChosen) 1.5.dp else 0.dp,
+                                            color = if (petGender == "نر" && isSpeciesChosen) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                            shape = RoundedCornerShape(8.dp)
+                                        )
+                                        .clickable(enabled = isSpeciesChosen) { petGender = "نر" },
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    RadioButton(
-                                        selected = petGender == "نر",
-                                        onClick = null,
-                                        enabled = isSpeciesChosen
-                                    )
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text("نر", fontSize = 11.sp)
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        RadioButton(
+                                            selected = petGender == "نر",
+                                            onClick = null,
+                                            enabled = isSpeciesChosen,
+                                            colors = RadioButtonDefaults.colors(
+                                                selectedColor = MaterialTheme.colorScheme.primary
+                                            )
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = "نر",
+                                            fontSize = 11.sp,
+                                            fontWeight = if (petGender == "نر") FontWeight.Bold else FontWeight.Normal,
+                                            color = if (isSpeciesChosen) MaterialTheme.colorScheme.onSurface else Color.Gray
+                                        )
+                                    }
                                 }
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
+
+                                // "ماده" option button
+                                Box(
                                     modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight()
                                         .clip(RoundedCornerShape(8.dp))
-                                        .clickable(enabled = isSpeciesChosen) { petGender = "ماده" }
-                                        .defaultMinSize(minHeight = 48.dp)
-                                        .padding(horizontal = 12.dp)
+                                        .background(
+                                            if (petGender == "ماده" && isSpeciesChosen) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                                            else Color.Transparent
+                                        )
+                                        .border(
+                                            width = if (petGender == "ماده" && isSpeciesChosen) 1.5.dp else 0.dp,
+                                            color = if (petGender == "ماده" && isSpeciesChosen) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                            shape = RoundedCornerShape(8.dp)
+                                        )
+                                        .clickable(enabled = isSpeciesChosen) { petGender = "ماده" },
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    RadioButton(
-                                        selected = petGender == "ماده",
-                                        onClick = null,
-                                        enabled = isSpeciesChosen
-                                    )
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text("ماده", fontSize = 11.sp)
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        RadioButton(
+                                            selected = petGender == "ماده",
+                                            onClick = null,
+                                            enabled = isSpeciesChosen,
+                                            colors = RadioButtonDefaults.colors(
+                                                selectedColor = MaterialTheme.colorScheme.primary
+                                            )
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = "ماده",
+                                            fontSize = 11.sp,
+                                            fontWeight = if (petGender == "ماده") FontWeight.Bold else FontWeight.Normal,
+                                            color = if (isSpeciesChosen) MaterialTheme.colorScheme.onSurface else Color.Gray
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
 
                     // Neutered / Spayed status
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                            .height(56.dp)
+                            .background(
+                                color = if (isSpeciesChosen) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = if (isSpeciesChosen) MaterialTheme.colorScheme.outline.copy(alpha = 0.4f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .clickable(enabled = isSpeciesChosen) { petIsNeutered = !petIsNeutered }
+                            .padding(horizontal = 14.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("عقیم شده است؟", fontSize = 13.sp, color = if (isSpeciesChosen) MaterialTheme.colorScheme.onSurface else Color.Gray)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = if (petIsNeutered) Icons.Default.Check else Icons.Default.Info,
+                                contentDescription = null,
+                                tint = if (petIsNeutered && isSpeciesChosen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "حیوان عقیم شده است؟",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = if (isSpeciesChosen) MaterialTheme.colorScheme.onSurface else Color.Gray
+                            )
+                        }
                         Switch(
                             checked = petIsNeutered,
                             onCheckedChange = { petIsNeutered = it },
-                            enabled = isSpeciesChosen
+                            enabled = isSpeciesChosen,
+                            thumbContent = if (petIsNeutered) {
+                                {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(SwitchDefaults.IconSize),
+                                    )
+                                }
+                            } else null
                         )
                     }
 
