@@ -927,26 +927,81 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                                         // Set display physical signs
                                         val displaySigns = when (selectedPhysicalCategoryDetail) {
                                             "general" -> listOf(
+                                                Triple("cyanosis", "Cyanosis", "کبودی پوست و مخاطات عروقی"),
                                                 Triple("failure_to_grow", "Failure to grow", "عدم رشد یا کندی رشد بالینی"),
                                                 Triple("fever", "Fever", "تب (دمای فوق فیزیولوژیک پاسخ به پیروژن)"),
+                                                Triple("hyperemia", "Hyperemia", "پرخونی فعال مخاطات یا پوست"),
+                                                Triple("hypertension", "Hypertension, systemic", "افزایش سنکوپ‌زای فشار خون سیستمیک"),
+                                                Triple("hypotension", "Hypotension, systemic", "کاهش بحرانی فشار خون سیستمیک"),
                                                 Triple("hypothermia", "Hypothermia", "کاهش دمای مرکزی بدن بیمار"),
+                                                Triple("jaundice", "Jaundice / Icterus", "زردی صلب چشم و پوست بدن حیوان"),
                                                 Triple("lymphadenopathy", "Lymphadenopathy", "تورم غدد لنفاوی سطحی"),
+                                                Triple("pallor", "Pallor", "رنگ‌پریدگی لثه و مخاطات"),
+                                                Triple("edema", "Peripheral edema", "ادم پیرامونی و تجمع مایع میان‌بافتی"),
+                                                Triple("petechiae", "Petechiae / Ecchymoses", "پورپورا و خونریزی ریز جلدی"),
+                                                Triple("pruritus", "Pruritus", "خارش و مالش مداوم پوست"),
+                                                Triple("restlessness", "Restlessness", "بی‌قراری و کلافگی بیمار"),
+                                                Triple("shock", "Shock", "کلاپس عروقی و عدم پرفیوژن بافتی"),
+                                                Triple("voice_change", "Voice change", "تغییر تن صدا بر اثر فلجی تارهای صوتی"),
                                                 Triple("obesity", "Weight gain / Obesity", "چاقی مفرط و انباشت چربی عروقی"),
                                                 Triple("weight_loss", "Weight loss", "لاغری مفرط و کاهش وزن مزمن بیمار")
                                             )
                                             "cardio" -> listOf(
-                                                Triple("cyanosis", "Cyanosis", "کبودی مخاطات دهان و ملتحمه چشم"),
-                                                Triple("hypertension", "Hypertension, systemic", "افزایش سنکوپ‌زای فشار خون سیستمیک"),
-                                                Triple("hypotension", "Hypotension, systemic", "کم‌فشاری بحرانی شریانی بدن بیمار"),
-                                                Triple("shock", "Shock", "کلاپس عروقی و پرفیوژن ناکافی بافت‌ها"),
-                                                Triple("pallor", "Pallor", "بی‌رنگی و سفیدشدن غشاهای مخاطی لثه")
+                                                Triple("bradycardia", "Bradycardia", "ضربان قلب بسیار کند و ضعیف"),
+                                                Triple("cardiac_arrhythmias", "Cardiac arrhythmias", "آریتمی شدید قلبی"),
+                                                Triple("congestive_heart_failure", "Congestive heart failure", "نارسایی احتقانی حاد قلب"),
+                                                Triple("cough_cats", "Cough in cats", "سرفه در گله گربه‌سانان"),
+                                                Triple("cough_dogs", "Cough in dogs", "سرفه در سگ‌سانان"),
+                                                Triple("crackles", "Crackles", "صداهای ترق‌ترق ریوی"),
+                                                Triple("dyspnea_tachypnea", "Dyspnea / Tachypnea", "تنگی نفس و تندنفسی حاد"),
+                                                Triple("epistaxis", "Epistaxis", "خون‌دماغ شدن (اپیستاکسی)"),
+                                                Triple("hemoptysis", "Hemoptysis", "خون‌ریزی ریوی (سرفه خونی)"),
+                                                Triple("jugular_pulse", "Jugular pulse (abnormal)", "پالس غیرطبیعی ورید ژوگولار"),
+                                                Triple("murmurs_cardiac", "Murmurs (cardiac)", "سوفل قلبی غیر طبیعی"),
+                                                Triple("pulse_abnormalities", "Pulse abnormalities", "ناهنجاری‌های پالس ضربانی نای"),
+                                                Triple("reverse_sneezing", "Reverse sneezing", "عطسه معکوس"),
+                                                Triple("sneezing_nasal", "Sneezing / Nasal discharge", "عطسه و ترشحات بینی"),
+                                                Triple("stertor", "Stertor", "خرخر تنفسی (خواب یا بیداری)"),
+                                                Triple("stridor", "Stridor", "صوت تنفسی زیر و خشن"),
+                                                Triple("tachycardia", "Tachycardia", "تاکی‌کاردی و ضربان قلب سریع"),
+                                                Triple("wheezes", "Wheezes", "صبت ویز تنفسی بازدمی ریوی")
                                             )
                                             "gastro" -> listOf(
-                                                Triple("jaundice", "Jaundice / Icterus", "زردی صلب چشم و پوست بدن حیوان"),
-                                                Triple("voice_change", "Voice change", "تغییر تن صدای حیوان بر اثر فلجی لارنژیت")
+                                                Triple("abdominal_distension", "Abdominal distension", "اتساع و بادکردگی شکم"),
+                                                Triple("acute_abdomen", "Acute abdomen", "شکم حاد و درد ارگانیک شدید"),
+                                                Triple("halitosis", "Halitosis", "بوی بد دهان"),
+                                                Triple("hepatomegaly", "Hepatomegaly", "بزرگ‌شدگی حاد کبد"),
+                                                Triple("oral_masses", "Oral masses", "توده‌ها و لزیون‌های دهانی"),
+                                                Triple("oral_ulceration", "Oral ulceration", "زخم‌های حاد مخاط دهانی"),
+                                                Triple("ptyalism_pseudoptyalism", "Ptyalism / Pseudoptyalism", "جاری شدن بزاق بیش از حد"),
+                                                Triple("salivary_gland_enlargement", "Salivary gland enlargement", "تورم غدد بزاق دهانی"),
+                                                Triple("stomatitis", "Stomatitis", "التهاب و زخم لثه و دهان")
                                             )
                                             "neuro" -> listOf(
-                                                Triple("restlessness", "Restlessness", "بی‌قراری حرکتی و کلافگی بیمار")
+                                                Triple("ataxia", "Ataxia", "عدم تعادل و ناهماهنگی حرکتی"),
+                                                Triple("cervical_lesions", "Cervical lesions (C1-C5)", "ضایعات نخاعی سگمان گردنی ۱ تا ۵"),
+                                                Triple("cervicothoracic_lesions", "Cervicothoracic lesions (C6-T2)", "ضایعات نخاعی سگمان گردنی ۶ تا سینه‌ای ۲"),
+                                                Triple("circling", "Circling", "چرخش ترجیحی به یک سمت"),
+                                                Triple("deafness", "Deafness", "ناشنوایی حاد یا مزمن"),
+                                                Triple("dyskinesia", "Dyskinesia", "حرکات غیر ارادی عضلانی دیسکینزی"),
+                                                Triple("head_pressing", "Head pressing", "فشار دادن سر به اجسام"),
+                                                Triple("head_tilt", "Head tilt", "کج کردن سر به یک سمت بدنی"),
+                                                Triple("lumbosacral_lesions", "Lumbosacral lesions (L4-S3)", "ضایعات کمری خاجی سگمان کمر ۴ تا خاجی ۳"),
+                                                Triple("monoparesis", "Monoparesis", "فلجی موضعی یک اندام حرکتی"),
+                                                Triple("myoclonus", "Myoclonus", "انقباضات ناگهانی و ریتمیک میوکلونوس"),
+                                                Triple("myotonia", "Myotonia", "سفتی پایدار عضلاتی (میوتونی)"),
+                                                Triple("nystagmus", "Nystagmus", "لرزش نوسانی مردمک چشم (نیستاگموس)"),
+                                                Triple("paraparesis", "Paraparesis", "فلجی ناقص اندام‌های حرکتی خلفی"),
+                                                Triple("seizures", "Seizures", "حملات صرع و غش رفتگی"),
+                                                Triple("stupor_coma", "Stupor / Coma", "بهت‌زدگی عمیق یا حالت کما"),
+                                                Triple("tetanus", "Tetanus", "سفتی شدید کلی کزاز"),
+                                                Triple("tetany", "Tetany", "اسپاسم و انقباضات پیاپی تشنج تپه‌ای"),
+                                                Triple("tetraparesis", "Tetraparesis", "ضعف حرکتی هر چهار اندام حرکتی"),
+                                                Triple("thoracolumbar_lesions", "Thoracolumbar lesions (T3-L3)", "ضایعات نخاعی سگمان سینه‌ای ۳ تا کمری ۳"),
+                                                Triple("tremors", "Tremors", "لرزش عمومی یا منطقه‌ای عضلات"),
+                                                Triple("vestibular_disease", "Vestibular disease", "بیماری وستیبولار"),
+                                                Triple("vestibular_disease_central", "Vestibular disease (central)", "بیماری وستیبولار منشأ مرکزی"),
+                                                Triple("vestibular_disease_peripheral", "Vestibular disease (peripheral)", "بیماری وستیبولار منشأ محیطی")
                                             )
                                             "ortho" -> listOf(
                                                 Triple("lameness", "Lameness", "لنگش خفیف و ملایم اندام حرکتی جفت"),
