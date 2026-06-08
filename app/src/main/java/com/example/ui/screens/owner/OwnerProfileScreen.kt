@@ -211,6 +211,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                 // 2. Account Management Category Grouping
                                 Text(
                                     text = "مدیریت حساب",
+                                    textAlign = TextAlign.Right,
                                     fontSize = 13.sp,
                                     color = mutedTextColor,
                                     fontWeight = FontWeight.Medium,
@@ -262,6 +263,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                 // 3. Support & Utils Grouping
                                 Text(
                                     text = "پشتیبانی و امکانات",
+                                    textAlign = TextAlign.Right,
                                     fontSize = 13.sp,
                                     color = mutedTextColor,
                                     fontWeight = FontWeight.Medium,
@@ -872,28 +874,11 @@ fun OwnerProfileMenuItemRedesigned(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Left side in RTL (Chevron indicator pointing left)
-        Text(
-            text = "‹", // Left pointing small Chevron
-            fontSize = 18.sp,
-            color = Color(0xFFA0AEC0),
-            modifier = Modifier.padding(bottom = 2.dp)
-        )
-
         // Right side in RTL (Icon circle badge + Title)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                text = title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = textColor,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
             // Stylized Circle containing the Emoji Icon
             Box(
                 modifier = Modifier
@@ -904,6 +889,23 @@ fun OwnerProfileMenuItemRedesigned(
             ) {
                 Text(iconEmoji, fontSize = 16.sp)
             }
+
+            Text(
+                text = title,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = textColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
+
+        // Left side in RTL (Chevron indicator pointing left)
+        Text(
+            text = "‹", // Left pointing small Chevron
+            fontSize = 18.sp,
+            color = Color(0xFFA0AEC0),
+            modifier = Modifier.padding(bottom = 2.dp)
+        )
     }
 }

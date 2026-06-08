@@ -123,7 +123,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                     }
                     Text(
                         text = when (activeProfileSection) {
-                            "نسخه‌ها" -> "کارت‌های ذخیره شده (نسخه‌ها)"
+                            "نسخه‌ها" -> "نسخه / پرونده ذخیره شده"
                             "تنظیمات" -> "تنظیمات برنامه"
                             "منابع" -> "منابع علمی معتبر"
                             "لینک‌ها" -> "لینک‌های کاربردی"
@@ -384,6 +384,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                 // 3. Account Management Category Grouping
                                 Text(
                                     text = "مدیریت حساب",
+                                    textAlign = TextAlign.Right,
                                     fontSize = 13.sp,
                                     color = mutedTextColor,
                                     fontWeight = FontWeight.Medium,
@@ -413,7 +414,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = "کارت‌های ذخیره شده",
+                                            title = "نسخه / پرونده ذخیره شده",
                                             iconEmoji = "💳",
                                             badge = if (allPrescriptions.isNotEmpty()) "${allPrescriptions.size}" else null,
                                             onClick = { activeProfileSection = "نسخه‌ها" }
@@ -424,6 +425,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                 // 4. Notifications Grouping
                                 Text(
                                     text = "اطلاع رسانی",
+                                    textAlign = TextAlign.Right,
                                     fontSize = 13.sp,
                                     color = mutedTextColor,
                                     fontWeight = FontWeight.Medium,
@@ -449,6 +451,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                 // 5. Support Grouping
                                 Text(
                                     text = "پشتیبانی",
+                                    textAlign = TextAlign.Right,
                                     fontSize = 13.sp,
                                     color = mutedTextColor,
                                     fontWeight = FontWeight.Medium,
@@ -478,7 +481,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = "گزارش تخلف فروشگاه",
+                                            title = "گزارش تخلف کاربر",
                                             iconEmoji = "⚠️",
                                             onClick = { showReportDialog = true }
                                         )
@@ -1295,7 +1298,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                             modifier = Modifier.verticalScroll(rememberScrollState())
                         ) {
                             Text("طرز کار با دوزینگ هوشمند:", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
-                            Text("۱. از صفحه اصلی، گونه حیوان یا علائم فیزیکال را انتخاب کنید.\n۲. دوز دارو را بر اساس میلی‌گرم یا وزن پت تعیین و محاسبه کنید.\n۳. نسخه نهایی در بخش 'کارت‌های ذخیره شده' با قابلیت اشتراک پیامکی سیو می‌شود.", fontSize = 11.sp, lineHeight = 16.sp, color = textColor)
+                            Text("۱. از صفحه اصلی، گونه حیوان یا علائم فیزیکال را انتخاب کنید.\n۲. دوز دارو را بر اساس میلی‌گرم یا وزن پت تعیین و محاسبه کنید.\n۳. نسخه نهایی در بخش 'نسخه / پرونده ذخیره شده' با قابلیت اشتراک پیامکی سیو می‌شود.", fontSize = 11.sp, lineHeight = 16.sp, color = textColor)
                         }
                     },
                     confirmButton = {
@@ -1330,13 +1333,13 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                 var reportMsg by remember { mutableStateOf("") }
                 AlertDialog(
                     onDismissRequest = { showReportDialog = false },
-                    title = { Text("گزارش تخلف فروشگاه یا کلینیک", fontWeight = FontWeight.Bold) },
+                    title = { Text("گزارش تخلف کاربر", fontWeight = FontWeight.Bold) },
                     text = {
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             OutlinedTextField(
                                 value = shopName,
                                 onValueChange = { shopName = it },
-                                label = { Text("نام فروشگاه یا کلینیک") },
+                                label = { Text("نام یا شناسه کاربر") },
                                 modifier = Modifier.fillMaxWidth()
                             )
                             OutlinedTextField(
@@ -1451,6 +1454,32 @@ fun ProfileMenuItemRedesigned(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Right side in RTL (Icon circle badge + Title)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Stylized Circle containing the Emoji Icon
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .background(circleBgColor, CircleShape)
+                    .border(1.dp, circleBorderColor, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(iconEmoji, fontSize = 16.sp)
+            }
+
+            Text(
+                text = title,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = textColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
         // Left side in RTL (Chevron indicator pointing left + potential count badge)
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -1478,32 +1507,6 @@ fun ProfileMenuItemRedesigned(
                 color = Color(0xFFA0AEC0),
                 modifier = Modifier.padding(bottom = 2.dp)
             )
-        }
-
-        // Right side in RTL (Icon circle badge + Title)
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = textColor,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            // Stylized Circle containing the Emoji Icon
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .background(circleBgColor, CircleShape)
-                    .border(1.dp, circleBorderColor, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(iconEmoji, fontSize = 16.sp)
-            }
         }
     }
 }
