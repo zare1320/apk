@@ -84,16 +84,16 @@ val Typography = Typography(
     ),
     bodyMedium = TextStyle(
         fontFamily = PersianFont,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.Medium, // Medium weight for better Persian legibility
         fontSize = 14.sp,
-        lineHeight = 22.sp,
+        lineHeight = 24.sp, // Ample line height for dense cursive connecting structures
         letterSpacing = 0.sp
     ),
     bodySmall = TextStyle(
         fontFamily = PersianFont,
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
-        lineHeight = 18.sp,
+        lineHeight = 20.sp, // Increased line height to 20.sp for beautiful legibility
         letterSpacing = 0.sp
     ),
     labelLarge = TextStyle(

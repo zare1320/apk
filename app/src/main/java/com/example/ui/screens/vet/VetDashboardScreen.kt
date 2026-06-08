@@ -31,6 +31,8 @@ import androidx.compose.ui.unit.sp
 import com.example.ui.screens.SharedSpeciesCircleButton
 import com.example.data.database.Pet
 import com.example.viewmodel.MainViewModel
+import com.example.ui.theme.glassmorphic
+import com.example.ui.theme.GlassBackgroundBox
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -239,10 +241,11 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
             exit = fadeOut() + shrinkVertically()
         ) {
             Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 8.dp)
+                    .glassmorphic(cornerRadius = 16.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Column(
@@ -292,10 +295,11 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
         if (!isSpeciesChosen) {
             // Disabled Callout
             Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp)
+                    .glassmorphic(accentGlow = true)
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),

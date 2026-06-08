@@ -28,6 +28,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.viewmodel.MainViewModel
+import com.example.ui.theme.glassmorphic
+import com.example.ui.theme.GlassBackgroundBox
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,18 +42,7 @@ fun LoginScreen(
     var showError by remember { mutableStateOf(false) }
     var socialAuthChoice by remember { mutableStateOf<String?>(null) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.background,
-                        MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
-                    )
-                )
-            )
-    ) {
+    GlassBackgroundBox {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -322,9 +313,10 @@ fun LoginScreen(
                             val detectedRole = if (email.contains("pet")) "owner" else "vet"
                             Card(
                                 shape = RoundedCornerShape(12.dp),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)),
+                                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                                 modifier = Modifier
                                     .fillMaxWidth()
+                                    .glassmorphic(accentGlow = true, cornerRadius = 12.dp)
                                     .clickable {
                                         viewModel.simulateSocialAuth(email, name, detectedRole, "Google")
                                         socialAuthChoice = null
@@ -363,9 +355,10 @@ fun LoginScreen(
                             val detectedRole = if (email.contains("ahmadi")) "owner" else "vet"
                             Card(
                                 shape = RoundedCornerShape(12.dp),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)),
+                                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                                 modifier = Modifier
                                     .fillMaxWidth()
+                                    .glassmorphic(accentGlow = true, cornerRadius = 12.dp)
                                     .clickable {
                                         viewModel.simulateSocialAuth(email, name, detectedRole, "Apple")
                                         socialAuthChoice = null

@@ -882,7 +882,8 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                 text = "لطفاً برای مراقبت از پت دلبندتان و بهره‌مندی ایمن از خدمات جامع پت‌کلاب، مفاد استفاده زیر را مطالعه فرمایید:",
                                 fontSize = 12.sp,
                                 color = textColor,
-                                lineHeight = 18.sp
+                                lineHeight = 20.sp,
+                                fontWeight = FontWeight.Medium
                             )
 
                             // Item 1: Virtual vs Real Clinic Visit
@@ -902,7 +903,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                     Column {
                                         Text("عدم جایگزینی معاینه حضوری و تخصصی", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
                                         Spacer(modifier = Modifier.height(2.dp))
-                                        Text("ابزارهای مراقبی نظافتی، بررسی بهداشت دندان و مو، پایش روحی روزانه و تقویم واکسیناسیون پت‌کلاب، ابزارهای پیشگیرانه خودمراقبتی هستند. ثبت این پارامترها هیچ‌گونه مجوزی برای نادیده گرفتن ویزیت دوره‌ای یا اورژانسی حیوان در کلینیک‌های مجاز نیست.", fontSize = 11.sp, color = mutedTextColor, lineHeight = 16.sp)
+                                        Text("ابزارهای مراقبی نظافتی، بررسی بهداشت دندان و مو، پایش روحی روزانه و تقویم واکسیناسیون پت‌کلاب، ابزارهای پیشگیرانه خودمراقبتی هستند. ثبت این پارامترها هیچ‌گونه مجوزی برای نادیده گرفتن ویزیت دوره‌ای یا اورژانسی حیوان در کلینیک‌های مجاز نیست.", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = mutedTextColor, lineHeight = 19.sp)
                                     }
                                 }
                             }
@@ -924,7 +925,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                     Column {
                                         Text("مسئولیت خطیر مصرف خودسرانه داروها", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
                                         Spacer(modifier = Modifier.height(2.dp))
-                                        Text("سرپرست پت موظف است داروها، مکمل‌ها و فرآورده‌های بهداشتی ذخیره شده در بایگانی نسخه‌های خود را دقیقاً بر اساس دوز اعلامی پزشک و تحت نظارت کلینیکال به حیوان بدهد. هرگونه درمان آزمایشی و خودسرانه مسولیت‌زا بوده و برای پت خطرناک است.", fontSize = 11.sp, color = mutedTextColor, lineHeight = 16.sp)
+                                        Text("سرپرست پت موظف است داروها، مکمل‌ها و فرآورده‌های بهداشتی ذخیره شده در بایگانی نسخه‌های خود را دقیقاً بر اساس دوز اعلامی پزشک و تحت نظارت کلینیکال به حیوان بدهد. هرگونه درمان آزمایشی و خودسرانه مسولیت‌زا بوده و برای پت خطرناک است.", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = mutedTextColor, lineHeight = 19.sp)
                                     }
                                 }
                             }
@@ -946,7 +947,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                     Column {
                                         Text("راستی‌آزمایی نقشه و موقعیت کلوپ‌ها", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
                                         Spacer(modifier = Modifier.height(2.dp))
-                                        Text("مسیریابی داروخانه‌ها، کلینیک‌ها و بیمارستان‌های شبانه‌روزی بر روی نقشه هوشمند پت‌کلاب بر اساس داده‌های خدمات مکان‌محور باز ارائه می‌شود. با توجه به تغییرات جوی یا ساعت‌های کاری، حتماً پیش از عزیمت فیزیکی با مرکز مربوطه هماهنگی تلفنی انجام دهید.", fontSize = 11.sp, color = mutedTextColor, lineHeight = 16.sp)
+                                        Text("مسیریابی داروخانه‌ها، کلینیک‌ها و بیمارستان‌های شبانه‌روزی بر روی نقشه هوشمند پت‌کلاب بر اساس داده‌های خدمات مکان‌محور باز ارائه می‌شود. با توجه به تغییرات جوی یا ساعت‌های کاری، حتماً پیش از عزیمت فیزیکی با مرکز مربوطه هماهنگی تلفنی انجام دهید.", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = mutedTextColor, lineHeight = 19.sp)
                                     }
                                 }
                             }
@@ -968,7 +969,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                     Column {
                                         Text("حفاظت جامع از پرونده سلامتی پت", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
                                         Spacer(modifier = Modifier.height(2.dp))
-                                        Text("تمام اطلاعات ثبت‌شده مانند تقویم درمانِ نوبت بعدی، جزئیات روحی حیوان و پرونده بیماری‌های بایگانی‌شده، به صورت محلی در حافظه امن برنامه کش می‌شوند تا از هرگونه دسترسی غیرمجاز متفرقه به حریم خصوصی پت دلبندتان ممانعت شود.", fontSize = 11.sp, color = mutedTextColor, lineHeight = 16.sp)
+                                        Text("تمام اطلاعات ثبت‌شده مانند تقویم درمانِ نوبت بعدی، جزئیات روحی حیوان و پرونده بیماری‌های بایگانی‌شده، به صورت محلی در حافظه امن برنامه کش می‌شوند تا از هرگونه دسترسی غیرمجاز متفرقه به حریم خصوصی پت دلبندتان ممانعت شود.", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = mutedTextColor, lineHeight = 19.sp)
                                     }
                                 }
                             }

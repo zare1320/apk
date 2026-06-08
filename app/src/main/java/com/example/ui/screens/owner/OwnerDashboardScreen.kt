@@ -32,6 +32,7 @@ import com.example.ui.screens.CatVectorIcon
 import com.example.ui.screens.ExoticVectorIcon
 import com.example.data.database.Pet
 import com.example.viewmodel.MainViewModel
+import com.example.ui.theme.glassmorphic
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -132,9 +133,11 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
     ) {
         // Welcoming card
         Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
             shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .glassmorphic(accentGlow = true, cornerRadius = 16.dp)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -144,12 +147,12 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                     text = "سلام، ${activeSession?.fullName ?: "صاحب عزیز پت"} 👋",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = "به پورتال مدیریت پرونده‌های سلامت حیوانات خانگی خوش آمدید. اطلاعات کلینیکی همگام‌سازی شده با دامپزشک فورا در تب نسخه قابل بازرسی است.",
                     fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
                     textAlign = TextAlign.Right,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -174,11 +177,12 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
         // Add Pet Form
         AnimatedVisibility(visible = showAddPetForm) {
             Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 12.dp)
+                    .glassmorphic(cornerRadius = 16.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -420,12 +424,12 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
 
         if (ownerPetsList.isEmpty()) {
             Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 shape = RoundedCornerShape(24.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp)
-                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f), RoundedCornerShape(24.dp))
+                    .glassmorphic(cornerRadius = 24.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -474,8 +478,8 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 6.dp)
-                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp)),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        .glassmorphic(cornerRadius = 16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Column(

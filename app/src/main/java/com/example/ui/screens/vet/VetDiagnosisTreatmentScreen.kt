@@ -142,19 +142,16 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
         )
     }
 
-    // Colors adaptation matching Ionic Framework polished specs for both dark & light modes
+    // Colors adaptation for both dark & light modes
     val isDark = isSystemInDarkTheme()
-    // Light mode uses signature iOS/Ionic cool light grey (0xFFF4F5F8), pure White card surfaces (0xFFFFFFFF)
-    val bgColor = if (isDark) MaterialTheme.colorScheme.background else Color(0xFFF4F5F8)
+    val bgColor = if (isDark) MaterialTheme.colorScheme.background else Color(0xFFFAFBFB)
     val cardBgColor = if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f) else Color.White
-    val strokeColor = if (isDark) Color(0xFF333333) else Color(0xFFE2E8F0) // Clean thin borders
-    // Extremely crisp slate typography for perfect light mode readability and AA contrast
-    val primaryText = if (isDark) Color.White else Color(0xFF0F172A) // Slate-900 (highly legible)
-    val secondaryText = if (isDark) Color(0xFF94A3B8) else Color(0xFF475569) // Slate-600 (ideal subtitle contrast)
+    val strokeColor = if (isDark) Color(0xFF333333) else Color(0xFFE5E7EB)
+    val primaryText = if (isDark) Color.White else Color(0xFF1E293B)
+    val secondaryText = if (isDark) Color(0xFF94A3B8) else Color(0xFF64748B)
 
-    // Ionic Royal Blue signature palette (with excellent contrast ratio in light mode)
-    val accentTeal = if (isDark) Color(0xFF5260FF) else Color(0xFF1E40AF)
-    val accentTealContainer = if (isDark) Color(0xFF1E3A8A) else Color(0xFFECF2FF)
+    val accentTeal = if (isDark) Color(0xFF2DD4BF) else Color(0xFF0F766E)
+    val accentTealContainer = if (isDark) Color(0xFF134E4A) else Color(0xFFF0FDFA)
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Column(
@@ -167,12 +164,12 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
             // Patient Summary Banner at top
             activeExaminedPet?.let { pet ->
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = if (isDark) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f) else Color(0xFFEFF6FF)),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
                     shape = RoundedCornerShape(16.dp),
-                    border = BorderStroke(1.dp, if (isDark) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else Color(0xFFBFDBFE))
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
                 ) {
                     Column(
                         modifier = Modifier
@@ -184,13 +181,12 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                             text = "🩺 پرونده فعال: ${pet.name} (${if (activeSpecies == "dog") "سگ" else "گربه"})",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (isDark) MaterialTheme.colorScheme.primary else Color(0xFF1E40AF)
+                            color = MaterialTheme.colorScheme.primary
                         )
                         Text(
                             text = "نژاد: ${pet.breed} | وزن: ${pet.weight}kg | پرونده: ${pet.recordNumber}",
                             fontSize = 11.sp,
-                            color = if (isDark) MaterialTheme.colorScheme.onSurfaceVariant else Color(0xFF475569),
-                            fontWeight = FontWeight.SemiBold
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -207,7 +203,7 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                     onClick = { activeSubTab = "درمان" },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (activeSubTab == "درمان") accentTeal else if (isDark) MaterialTheme.colorScheme.surfaceVariant else Color(0xFFE2E8F0)
+                        containerColor = if (activeSubTab == "درمان") accentTeal else MaterialTheme.colorScheme.surfaceVariant
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -218,7 +214,7 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                     onClick = { activeSubTab = "تشخیص" },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (activeSubTab == "تشخیص") accentTeal else if (isDark) MaterialTheme.colorScheme.surfaceVariant else Color(0xFFE2E8F0)
+                        containerColor = if (activeSubTab == "تشخیص") accentTeal else MaterialTheme.colorScheme.surfaceVariant
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {

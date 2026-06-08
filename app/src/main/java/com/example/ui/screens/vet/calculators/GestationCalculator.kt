@@ -858,9 +858,10 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = point,
-                                fontSize = 11.sp,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium,
                                 color = secondaryText,
-                                lineHeight = 16.sp,
+                                lineHeight = 20.sp,
                                 textAlign = TextAlign.Right,
                                 modifier = Modifier.fillMaxWidth()
                             )

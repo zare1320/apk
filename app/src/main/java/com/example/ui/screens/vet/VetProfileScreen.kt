@@ -1486,7 +1486,8 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                 text = "لطفاً پیش از استفاده از ابزار محاسباتی و دارونامه تخصصی پت‌کلاب، قوانین زیر را با دقت مطالعه فرمایید:",
                                 fontSize = 12.sp,
                                 color = textColor,
-                                lineHeight = 18.sp
+                                lineHeight = 20.sp,
+                                fontWeight = FontWeight.Medium
                             )
 
                             // Item 1: Clinical Responsibility
@@ -1506,7 +1507,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                     Column {
                                         Text("مسئولیت تشخیصی و تصمیم بالینی", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
                                         Spacer(modifier = Modifier.height(2.dp))
-                                        Text("کلیه پروتکل‌های درمانی پیشنهادی، نتایج آنالیز علائم بالینی و دوزهای استخراج‌شده از دارونامه مکتوب صرفا به عنوان راهنمای کمکی کلینیکال و برگرفته از مراجع معتبر (مانند Plumb و BSAVA) می‌باشند. تصمیم نهایی تشخیصی و درمانی در قبال حیوان بیمار، منحصراً بر عهده دامپزشک معالج است.", fontSize = 11.sp, color = mutedTextColor, lineHeight = 16.sp)
+                                        Text("کلیه پروتکل‌های درمانی پیشنهادی، نتایج آنالیز علائم بالینی و دوزهای استخراج‌شده از دارونامه مکتوب صرفا به عنوان راهنمای کمکی کلینیکال و برگرفته از مراجع معتبر (مانند Plumb و BSAVA) می‌باشند. تصمیم نهایی تشخیصی و درمانی در قبال حیوان بیمار، منحصراً بر عهده دامپزشک معالج است.", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = mutedTextColor, lineHeight = 19.sp)
                                     }
                                 }
                             }
@@ -1528,7 +1529,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                     Column {
                                         Text("راستی‌آزمایی دقیق محاسبات کلینیکال", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
                                         Spacer(modifier = Modifier.height(2.dp))
-                                        Text("پزشک موظف است پارامترهای ورودی نظیر وزن بیمار (کیلوگرم)، درصد کم‌آبی (دهیدراتاسیون)، وضعیت هماتوکریت (PCV) برای ترانسفیوژن، و نمره کما گلاسکو (تریاژ تروما) را پیش از اعمال قطرات سرم یا تجویز نهایی بررسی و دوز حاصله را با شرایط فیزیکی حیوان تطبیق دهد.", fontSize = 11.sp, color = mutedTextColor, lineHeight = 16.sp)
+                                        Text("پزشک موظف است پارامترهای ورودی نظیر وزن بیمار (کیلوگرم)، درصد کم‌آبی (دهیدراتاسیون)، وضعیت هماتوکریت (PCV) برای ترانسفیوژن، و نمره کما گلاسکو (تریاژ تروما) را پیش از اعمال قطرات سرم یا تجویز نهایی بررسی و دوز حاصله را با شرایط فیزیکی حیوان تطبیق دهد.", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = mutedTextColor, lineHeight = 19.sp)
                                     }
                                 }
                             }
@@ -1550,7 +1551,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                     Column {
                                         Text("حریم خصوصی سرپرست و ارسال نسخه", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
                                         Spacer(modifier = Modifier.height(2.dp))
-                                        Text("سامانه پت‌کلاب هیچ‌گونه اطلاعات هویتی حساس از پت یا شماره تماس سرپرستان را بدون اجازه در سرورهای خارجی ذخیره نخواهد کرد. ارسال نسخه‌های تجویزشده از طریق پیامک منطبق بر قوانین رازداری پزشکی و حفظ اسرار بیمارستان‌های دامپزشکی کشور است.", fontSize = 11.sp, color = mutedTextColor, lineHeight = 16.sp)
+                                        Text("سامانه پت‌کلاب هیچ‌گونه اطلاعات هویتی حساس از پت یا شماره تماس سرپرستان را بدون اجازه در سرورهای خارجی ذخیره نخواهد کرد. ارسال نسخه‌های تجویزشده از طریق پیامک منطبق بر قوانین رازداری پزشکی و حفظ اسرار بیمارستان‌های دامپزشکی کشور است.", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = mutedTextColor, lineHeight = 19.sp)
                                     }
                                 }
                             }
@@ -1572,7 +1573,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                     Column {
                                         Text("مالکیت مادی و معنوی دارونامه", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
                                         Spacer(modifier = Modifier.height(2.dp))
-                                        Text("بانک اطلاعاتی مرجع دارویی، اندیکاسیون‌ها، تریاژ و کلاسه بیماری‌های تعبیه‌شده در نرم‌افزار، حاصل کادرسازی و تلاش تیم پت‌کلاب است. هرگونه استخراج خودکار (دیتا ماینینگ) یا سوءاستفاده تجاری از داده‌ها غیرقانونی بوده و پیگرد مراجع دامپزشکی و قضایی را به همراه دارد.", fontSize = 11.sp, color = mutedTextColor, lineHeight = 16.sp)
+                                        Text("بانک اطلاعاتی مرجع دارویی، اندیکاسیون‌ها، تریاژ و کلاسه بیماری‌های تعبیه‌شده در نرم‌افزار، حاصل کادرسازی و تلاش تیم پت‌کلاب است. هرگونه استخراج خودکار (دیتا ماینینگ) یا سوءاستفاده تجاری از داده‌ها غیرقانونی بوده و پیگرد مراجع دامپزشکی و قضایی را به همراه دارد.", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = mutedTextColor, lineHeight = 19.sp)
                                     }
                                 }
                             }

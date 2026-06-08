@@ -1537,9 +1537,10 @@ fun TraumaTriageView() {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "معیار تریاژ تروما پت (ATT) ابزاری استاندارد است که در ۳۰ روز نخست پس از ورود حیوان تروما دیده، بقای حیوانات را پیش‌بینی می‌کند. در این سیستم ۶ ارگان (پرفیوژن، قلب، تنفس، اسکلت، مغز و چشم/پوست) بین ۰ تا ۳ ارزیابی می‌شوند. امتیاز بالاتر معرف آسیب دیدگی شدیدتر و شانس بقای کمتر است.",
-                            fontSize = 11.sp,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
                             color = secondaryText,
-                            lineHeight = 16.sp
+                            lineHeight = 20.sp
                         )
                     }
                 }
@@ -1575,9 +1576,10 @@ fun TraumaTriageView() {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "شاخص پیش‌بینی بقا (SPI) بر پایه همبستگی آماری رگرسیون لجستیک میزان فشار خون متمرکز، ترشحات کراتینین، غلظت آلبومین، درصد PCV خون و سن بیمار ایجاد شده است. بررسی‌های آماری نشان می‌دهند افزایش فشار و بهبود آلبومین تاثیر مستقیمی روی افزایش توان ماندگاری پت دارد.",
-                            fontSize = 11.sp,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
                             color = secondaryText,
-                            lineHeight = 16.sp
+                            lineHeight = 20.sp
                         )
                     }
                 }
@@ -1613,9 +1615,10 @@ fun TraumaTriageView() {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "سیستم ارزیابی همه‌جانبه بالینی و هماتولوژی سریع (APPLEfast) یک روش خلاصه بسیار کارآمد است که توانایی تخمین دقیق ریسک مرگ و میر حیوانات بستری در بخش مراقبت‌های ویژه را با اندازه‌گیری ۵ فاکتور پر تنش خون از جمله قند، آلبومین، تست لاکتات سرسام‌آور جدار سلولی، هماتوکریت پلاکت‌ها و سطح هوشیاری ذهنی فراهم می‌سازد.",
-                            fontSize = 11.sp,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
                             color = secondaryText,
-                            lineHeight = 16.sp
+                            lineHeight = 20.sp
                         )
                     }
                 }
