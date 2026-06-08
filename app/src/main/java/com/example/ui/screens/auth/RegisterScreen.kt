@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -146,7 +147,7 @@ fun RegisterScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("عضویت در سامانه تخصصی", fontSize = 16.sp, fontWeight = FontWeight.Bold) },
+                title = { Text("عضویت در دستیار حرفه ای دامپزشکی", fontSize = 16.sp, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -241,9 +242,9 @@ fun RegisterScreen(
                     value = phoneNumber,
                     onValueChange = { phoneNumber = it },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("شماره تلفن همراه") },
-                    placeholder = { Text("مثال: 09121234567") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    label = { Text("شماره تلفن همراه یا ایمیل") },
+                    placeholder = { Text("مثال: 09121234567 یا zahra@outlook.com") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp)
                 )
@@ -252,9 +253,10 @@ fun RegisterScreen(
 
                 // OTP Verification Flow Simulation
                 if (!isOtpSent) {
+                    val isEmail = phoneNumber.contains("@")
                     Button(
                         onClick = {
-                            if (phoneNumber.length >= 10) {
+                            if (phoneNumber.isNotEmpty()) {
                                 isOtpSent = true
                             }
                         },
@@ -264,35 +266,84 @@ fun RegisterScreen(
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                     ) {
-                        Text("ارسال پیامک تایید هویت (OTP)", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = if (isEmail) "ارسال کد فعال‌سازی به ایمیل (OTP)" else "ارسال پیامک تایید هویت (OTP)",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 } else if (!isOtpVerified) {
+                    val isEmail = phoneNumber.contains("@")
                     Card(
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Column(modifier = Modifier.padding(14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("کد ۴ رقمی پیامک شده را وارد کنید (شبیه‌ساز: ۱۲۳۴)", fontSize = 11.sp, color = MaterialTheme.colorScheme.primary)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            OutlinedTextField(
+                        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = if (isEmail) "کد فعال‌سازی ۶ رقمی ایمیل شده را وارد کنید (شبیه‌ساز: ۱۲۳۴۵۶)"
+                                       else "کد فعال‌سازی ۶ رقمی پیامک شده را وارد کنید (شبیه‌ساز: ۱۲۳۴۵۶)",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.primary,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(14.dp))
+                            
+                            // 6-digit individual code inputs (OTP Verification V2)
+                            BasicTextField(
                                 value = otpCode,
                                 onValueChange = {
-                                    otpCode = it
-                                    if (it == "1234") {
-                                        isOtpVerified = true
+                                    if (it.length <= 6 && it.all { char -> char.isDigit() }) {
+                                        otpCode = it
+                                        if (it == "123456") {
+                                            isOtpVerified = true
+                                        }
                                     }
                                 },
-                                modifier = Modifier.width(180.dp),
-                                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-                                label = { Text("کد فعال‌سازی") },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                singleLine = true,
-                                shape = RoundedCornerShape(8.dp)
+                                decorationBox = {
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        for (i in 0 until 6) {
+                                            val char = otpCode.getOrNull(i)?.toString() ?: ""
+                                            val isFocused = i == otpCode.length
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(42.dp)
+                                                    .border(
+                                                        width = if (isFocused) 2.dp else 1.dp,
+                                                        color = if (isFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+                                                        shape = RoundedCornerShape(10.dp)
+                                                    )
+                                                    .background(
+                                                        color = if (isFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+                                                                else MaterialTheme.colorScheme.surface,
+                                                        shape = RoundedCornerShape(10.dp)
+                                                    ),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = char,
+                                                    fontSize = 18.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = MaterialTheme.colorScheme.onSurface,
+                                                    textAlign = TextAlign.Center
+                                                )
+                                            }
+                                        }
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("otp_code_6_digit")
                             )
                         }
                     }
                 } else {
+                    val isEmail = phoneNumber.contains("@")
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -302,7 +353,12 @@ fun RegisterScreen(
                     ) {
                         Icon(Icons.Default.Check, contentDescription = "", tint = Color(0xFF15803D))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("شماره همراه شما تایید کد دو عاملی شد.", color = Color(0xFF15803D), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = if (isEmail) "نشانی ایمیل و کد فعال‌سازی ۶ رقمی تایید گردید." else "شماره همراه شما تایید کد دو عاملی شد.",
+                            color = Color(0xFF15803D),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
 
