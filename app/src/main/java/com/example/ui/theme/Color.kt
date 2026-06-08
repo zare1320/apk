@@ -2,19 +2,19 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Professional Polish primary blue gradients
-val VetTealPrimary = Color(0xFF005C97)       // Royal blue primary
-val VetTealSecondary = Color(0xFF3A7BD5)     // Light-medium accent blue
-val VetTealTertiary = Color(0xFF1E3A8A)      // Dark navy shade
-val VetBackgroundLight = Color(0xFFF3F4F6)   // Professional light-grey background
+// Ionic Framework signature polished color palette
+val VetTealPrimary = Color(0xFF3880FF)       // Ionic Blue Primary
+val VetTealSecondary = Color(0xFF5260FF)     // Ionic Purple Accent
+val VetTealTertiary = Color(0xFF3DC2FF)      // Ionic Cyan Support
+val VetBackgroundLight = Color(0xFFF4F5F8)   // Ionic Light iOS Grey Background
 val VetSurfaceLight = Color(0xFFFFFFFF)
 
-// Professional Polish dark mode variants
-val VetDarkPrimary = Color(0xFF60A5FA)       // Light blue text and buttons
-val VetDarkSecondary = Color(0xFF3B82F6)     // Medium blue actions
-val VetDarkTertiary = Color(0xFF1D4ED8)      // Cobalt accent
-val VetSurfaceDark = Color(0xFF1E293B)        // Slate 800 cards
-val VetBackgroundDark = Color(0xFF0F172A)     // Slate 900 deep dark canvas
+// Ionic Dark themed custom elements
+val VetDarkPrimary = Color(0xFF3880FF)       // Active blue indicators
+val VetDarkSecondary = Color(0xFF5260FF)     // Active purple accents
+val VetDarkTertiary = Color(0xFF3DC2FF)      // Muted light blue
+val VetSurfaceDark = Color(0xFF1E1E24)        // Ionic Dark Card Surface
+val VetBackgroundDark = Color(0xFF121212)     // Ionic Dark deep background dark canvas
 
 // Keep legacy definitions so standard widgets compiled without issues
 val Purple80 = Color(0xFF60A5FA)
