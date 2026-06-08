@@ -50,6 +50,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
     var showTermsDialog by remember { mutableStateOf(false) }
     var showUpdateDialog by remember { mutableStateOf(false) }
     var showSupportDialog by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     // Interactivity state copies
     var editedName by remember { mutableStateOf("صاحب پت گرامی") }
@@ -339,7 +340,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                         .fillMaxWidth()
                                         .padding(bottom = 12.dp)
                                         .border(1.dp, logoutBorderColor, RoundedCornerShape(16.dp))
-                                        .clickable { viewModel.logout() }
+                                        .clickable { showLogoutDialog = true }
                                 ) {
                                     Row(
                                         modifier = Modifier
@@ -802,6 +803,32 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                     dismissButton = {
                         TextButton(onClick = { showSupportDialog = false }) {
                             Text("بستن")
+                        }
+                    }
+                )
+            }
+
+            if (showLogoutDialog) {
+                AlertDialog(
+                    onDismissRequest = { showLogoutDialog = false },
+                    title = { Text("خروج از سیستم", fontWeight = FontWeight.Bold) },
+                    text = {
+                        Text("آیا مطمئن هستید که می‌خواهید از حساب کاربری خود خارج شوید؟", fontSize = 14.sp, color = textColor)
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                showLogoutDialog = false
+                                viewModel.logout()
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
+                        ) {
+                            Text("خروج")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showLogoutDialog = false }) {
+                            Text("انصراف")
                         }
                     }
                 )
