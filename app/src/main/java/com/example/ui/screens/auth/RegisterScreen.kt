@@ -64,6 +64,7 @@ fun RegisterScreen(
     var petAge by remember { mutableStateOf("") }
     var petBreed by remember { mutableStateOf("") }
     var petWeight by remember { mutableStateOf("") }
+    var showBreedHelpDialog by remember { mutableStateOf(false) }
 
     // Populate standard lists of breed based on species in Persian and English for Register pet screen
     val registerBreedOptions = when (petSpecies) {
@@ -578,6 +579,15 @@ fun RegisterScreen(
                                 },
                             label = { Text("نژاد حیوان") },
                             placeholder = { Text("مثال: پرشین / شیتزو / همستر سوری") },
+                            trailingIcon = {
+                                IconButton(onClick = { showBreedHelpDialog = true }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Info,
+                                        contentDescription = "راهنمای نژادها",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            },
                             singleLine = true,
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -601,30 +611,89 @@ fun RegisterScreen(
                         }
                     }
 
-                    if (filteredBreeds.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Text("پیشنهادهای نژاد بر اساس گونه:", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        @OptIn(ExperimentalLayoutApi::class)
-                        FlowRow(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 4.dp),
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            filteredBreeds.take(12).forEach { option ->
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f))
-                                        .clickable { 
-                                            petBreed = option 
-                                            isBreedDropdownExpanded = false
+                    // Breed recommendation helper dialog
+                    if (showBreedHelpDialog) {
+                        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                            AlertDialog(
+                                onDismissRequest = { showBreedHelpDialog = false },
+                                title = {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Info,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                        val speciesName = when(petSpecies) {
+                                            "dog" -> "سگ‌ها"
+                                            "cat" -> "گربه‌ها"
+                                            else -> "پرندگان و حیوانات خاص / اگزوتیک"
                                         }
-                                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                                ) {
-                                    Text(option, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSecondaryContainer)
-                                }
-                            }
+                                        Text(
+                                            text = "نژادهای پیشنهادی برای $speciesName",
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                },
+                                text = {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .heightIn(max = 300.dp)
+                                            .verticalScroll(rememberScrollState())
+                                    ) {
+                                        Text(
+                                            text = "برای انتخاب خودکار هر نژاد، روی آن ضربه بزنید:",
+                                            fontSize = 12.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.padding(bottom = 12.dp)
+                                        )
+
+                                        @OptIn(ExperimentalLayoutApi::class)
+                                        FlowRow(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                                        ) {
+                                            registerBreedOptions.forEach { option ->
+                                                Box(
+                                                    modifier = Modifier
+                                                        .clip(RoundedCornerShape(8.dp))
+                                                        .background(MaterialTheme.colorScheme.secondaryContainer)
+                                                        .border(
+                                                            width = 1.dp,
+                                                            color = MaterialTheme.colorScheme.outlineVariant,
+                                                            shape = RoundedCornerShape(8.dp)
+                                                        )
+                                                        .clickable {
+                                                            petBreed = option
+                                                            showBreedHelpDialog = false
+                                                        }
+                                                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                                                ) {
+                                                    Text(
+                                                        text = option,
+                                                        fontSize = 11.sp,
+                                                        fontWeight = FontWeight.Medium,
+                                                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                confirmButton = {
+                                    TextButton(onClick = { showBreedHelpDialog = false }) {
+                                        Text("بستن", fontWeight = FontWeight.Bold)
+                                    }
+                                },
+                                shape = RoundedCornerShape(20.dp)
+                            )
                         }
                     }
                 }
