@@ -682,24 +682,140 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
             if (showHelpDialog) {
                 AlertDialog(
                     onDismissRequest = { showHelpDialog = false },
-                    title = { Text("راهنما و درباره ما", fontWeight = FontWeight.Bold) },
+                    title = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text("🐾", fontSize = 22.sp)
+                            Text("راهنما و معرفی قابلیت‌ها", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = textColor)
+                        }
+                    },
                     text = {
                         Column(
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier.verticalScroll(rememberScrollState())
+                            verticalArrangement = Arrangement.spacedBy(14.dp),
+                            modifier = Modifier
+                                .verticalScroll(rememberScrollState())
+                                .padding(vertical = 4.dp)
                         ) {
-                            Text("درباره پت‌کلاب:", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textColor)
-                            Text("پت‌کلاب: پورتال هوشمند تشخیص و دارونامه مکتوب دامپزشکی کشور\nطراحی شده جهت بهبود سرعت عمل و بهینه‌سازی فرآیندهای بالینی و محاسبات دارویی دام‌های کوچک و اگزوتیک.\nنسخه: v1.5.0", fontSize = 12.sp, color = textColor, lineHeight = 18.sp)
-                            
-                            HorizontalDivider(color = dividerColor, thickness = 1.dp)
-                            
-                            Text("نحوه استفاده از پرتال حامی پت:", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
-                            Text("۱. جدول تغذیه منظم روزانه بر حسب نژاد سگ یا گربه را مطالعه کنید.\n۲. زمان‌بندی دقیق واکسیناسیون‌ها و دوره‌های ضدانگل را از پزشک معالج بپرسید.\n۳. در صورت بروز هرگونه مشکل اضطراری از پشتیبانی آنلاین کادر درمان راهنمایی بگیرید.", fontSize = 11.sp, lineHeight = 16.sp, color = textColor)
+                            // Section: About
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = if (isDark) Color(0xFF1E293B) else Color(0xFFF8FAFC)),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, borderColor, RoundedCornerShape(12.dp))
+                            ) {
+                                Column(modifier = Modifier.padding(12.dp)) {
+                                    Text("درباره پورتال سرپرستان پت‌کلاب", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFFEF4444))
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = "سامانه هوشمند پت‌کلاب ویژه سرپرستان دلسوز، ابزاری جامع جهت پایش روزانه سلامت، واکسیناسیون سازمان‌یافته، مشاهده نقشه داروخانه‌ها و کلینیک‌های حیوانات و بایگانی ایمنِ نسخه‌های تجویزی پزشکان می‌باشد. (نسخه v1.5.0)",
+                                        fontSize = 11.sp,
+                                        color = textColor,
+                                        lineHeight = 17.sp
+                                    )
+                                }
+                            }
+
+                            Text("🚀 قابلیت‌ها و ابزارهای حامی پت شما:", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
+
+                            // Item 1: Health Dashboard
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, borderColor.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(10.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    verticalAlignment = Alignment.Top
+                                ) {
+                                    Text("🏡", fontSize = 18.sp)
+                                    Column {
+                                        Text("داشبورد سلامت و پایش وضعیت عمومی", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text("در صفحه اصلی، وضعیت روزانه روحیه، بهداشت دندان، نظافت مو زنی و عقیم سازی پت خود را بررسی کنید و از نکات و مقالات مراقبتی روزانه بهره‌مند شوید.", fontSize = 11.sp, color = mutedTextColor, lineHeight = 16.sp)
+                                    }
+                                }
+                            }
+
+                            // Item 2: Calendar & Vaccine Scheduler
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, borderColor.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(10.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    verticalAlignment = Alignment.Top
+                                ) {
+                                    Text("📅", fontSize = 18.sp)
+                                    Column {
+                                        Text("تقویم هوشمند درمان و واکسن‌ها", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text("سازماندهی کامل دوره‌های انگل‌زدایی استاندارد، واکسن‌های سالانه، مراجعات دندان‌پزشکی و آرایشگاهی نوبت بعدی بدون نگرانی از فراموشی.", fontSize = 11.sp, color = mutedTextColor, lineHeight = 16.sp)
+                                    }
+                                }
+                            }
+
+                            // Item 3: Maps & Clinics Directory
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, borderColor.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(10.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    verticalAlignment = Alignment.Top
+                                ) {
+                                    Text("📍", fontSize = 18.sp)
+                                    Column {
+                                        Text("موقیعت‌یاب و نقشه هوشمند پت‌سنترها", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text("مسیریابی یکپارچه و فیلتر شده مراجع، داروخانه‌ها و کلینیک‌های معتبر دولتی و خصوصی پیرامون شما همراه با جزئیات دقیق شماره تماس و مشاوره.", fontSize = 11.sp, color = mutedTextColor, lineHeight = 16.sp)
+                                    }
+                                }
+                            }
+
+                            // Item 4: Prescription Ledger
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, borderColor.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(10.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    verticalAlignment = Alignment.Top
+                                ) {
+                                    Text("🩺", fontSize = 18.sp)
+                                    Column {
+                                        Text("پرونده و بایگانی لایو نسخه‌ها", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text("دریافت مستقیم نسخه‌های درمانی صادر شده توسط دامپزشک پت‌کلاب، ثبت مجزای پرونده‌ها و دوز داروهای خانگی جهت شفافیت دوره نقاهت بالینی حیوان.", fontSize = 11.sp, color = mutedTextColor, lineHeight = 16.sp)
+                                    }
+                                }
+                            }
                         }
                     },
                     confirmButton = {
-                        Button(onClick = { showHelpDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))) {
-                            Text("بستن")
+                        Button(
+                            onClick = { showHelpDialog = false },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444)),
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+                        ) {
+                            Text("متوجه شدم", fontWeight = FontWeight.Bold)
                         }
                     }
                 )
@@ -746,18 +862,125 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
             if (showTermsDialog) {
                 AlertDialog(
                     onDismissRequest = { showTermsDialog = false },
-                    title = { Text("شرایط و قوانین استفاده", fontWeight = FontWeight.Bold) },
+                    title = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text("📄", fontSize = 22.sp)
+                            Text("شرایط و قوانین ویژه سرپرستان", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = textColor)
+                        }
+                    },
                     text = {
                         Column(
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.verticalScroll(rememberScrollState())
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier
+                                .verticalScroll(rememberScrollState())
+                                .padding(vertical = 4.dp)
                         ) {
-                            Text("۱. دوزهای محاسبه شده پیشنهادی هستند و نباید جایگزین تصمیم بالینی پزشک معالج شوند.\n\n۲. حفظ حریم خصوصی حیوانات و اطلاعات صاحبان پت بر عهده سرور کلینیکال می‌باشد.\n\n۳. هرگونه استفاده تجاری غیر‌مجاز پیگرد قانونی دارد.", fontSize = 11.sp, color = textColor)
+                            Text(
+                                text = "لطفاً برای مراقبت از پت دلبندتان و بهره‌مندی ایمن از خدمات جامع پت‌کلاب، مفاد استفاده زیر را مطالعه فرمایید:",
+                                fontSize = 12.sp,
+                                color = textColor,
+                                lineHeight = 18.sp
+                            )
+
+                            // Item 1: Virtual vs Real Clinic Visit
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, borderColor.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(10.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    verticalAlignment = Alignment.Top
+                                ) {
+                                    Text("🏠", fontSize = 18.sp)
+                                    Column {
+                                        Text("عدم جایگزینی معاینه حضوری و تخصصی", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text("ابزارهای مراقبی نظافتی، بررسی بهداشت دندان و مو، پایش روحی روزانه و تقویم واکسیناسیون پت‌کلاب، ابزارهای پیشگیرانه خودمراقبتی هستند. ثبت این پارامترها هیچ‌گونه مجوزی برای نادیده گرفتن ویزیت دوره‌ای یا اورژانسی حیوان در کلینیک‌های مجاز نیست.", fontSize = 11.sp, color = mutedTextColor, lineHeight = 16.sp)
+                                    }
+                                }
+                            }
+
+                            // Item 2: Safe Drug Application
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, borderColor.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(10.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    verticalAlignment = Alignment.Top
+                                ) {
+                                    Text("💊", fontSize = 18.sp)
+                                    Column {
+                                        Text("مسئولیت خطیر مصرف خودسرانه داروها", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text("سرپرست پت موظف است داروها، مکمل‌ها و فرآورده‌های بهداشتی ذخیره شده در بایگانی نسخه‌های خود را دقیقاً بر اساس دوز اعلامی پزشک و تحت نظارت کلینیکال به حیوان بدهد. هرگونه درمان آزمایشی و خودسرانه مسولیت‌زا بوده و برای پت خطرناک است.", fontSize = 11.sp, color = mutedTextColor, lineHeight = 16.sp)
+                                    }
+                                }
+                            }
+
+                            // Item 3: Maps and Contact Verification
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, borderColor.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(10.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    verticalAlignment = Alignment.Top
+                                ) {
+                                    Text("📍", fontSize = 18.sp)
+                                    Column {
+                                        Text("راستی‌آزمایی نقشه و موقعیت کلوپ‌ها", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text("مسیریابی داروخانه‌ها، کلینیک‌ها و بیمارستان‌های شبانه‌روزی بر روی نقشه هوشمند پت‌کلاب بر اساس داده‌های خدمات مکان‌محور باز ارائه می‌شود. با توجه به تغییرات جوی یا ساعت‌های کاری، حتماً پیش از عزیمت فیزیکی با مرکز مربوطه هماهنگی تلفنی انجام دهید.", fontSize = 11.sp, color = mutedTextColor, lineHeight = 16.sp)
+                                    }
+                                }
+                            }
+
+                            // Item 4: Pet Memory & Data Security
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, borderColor.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(10.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    verticalAlignment = Alignment.Top
+                                ) {
+                                    Text("🔐", fontSize = 18.sp)
+                                    Column {
+                                        Text("حفاظت جامع از پرونده سلامتی پت", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text("تمام اطلاعات ثبت‌شده مانند تقویم درمانِ نوبت بعدی، جزئیات روحی حیوان و پرونده بیماری‌های بایگانی‌شده، به صورت محلی در حافظه امن برنامه کش می‌شوند تا از هرگونه دسترسی غیرمجاز متفرقه به حریم خصوصی پت دلبندتان ممانعت شود.", fontSize = 11.sp, color = mutedTextColor, lineHeight = 16.sp)
+                                    }
+                                }
+                            }
                         }
                     },
                     confirmButton = {
-                        Button(onClick = { showTermsDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))) {
-                            Text("موافقم")
+                        Button(
+                            onClick = { showTermsDialog = false },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444)),
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+                        ) {
+                            Text("قوانین را می‌پذیرم", fontWeight = FontWeight.Bold)
                         }
                     }
                 )
@@ -788,21 +1011,120 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
             if (showSupportDialog) {
                 AlertDialog(
                     onDismissRequest = { showSupportDialog = false },
-                    title = { Text("پشتیبانی آنلاین پت‌کلاب", fontWeight = FontWeight.Bold) },
+                    title = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text("💬", fontSize = 22.sp)
+                            Text("پشتیبانی همه‌جانبه سرپرستان پت", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = textColor)
+                        }
+                    },
                     text = {
-                        Text("کارشناسان فنی و پشتیبان‌های کلینیکال پت‌کلاب جهت رفع هرگونه ابهام یا خطا به صورت ۲۴ ساعته از طریق پیام‌رسان‌ها آماده پاسخگویی هستند.", fontSize = 13.sp)
+                        val context = androidx.compose.ui.platform.LocalContext.current
+                        val launchIntent = { url: String ->
+                            try {
+                                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))
+                                context.startActivity(intent)
+                            } catch (e: Exception) {
+                                android.widget.Toast.makeText(context, "برنامه‌ای برای باز کردن این لینک یافت نشد", android.widget.Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier
+                                .verticalScroll(rememberScrollState())
+                                .padding(vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = "کارشناسان بخش فنی و تیم پشتیبانی روی خط پت‌کلاب جهت پاسخ به سوالات شما، ثبت پیشنهادات و حل سریع مشکلات کاربری، به صورت ۲۴ ساعته در کنار شما سرپرست دلسوز خواهند بود:",
+                                fontSize = 12.sp,
+                                color = textColor,
+                                lineHeight = 18.sp,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+
+                            // WhatsApp Card
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, borderColor, RoundedCornerShape(12.dp))
+                                    .clickable { launchIntent("https://wa.me/989120000000") }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(12.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text("💬", fontSize = 24.sp)
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text("پشتیبانی فعال در واتساپ", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text("مشاوره کاربری، همفکری و چت سریع", fontSize = 11.sp, color = mutedTextColor)
+                                    }
+                                    Text("◀", fontSize = 12.sp, color = Color(0xFF25D366), fontWeight = FontWeight.Bold)
+                                }
+                            }
+
+                            // Telegram Card
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, borderColor, RoundedCornerShape(12.dp))
+                                    .clickable { launchIntent("https://t.me/petclub_support") }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(12.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text("✈️", fontSize = 24.sp)
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text("کانال و پشتیبانی تلگرام", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text("ارسال مستقیم مستندات، عکس‌ها و خطاها", fontSize = 11.sp, color = mutedTextColor)
+                                    }
+                                    Text("◀", fontSize = 12.sp, color = Color(0xFF24A1DE), fontWeight = FontWeight.Bold)
+                                }
+                            }
+
+                            // Email Support Card
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, borderColor, RoundedCornerShape(12.dp))
+                                    .clickable { launchIntent("mailto:support@petclub.ir?subject=پشتیبانی سرپرستان پت‌کلاب") }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(12.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text("✉️", fontSize = 24.sp)
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text("مکاتبه مستقیم با ایمیل فنی", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text("ارائه بازخوردهای ساختاری و توسعه سیستم", fontSize = 11.sp, color = mutedTextColor)
+                                    }
+                                    Text("◀", fontSize = 12.sp, color = textColor, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
                     },
                     confirmButton = {
                         Button(
                             onClick = { showSupportDialog = false },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444)),
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
                         ) {
-                            Text("ارسال پیام در واتساپ پشتیبانی")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showSupportDialog = false }) {
-                            Text("بستن")
+                            Text("متوجه شدم", fontWeight = FontWeight.Bold)
                         }
                     }
                 )
