@@ -1,5 +1,7 @@
 package com.example.ui.screens.owner
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.platform.testTag
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -140,6 +142,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                     ) {
                                         // Right-side (in RTL): Avatar + Name & Phone
                                         Row(
+                                            modifier = Modifier.weight(1f),
                                             verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                                         ) {
@@ -174,27 +177,31 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                             }
                                         }
 
-                                        // Left-side (in RTL): Edit button and left pointing arrow
-                                        Row(
+                                        // Left-side (in RTL): Improved, un-squishable Edit button with edit icon
+                                        OutlinedButton(
+                                            onClick = { showEditProfileDialog = true },
                                             modifier = Modifier
-                                                .clip(RoundedCornerShape(8.dp))
-                                                .clickable { showEditProfileDialog = true }
-                                                .padding(6.dp),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                                .padding(start = 8.dp)
+                                                .testTag("edit_profile_btn"),
+                                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                                            shape = RoundedCornerShape(12.dp),
+                                            border = BorderStroke(1.dp, Color(0xFF3B82F6))
                                         ) {
-                                            Text(
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Edit Profile",
+                                                tint = Color(0xFF3B82F6),
+                                                modifier = Modifier.size(16.dp)
+                                             )
+                                             Spacer(modifier = Modifier.width(6.dp))
+                                             Text(
                                                 text = "ویرایش",
-                                                fontSize = 13.sp,
+                                                fontSize = 12.sp,
                                                 fontWeight = FontWeight.Bold,
-                                                color = Color(0xFF3B82F6)
-                                            )
-                                            Text(
-                                                text = "←",
-                                                fontSize = 14.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                color = Color(0xFF3B82F6)
-                                            )
+                                                color = Color(0xFF3B82F6),
+                                                maxLines = 1,
+                                                softWrap = false
+                                             )
                                         }
                                     }
                                 }
@@ -505,7 +512,10 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
 
             if (showEditProfileDialog) {
                 var nameInput by remember { mutableStateOf(editedName) }
-                var phoneInput by remember { mutableStateOf(editedPhone) }
+                // Clear any social credential placeholder email or dummy login from phone so they can complete it
+                var phoneInput by remember { 
+                    mutableStateOf(if (editedPhone.contains("@") || editedPhone.startsWith("سریع با")) "" else editedPhone) 
+                }
                 AlertDialog(
                     onDismissRequest = { showEditProfileDialog = false },
                     title = { Text("ویرایش اطلاعات حساب کاربری", fontWeight = FontWeight.Bold, fontSize = 16.sp) },
