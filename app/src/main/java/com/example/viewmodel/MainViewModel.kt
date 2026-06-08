@@ -190,7 +190,8 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
                 identification = idNumber,
                 workplaceOrUni = workplace,
                 specialty = specialty,
-                isLoggedIn = true
+                isLoggedIn = true,
+                coins = 100
             )
             repository.login(session)
 
@@ -200,6 +201,27 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
                     repository.insertPet(pet.copy(ownerPhone = phone, ownerName = fullName))
                 }
             }
+        }
+    }
+
+    fun simulateSocialAuth(
+        emailOrId: String,
+        fullName: String,
+        userType: String,
+        provider: String
+    ) {
+        viewModelScope.launch {
+            val session = UserSession(
+                phoneNumber = emailOrId,
+                userType = userType,
+                fullName = fullName,
+                identification = "سریع با $provider",
+                workplaceOrUni = provider,
+                specialty = "تایید هویت سریع مستقل",
+                isLoggedIn = true,
+                coins = 100
+            )
+            repository.login(session)
         }
     }
 
@@ -215,7 +237,8 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
                 identification = "9901123",
                 workplaceOrUni = "دانشگاه تهران",
                 specialty = "دام‌های کوچک",
-                isLoggedIn = true
+                isLoggedIn = true,
+                coins = 100
             )
             repository.login(session)
         }
