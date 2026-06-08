@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -224,8 +225,12 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
-                // Form General Inputs
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    // Form General Inputs
                 OutlinedTextField(
                     value = fullName,
                     onValueChange = { fullName = it },
@@ -673,6 +678,7 @@ fun RegisterScreen(
                 ) {
                     Text("ثبت‌نام نهایی و ورود به داشبورد اختصاصی", fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 }
+                }
             }
         }
     }
@@ -700,19 +706,21 @@ fun UniversityRowDropdown(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("▼", fontSize = 11.sp, color = Color.Gray)
             Text(currentSelection, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text("▼", fontSize = 11.sp, color = Color.Gray)
         }
 
         DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
-            allSelections.forEach { item ->
-                DropdownMenuItem(
-                    text = { Text(item, fontSize = 13.sp, textAlign = TextAlign.Right) },
-                    onClick = {
-                        onChoose(item)
-                        isExpanded = false
-                    }
-                )
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                allSelections.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(item, fontSize = 13.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Right) },
+                        onClick = {
+                            onChoose(item)
+                            isExpanded = false
+                        }
+                    )
+                }
             }
         }
     }
