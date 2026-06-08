@@ -46,7 +46,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
     var showDevicesDialog by remember { mutableStateOf(false) }
     var showSubscriptionDialog by remember { mutableStateOf(false) }
     var showHelpDialog by remember { mutableStateOf(false) }
-    var showAboutDialog by remember { mutableStateOf(false) }
+    var showReportDialog by remember { mutableStateOf(false) }
     var showTermsDialog by remember { mutableStateOf(false) }
     var showUpdateDialog by remember { mutableStateOf(false) }
     var showSupportDialog by remember { mutableStateOf(false) }
@@ -110,7 +110,8 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                     Text(
                         text = when (activeOwnerSection) {
                             "تنظیمات" -> "تنظیمات برنامه"
-                            "لینک‌ها" -> "پورتال‌های حامی حیوانات"
+                            "لینک‌ها" -> "لینک های کاربردی و پورتابل"
+                            "منابع" -> "منابع علمی"
                             else -> "حساب من"
                         },
                         fontSize = 20.sp,
@@ -281,15 +282,9 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                 ) {
                                     Column {
                                         OwnerProfileMenuItemRedesigned(
-                                            title = "راهنمای نگهداری پت",
+                                            title = "راهنما و درباره ما",
                                             iconEmoji = "❓",
                                             onClick = { showHelpDialog = true }
-                                        )
-                                        HorizontalDivider(color = dividerColor, thickness = 1.dp)
-                                        OwnerProfileMenuItemRedesigned(
-                                            title = "درباره ما",
-                                            iconEmoji = "ℹ️",
-                                            onClick = { showAboutDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         OwnerProfileMenuItemRedesigned(
@@ -299,25 +294,37 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         OwnerProfileMenuItemRedesigned(
-                                            title = "جستجوی به روز رسانی",
-                                            iconEmoji = "🔄",
-                                            onClick = { showUpdateDialog = true }
+                                            title = "منابع علمی",
+                                            iconEmoji = "📖",
+                                            onClick = { activeOwnerSection = "منابع" }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         OwnerProfileMenuItemRedesigned(
-                                            title = "پشتیبانی و مشاوره آنلاین کادر درمان",
-                                            iconEmoji = "💬",
-                                            onClick = { showSupportDialog = true }
-                                        )
-                                        HorizontalDivider(color = dividerColor, thickness = 1.dp)
-                                        OwnerProfileMenuItemRedesigned(
-                                            title = "🔗 پورتال‌های حامي حیوانات",
+                                            title = "لینک های کاربردی و پورتابل",
                                             iconEmoji = "🔗",
                                             onClick = { activeOwnerSection = "لینک‌ها" }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         OwnerProfileMenuItemRedesigned(
-                                            title = "⚙️ تنظیمات عمومی نرم‌افزار",
+                                            title = "گزارش تخلف کاربر",
+                                            iconEmoji = "⚠️",
+                                            onClick = { showReportDialog = true }
+                                        )
+                                        HorizontalDivider(color = dividerColor, thickness = 1.dp)
+                                        OwnerProfileMenuItemRedesigned(
+                                            title = "پشتیبانی انلاین",
+                                            iconEmoji = "💬",
+                                            onClick = { showSupportDialog = true }
+                                        )
+                                        HorizontalDivider(color = dividerColor, thickness = 1.dp)
+                                        OwnerProfileMenuItemRedesigned(
+                                            title = "بروزرسانی پایگاه داده و برنامه",
+                                            iconEmoji = "🔄",
+                                            onClick = { showUpdateDialog = true }
+                                        )
+                                        HorizontalDivider(color = dividerColor, thickness = 1.dp)
+                                        OwnerProfileMenuItemRedesigned(
+                                            title = "تنظیمات عمومی",
                                             iconEmoji = "⚙️",
                                             onClick = { activeOwnerSection = "تنظیمات" }
                                         )
@@ -453,6 +460,39 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                         shape = RoundedCornerShape(12.dp)
                                     ) {
                                         Text("پاک‌سازی کامل پایگاه داده محلی (ریست)", fontSize = 12.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            }
+                        }
+
+                        "منابع" -> {
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Text(
+                                    text = "📚 مراجع علمی معتبر دامپزشکی دارونامه پت‌کلاب:",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = textColor,
+                                    modifier = Modifier.padding(bottom = 12.dp)
+                                )
+
+                                listOf(
+                                    "Plumb's Veterinary Drug Handbook" to "کتابچه جامع راهنمای دارویی دامپزشکی پلانتون - ویرایش دهم مرجع دوزهای استاندارد کلینیکال جهت محاسبات برای سگ و گربه.",
+                                    "Merck Veterinary Manual (دارونامه اگزوتیک)" to "مرجع جهانی تشخیص بیماری‌ها، پاتولوژی کلینیکال و درمان‌های اختصاصی پرندگان و حیوانات خانگی خاص.",
+                                    "BSAVA Small Animal Formulary" to "راهنمای دارویی تخصصی حیوانات کوچک آکادمی دامپزشکی بریتانیا جهت سنجش مقادیر داروها."
+                                ).forEach { (title, description) ->
+                                    Card(
+                                        colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                        shape = RoundedCornerShape(16.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 6.dp)
+                                            .border(1.dp, borderColor, RoundedCornerShape(16.dp))
+                                    ) {
+                                        Column(modifier = Modifier.padding(16.dp)) {
+                                            Text(title, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFFEF4444))
+                                            Spacer(modifier = Modifier.height(6.dp))
+                                            Text(description, fontSize = 12.sp, color = textColor, lineHeight = 18.sp)
+                                        }
                                     }
                                 }
                             }
@@ -641,38 +681,62 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
             if (showHelpDialog) {
                 AlertDialog(
                     onDismissRequest = { showHelpDialog = false },
-                    title = { Text("راهنمای نگهداری پت", fontWeight = FontWeight.Bold) },
+                    title = { Text("راهنما و درباره ما", fontWeight = FontWeight.Bold) },
                     text = {
                         Column(
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
                             modifier = Modifier.verticalScroll(rememberScrollState())
                         ) {
-                            Text("نحوه استفاده از پرتال حامی پت:", fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                            Text("۱. جدول تغذیه منظم روزانه بر حسب نژاد سگ یا گربه را مطالعه کنید.\n۲. زمان‌بندی دقیق واکسیناسیون‌ها و دوره‌های ضدانگل را از پزشک معالج بپرسید.\n۳. در صورت بروز هرگونه مشکل اضطراری از پشتیبانی آنلاین کادر درمان راهنمایی بگیرید.", fontSize = 11.sp, lineHeight = 16.sp)
+                            Text("درباره پت‌کلاب:", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textColor)
+                            Text("پت‌کلاب: پورتال هوشمند تشخیص و دارونامه مکتوب دامپزشکی کشور\nطراحی شده جهت بهبود سرعت عمل و بهینه‌سازی فرآیندهای بالینی و محاسبات دارویی دام‌های کوچک و اگزوتیک.\nنسخه: v1.5.0", fontSize = 12.sp, color = textColor, lineHeight = 18.sp)
+                            
+                            HorizontalDivider(color = dividerColor, thickness = 1.dp)
+                            
+                            Text("نحوه استفاده از پرتال حامی پت:", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
+                            Text("۱. جدول تغذیه منظم روزانه بر حسب نژاد سگ یا گربه را مطالعه کنید.\n۲. زمان‌بندی دقیق واکسیناسیون‌ها و دوره‌های ضدانگل را از پزشک معالج بپرسید.\n۳. در صورت بروز هرگونه مشکل اضطراری از پشتیبانی آنلاین کادر درمان راهنمایی بگیرید.", fontSize = 11.sp, lineHeight = 16.sp, color = textColor)
                         }
                     },
                     confirmButton = {
                         Button(onClick = { showHelpDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))) {
-                            Text("مفهوم شد")
+                            Text("بستن")
                         }
                     }
                 )
             }
 
-            if (showAboutDialog) {
+            if (showReportDialog) {
+                var shopName by remember { mutableStateOf("") }
+                var reportMsg by remember { mutableStateOf("") }
                 AlertDialog(
-                    onDismissRequest = { showAboutDialog = false },
-                    title = { Text("درباره پت‌کلاب", fontWeight = FontWeight.Bold) },
+                    onDismissRequest = { showReportDialog = false },
+                    title = { Text("گزارش تخلف کاربر", fontWeight = FontWeight.Bold) },
                     text = {
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text("پت‌کلاب: پورتال هوشمند تشخیص و دارونامه مکتوب دامپزشکی کشور", fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                            Text("طراحی شده جهت بهبود سرعت عمل و بهینه‌سازی فرآیندهای بالینی و محاسبات دارویی دام‌های کوچک و اگزوتیک.", fontSize = 12.sp, color = textColor)
-                            Text("نسخه: v1.5.0", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = mutedTextColor)
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            OutlinedTextField(
+                                value = shopName,
+                                onValueChange = { shopName = it },
+                                label = { Text("نام یا شناسه کاربر") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            OutlinedTextField(
+                                value = reportMsg,
+                                onValueChange = { reportMsg = it },
+                                label = { Text("شرح جزئیات تخلف") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
                     },
                     confirmButton = {
-                        Button(onClick = { showAboutDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))) {
-                            Text("بستن")
+                        Button(
+                            onClick = { showReportDialog = false },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
+                        ) {
+                            Text("ارسال گزارش")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showReportDialog = false }) {
+                            Text("انصراف")
                         }
                     }
                 )

@@ -469,21 +469,9 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                 ) {
                                     Column {
                                         ProfileMenuItemRedesigned(
-                                            title = "راهنما",
+                                            title = "راهنما و درباره ما",
                                             iconEmoji = "❓",
                                             onClick = { showHelpDialog = true }
-                                        )
-                                        HorizontalDivider(color = dividerColor, thickness = 1.dp)
-                                        ProfileMenuItemRedesigned(
-                                            title = "درباره ما",
-                                            iconEmoji = "ℹ️",
-                                            onClick = { showAboutDialog = true }
-                                        )
-                                        HorizontalDivider(color = dividerColor, thickness = 1.dp)
-                                        ProfileMenuItemRedesigned(
-                                            title = "گزارش تخلف کاربر",
-                                            iconEmoji = "⚠️",
-                                            onClick = { showReportDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
@@ -493,31 +481,37 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = "به روز رسانی",
-                                            iconEmoji = "🔄",
-                                            onClick = { showUpdateDialog = true }
-                                        )
-                                        HorizontalDivider(color = dividerColor, thickness = 1.dp)
-                                        ProfileMenuItemRedesigned(
-                                            title = "پشتیبانی آنلاین",
-                                            iconEmoji = "💬",
-                                            onClick = { showSupportDialog = true }
-                                        )
-                                        HorizontalDivider(color = dividerColor, thickness = 1.dp)
-                                        ProfileMenuItemRedesigned(
-                                            title = "📚 منابع علمی معتبر دارونامه",
+                                            title = "منابع علمی",
                                             iconEmoji = "📖",
                                             onClick = { activeProfileSection = "منابع" }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = "🔗 لینک‌های کاربردی و پورتال‌ها",
+                                            title = "لینک های کاربردی و پورتابل",
                                             iconEmoji = "🔗",
                                             onClick = { activeProfileSection = "لینک‌ها" }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = "⚙️ تنظیمات عمومی نرم‌افزار",
+                                            title = "گزارش تخلف کاربر",
+                                            iconEmoji = "⚠️",
+                                            onClick = { showReportDialog = true }
+                                        )
+                                        HorizontalDivider(color = dividerColor, thickness = 1.dp)
+                                        ProfileMenuItemRedesigned(
+                                            title = "پشتیبانی انلاین",
+                                            iconEmoji = "💬",
+                                            onClick = { showSupportDialog = true }
+                                        )
+                                        HorizontalDivider(color = dividerColor, thickness = 1.dp)
+                                        ProfileMenuItemRedesigned(
+                                            title = "بروزرسانی پایگاه داده و برنامه",
+                                            iconEmoji = "🔄",
+                                            onClick = { showUpdateDialog = true }
+                                        )
+                                        HorizontalDivider(color = dividerColor, thickness = 1.dp)
+                                        ProfileMenuItemRedesigned(
+                                            title = "تنظیمات عمومی",
                                             iconEmoji = "⚙️",
                                             onClick = { activeProfileSection = "تنظیمات" }
                                         )
@@ -1291,37 +1285,23 @@ fun VetProfileScreen(viewModel: MainViewModel) {
             if (showHelpDialog) {
                 AlertDialog(
                     onDismissRequest = { showHelpDialog = false },
-                    title = { Text("راهنمای سریع اپلیکیشن", fontWeight = FontWeight.Bold) },
+                    title = { Text("راهنما و درباره ما", fontWeight = FontWeight.Bold) },
                     text = {
                         Column(
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
                             modifier = Modifier.verticalScroll(rememberScrollState())
                         ) {
+                            Text("درباره پت‌کلاب:", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textColor)
+                            Text("پت‌کلاب: پورتال هوشمند تشخیص و دارونامه مکتوب دامپزشکی کشور\nطراحی شده جهت بهبود سرعت عمل و بهینه‌سازی فرآیندهای بالینی و محاسبات دارویی دام‌های کوچک و اگزوتیک.\nنسخه: v1.5.0", fontSize = 12.sp, color = textColor, lineHeight = 18.sp)
+                            
+                            HorizontalDivider(color = dividerColor, thickness = 1.dp)
+                            
                             Text("طرز کار با دوزینگ هوشمند:", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = textColor)
                             Text("۱. از صفحه اصلی، گونه حیوان یا علائم فیزیکال را انتخاب کنید.\n۲. دوز دارو را بر اساس میلی‌گرم یا وزن پت تعیین و محاسبه کنید.\n۳. نسخه نهایی در بخش 'نسخه / پرونده ذخیره شده' با قابلیت اشتراک پیامکی سیو می‌شود.", fontSize = 11.sp, lineHeight = 16.sp, color = textColor)
                         }
                     },
                     confirmButton = {
                         Button(onClick = { showHelpDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))) {
-                            Text("فهمیدم")
-                        }
-                    }
-                )
-            }
-
-            if (showAboutDialog) {
-                AlertDialog(
-                    onDismissRequest = { showAboutDialog = false },
-                    title = { Text("درباره پت‌کلاب", fontWeight = FontWeight.Bold) },
-                    text = {
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text("پت‌کلاب: پورتال هوشمند تشخیص و دارونامه مکتوب دامپزشکی کشور", fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                            Text("طراحی شده جهت بهبود سرعت عمل و بهینه‌سازی فرآیندهای بالینی و محاسبات دارویی دام‌های کوچک و اگزوتیک.", fontSize = 12.sp, color = textColor)
-                            Text("نسخه: v1.5.0", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = mutedTextColor)
-                        }
-                    },
-                    confirmButton = {
-                        Button(onClick = { showAboutDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))) {
                             Text("بستن")
                         }
                     }
