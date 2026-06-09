@@ -307,22 +307,24 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                                     }
                                     Spacer(modifier = Modifier.height(24.dp))
                                 } else {
-                                    // Professional Doctor Illustration Image with fallback layout
+                                    // Professional Doctor Illustration / App Logo Image with permanent fallback layout
                                     Box(
                                         modifier = Modifier
-                                            .size(0.dp)
-                                            .clip(CircleShape)
-                                            .border(0.dp, Color.Transparent, CircleShape),
+                                            .size(120.dp)
+                                            .clip(RoundedCornerShape(24.dp))
+                                            .background(if (isDark) CardDefaults.cardColors().containerColor else Color.White)
+                                            .border(2.dp, accentTeal.copy(alpha = 0.5f), RoundedCornerShape(24.dp))
+                                            .padding(8.dp),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Image(
-                                            painter = painterResource(id = R.drawable.img_vet_doctor),
-                                            contentDescription = "Doctor",
+                                            painter = painterResource(id = R.drawable.img_app_logo),
+                                            contentDescription = "Pet App Logo",
                                             modifier = Modifier.fillMaxSize()
                                         )
                                     }
 
-                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Spacer(modifier = Modifier.height(18.dp))
 
                                     // Primary Headline matching Screenshot 1 exactly
                                     Text(

@@ -45,6 +45,24 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
     var recordNumber by remember { mutableStateOf("") }
     var petName by remember { mutableStateOf("") }
     var petBreed by remember { mutableStateOf("") }
+
+    val reptilesList = listOf("ایگوانا", "آفتاب‌پرست", "مار", "lizard", "iguana", "chameleon", "snake")
+    val isReptileBreed = remember(petBreed) {
+        reptilesList.any { petBreed.lowercase().contains(it) }
+    }
+    var localSpeciesSelection by remember(activeSpecies, activeExotic, petBreed) {
+        mutableStateOf(
+            when {
+                activeSpecies == "dog" -> "dog"
+                activeSpecies == "cat" -> "cat"
+                activeSpecies == "exotic" && activeExotic == "bird" -> "bird"
+                activeSpecies == "exotic" && activeExotic == "rodent" -> "rodent"
+                activeSpecies == "exotic" && activeExotic == "aquatic" -> "aquatic"
+                activeSpecies == "exotic" && activeExotic == "amphibian" -> if (isReptileBreed) "reptile" else "amphibian"
+                else -> null
+            }
+        )
+    }
     var petWeight by remember { mutableStateOf("") }
     var petAge by remember { mutableStateOf("") }
     var petIsNeutered by remember { mutableStateOf(false) }
@@ -182,108 +200,144 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Core Species Select Row (Circular items)
+        // Core Species Select Grid matching user's visual reference
         Text(
-            text = "انتخاب گونه حیوان خانگی مورد معاینه (الزامی):",
-            fontSize = 15.sp,
+            text = "گونه",
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 12.dp),
+                .padding(bottom = 16.dp, top = 8.dp),
             textAlign = TextAlign.Right
         )
 
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Dog circle
-            SharedSpeciesCircleButton(
-                speciesKey = "dog",
-                label = "سگ",
-                isSelected = activeSpecies == "dog",
-                onClick = {
-                    viewModel.selectSpecies("dog")
-                    petBreed = ""
-                }
-            )
-
-            // Cat circle
-            SharedSpeciesCircleButton(
-                speciesKey = "cat",
-                label = "گربه",
-                isSelected = activeSpecies == "cat",
-                onClick = {
-                    viewModel.selectSpecies("cat")
-                    petBreed = ""
-                }
-            )
-
-            // Exotic circle
-            SharedSpeciesCircleButton(
-                speciesKey = "exotic",
-                label = "اگزوتیک پت",
-                isSelected = activeSpecies == "exotic",
-                onClick = {
-                    viewModel.selectSpecies("exotic")
-                    petBreed = ""
-                }
-            )
-        }
-
-        // Suboptions for Exotic Pet
-        AnimatedVisibility(
-            visible = activeSpecies == "exotic",
-            enter = fadeIn() + expandVertically(),
-            exit = fadeOut() + shrinkVertically()
-        ) {
-            Card(
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .glassmorphic(cornerRadius = 16.dp),
-                shape = RoundedCornerShape(16.dp)
+            // Row 1: Cat, Dog, Bird (RTL order matching screenshot: right to left)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column(
-                    modifier = Modifier.padding(12.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "نوع گروه اگزوتیک را انتخاب کنید:",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        listOf(
-                            Triple("bird", "پرندگان 🦜", "پرنده"),
-                            Triple("rodent", "جوندگان 🐹", "جونده"),
-                            Triple("aquatic", "آبزیان 🐠", "آبزیان"),
-                            Triple("amphibian", "دوزیستان 🦎", "دوزیستان")
-                        ).forEach { (key, display, speciesName) ->
-                            val isSel = activeExotic == key
-                            val col = if (isSel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-                            val textCol = if (isSel) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(col)
-                                    .clickable { viewModel.selectExoticOption(key) }
-                                    .padding(horizontal = 10.dp, vertical = 6.dp)
-                            ) {
-                                Text(display, fontSize = 11.sp, color = textCol, fontWeight = FontWeight.Bold)
-                            }
+                // Cat (right)
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    SharedSpeciesCircleButton(
+                        speciesKey = "cat",
+                        label = "گربه",
+                        isSelected = localSpeciesSelection == "cat",
+                        onClick = {
+                            viewModel.selectSpecies("cat")
+                            petBreed = ""
                         }
-                    }
+                    )
                 }
+
+                // Dog (middle)
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    SharedSpeciesCircleButton(
+                        speciesKey = "dog",
+                        label = "سگ",
+                        isSelected = localSpeciesSelection == "dog",
+                        onClick = {
+                            viewModel.selectSpecies("dog")
+                            petBreed = ""
+                        }
+                    )
+                }
+
+                // Bird (left)
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    SharedSpeciesCircleButton(
+                        speciesKey = "bird",
+                        label = "پرنده",
+                        isSelected = localSpeciesSelection == "bird",
+                        onClick = {
+                            viewModel.selectSpecies("exotic")
+                            viewModel.selectExoticOption("bird")
+                            petBreed = ""
+                        }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Row 2: Mammal (Rodent), Reptile, Amphibian (RTL order: right to left)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Mammal (Rodent - Bunny image helper) (right)
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    SharedSpeciesCircleButton(
+                        speciesKey = "rodent",
+                        label = "پستاندار",
+                        isSelected = localSpeciesSelection == "rodent",
+                        onClick = {
+                            viewModel.selectSpecies("exotic")
+                            viewModel.selectExoticOption("rodent")
+                            petBreed = ""
+                        }
+                    )
+                }
+
+                // Reptile (Lizard icon helper) (middle)
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    SharedSpeciesCircleButton(
+                        speciesKey = "reptile",
+                        label = "خزنده",
+                        isSelected = localSpeciesSelection == "reptile",
+                        onClick = {
+                            viewModel.selectSpecies("exotic")
+                            viewModel.selectExoticOption("amphibian")
+                            petBreed = ""
+                        }
+                    )
+                }
+
+                // Amphibian (Turtle image helper) (left)
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    SharedSpeciesCircleButton(
+                        speciesKey = "amphibian",
+                        label = "دوزیست",
+                        isSelected = localSpeciesSelection == "amphibian",
+                        onClick = {
+                            viewModel.selectSpecies("exotic")
+                            viewModel.selectExoticOption("amphibian")
+                            petBreed = ""
+                        }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Row 3: Fish (Aquatic) on the right column
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Fish (right)
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    SharedSpeciesCircleButton(
+                        speciesKey = "aquatic",
+                        label = "ماهی",
+                        isSelected = localSpeciesSelection == "aquatic",
+                        onClick = {
+                            viewModel.selectSpecies("exotic")
+                            viewModel.selectExoticOption("aquatic")
+                            petBreed = ""
+                        }
+                    )
+                }
+
+                // Spacer columns for perfect RTL grid layout symmetry
+                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.weight(1f))
             }
         }
 

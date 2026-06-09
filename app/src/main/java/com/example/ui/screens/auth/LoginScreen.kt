@@ -305,7 +305,7 @@ fun LoginScreen(
                     // Choose Profile / Account option
                     if (provider == "Google") {
                         val googleAccounts = listOf(
-                            Pair("دکتر سمانه کاظمی", "samaneh.kazemi@gmail.com"),
+                            Pair("خانم دکتر سمانه زارع", "samaneh.zare@gmail.com"),
                             Pair("امیرحسین زارعی (صاحب پت)", "amir.zarei.pet@gmail.com")
                         )
 

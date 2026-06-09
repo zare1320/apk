@@ -1,6 +1,7 @@
 package com.example.ui.screens
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,9 +21,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.R
 
 @Composable
 fun DogVectorIcon(
@@ -273,15 +277,84 @@ fun ExoticVectorIcon(
 }
 
 @Composable
+fun ReptileVectorIcon(
+    modifier: Modifier = Modifier,
+    tint: Color = Color.White
+) {
+    Canvas(modifier = modifier) {
+        val width = size.width
+        val height = size.height
+        val cx = width / 2f
+        val cy = height / 2f
+        val radius = width * 0.35f
+
+        // Head
+        drawCircle(
+            color = tint,
+            radius = radius * 0.5f,
+            center = Offset(cx - radius * 0.2f, cy - radius * 0.3f)
+        )
+        // Big funny eye
+        drawCircle(
+            color = Color(0xFFFBBF24), // Yellow
+            radius = radius * 0.2f,
+            center = Offset(cx - radius * 0.3f, cy - radius * 0.35f)
+        )
+        drawCircle(
+            color = Color(0xFF1E293B), // Pupil
+            radius = radius * 0.08f,
+            center = Offset(cx - radius * 0.3f, cy - radius * 0.35f)
+        )
+
+        // Body curve
+        val bodyPath = Path().apply {
+            moveTo(cx - radius * 0.4f, cy - radius * 0.1f)
+            quadraticTo(cx + radius * 0.8f, cy - radius * 0.4f, cx + radius * 0.7f, cy + radius * 0.4f)
+            quadraticTo(cx + radius * 0.3f, cy + radius * 0.8f, cx - radius * 0.3f, cy + radius * 0.5f)
+            quadraticTo(cx + radius * 0.2f, cy + radius * 0.4f, cx + radius * 0.3f, cy + radius * 0.1f)
+            quadraticTo(cx + radius * 0.3f, cy - radius * 0.1f, cx - radius * 0.2f, cy - radius * 0.05f)
+            close()
+        }
+        drawPath(bodyPath, tint)
+
+        // Cute back spikes
+        drawCircle(
+            color = Color(0xFFEF4444),
+            radius = radius * 0.1f,
+            center = Offset(cx + radius * 0.1f, cy - radius * 0.42f)
+        )
+        drawCircle(
+            color = Color(0xFFEF4444),
+            radius = radius * 0.1f,
+            center = Offset(cx + radius * 0.35f, cy - radius * 0.3f)
+        )
+        drawCircle(
+            color = Color(0xFFEF4444),
+            radius = radius * 0.1f,
+            center = Offset(cx + radius * 0.55f, cy - radius * 0.1f)
+        )
+    }
+}
+
+@Composable
 fun SharedSpeciesCircleButton(
     speciesKey: String,
     label: String,
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val bgCol by animateColorAsState(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
-    val textCol by animateColorAsState(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
-    val outlineCol by animateColorAsState(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
+    val outlineCol by animateColorAsState(if (isSelected) Color(0xFF2DD4BF) else Color.Transparent)
+    val textCol by animateColorAsState(if (isSelected) Color(0xFF2DD4BF) else MaterialTheme.colorScheme.onSurfaceVariant)
+
+    val gradient = when (speciesKey) {
+        "dog" -> Brush.verticalGradient(listOf(Color(0xFF38BDF8), Color(0xFF0284C7)))
+        "cat" -> Brush.verticalGradient(listOf(Color(0xFF2DD4BF), Color(0xFF0D9488)))
+        "bird" -> Brush.verticalGradient(listOf(Color(0xFF60A5FA), Color(0xFF2563EB)))
+        "rodent" -> Brush.verticalGradient(listOf(Color(0xFF34D399), Color(0xFF059669)))
+        "aquatic" -> Brush.verticalGradient(listOf(Color(0xFF38BDF8), Color(0xFF0369A1)))
+        "amphibian" -> Brush.verticalGradient(listOf(Color(0xFF4ADE80), Color(0xFF16A34A)))
+        else -> Brush.verticalGradient(listOf(Color(0xFFFBBF24), Color(0xFFD97706))) // reptile
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -291,19 +364,52 @@ fun SharedSpeciesCircleButton(
     ) {
         Box(
             modifier = Modifier
-                .size(75.dp)
+                .size(85.dp)
                 .clip(CircleShape)
-                .background(if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-                .border(2.5.dp, outlineCol, CircleShape),
+                .background(gradient)
+                .border(3.dp, outlineCol, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             when (speciesKey) {
-                "dog" -> DogVectorIcon(modifier = Modifier.fillMaxSize(0.85f), tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
-                "cat" -> CatVectorIcon(modifier = Modifier.fillMaxSize(0.85f), tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
-                else -> ExoticVectorIcon(modifier = Modifier.fillMaxSize(0.85f), tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
+                "dog" -> Image(
+                    painter = painterResource(id = R.drawable.img_species_dog),
+                    contentDescription = label,
+                    modifier = Modifier.fillMaxSize()
+                )
+                "cat" -> Image(
+                    painter = painterResource(id = R.drawable.img_species_cat),
+                    contentDescription = label,
+                    modifier = Modifier.fillMaxSize()
+                )
+                "bird" -> Image(
+                    painter = painterResource(id = R.drawable.img_species_bird),
+                    contentDescription = label,
+                    modifier = Modifier.fillMaxSize()
+                )
+                "rodent" -> Image(
+                    painter = painterResource(id = R.drawable.img_species_rodent),
+                    contentDescription = label,
+                    modifier = Modifier.fillMaxSize()
+                )
+                "aquatic" -> Image(
+                    painter = painterResource(id = R.drawable.img_species_aquatic),
+                    contentDescription = label,
+                    modifier = Modifier.fillMaxSize(0.9f)
+                )
+                "amphibian" -> Image(
+                    painter = painterResource(id = R.drawable.img_species_amphibian),
+                    contentDescription = label,
+                    modifier = Modifier.fillMaxSize(0.9f)
+                )
+                else -> {
+                    ReptileVectorIcon(
+                        modifier = Modifier.fillMaxSize(0.7f),
+                        tint = Color.White
+                    )
+                }
             }
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = label,
             fontSize = 12.sp,
@@ -312,3 +418,4 @@ fun SharedSpeciesCircleButton(
         )
     }
 }
+
