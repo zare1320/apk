@@ -284,68 +284,73 @@ fun OwnerLayoutContainer(viewModel: MainViewModel) {
                     .statusBarsPadding()
                     .padding(horizontal = 16.dp, vertical = 14.dp)
             ) {
-                CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides LayoutDirection.Rtl) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // Avatar and owner information on the right (first in RTL Row)
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(45.dp)
-                                    .background(Color.White, RoundedCornerShape(50.dp)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text("👤", fontSize = 24.sp)
-                            }
-                            Column {
-                                val cleanedName = (session?.fullName ?: "صاحب پت محترم")
-                                    .replace("(صاحب پت)", "")
-                                    .replace("（صاحب پت）", "")
-                                    .trim()
-                                Text(
-                                    text = cleanedName,
-                                    color = Color.White,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = session?.phoneNumber ?: "",
-                                    color = Color.White.copy(alpha = 0.85f),
-                                    fontSize = 11.sp
-                                )
-                            }
-                        }
-
-                        // Theme switcher toggle on the left of row (second item in RTL Row)
                         Box(
                             modifier = Modifier
                                 .size(36.dp)
-                                .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(50.dp))
-                                .clickable { viewModel.toggleTheme() },
+                                .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(8.dp)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(if (themeMode == "dark") "☀️" else "🌙", fontSize = 16.sp)
+                            Text("🐕", fontSize = 18.sp)
                         }
+                        Text(
+                            text = "دستیار همراه صاحب پت",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(50.dp))
+                            .clickable { viewModel.toggleTheme() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(if (themeMode == "dark") "☀️" else "🌙", fontSize = 16.sp)
+                    }
+                }
 
-                    // Title of the app under user info
-                    Text(
-                        text = "دستیار حرفه ای صاحبین پت",
-                        color = Color.White,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Right
-                    )
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "بخش مراقبت هوشمند و نوبت‌دهی",
+                            color = Color.White.copy(alpha = 0.85f),
+                            fontSize = 10.sp
+                        )
+                        Text(
+                            text = "خوش آمدید، " + (session?.fullName ?: "صاحب پت محترم"),
+                            color = Color.White,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .background(Color.White, RoundedCornerShape(50.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("👤", fontSize = 20.sp)
+                    }
                 }
             }
         },
