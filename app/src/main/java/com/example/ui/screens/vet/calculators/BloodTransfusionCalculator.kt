@@ -42,7 +42,7 @@ fun BloodTransfusionCalculator(
         selectedSpecies?.lowercase() != "cat"
     }
 
-    val isDark = isSystemInDarkTheme()
+    val isDark = MaterialTheme.colorScheme.background.red < 0.3f
     val themeCardBg = if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) else Color.White
     val textSecondary = MaterialTheme.colorScheme.onSurfaceVariant
     val textPrimary = MaterialTheme.colorScheme.onSurface
@@ -492,7 +492,7 @@ fun AccordionItem(
     content: @Composable () -> Unit
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f) else Color(0xFFF9FAFB)),
+        colors = CardDefaults.cardColors(containerColor = if (MaterialTheme.colorScheme.background.red < 0.3f) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f) else Color(0xFFF9FAFB)),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)

@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun HumanAgeCalculatorView(initWeight: String) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = MaterialTheme.colorScheme.background.red < 0.3f
     val bgColor = MaterialTheme.colorScheme.background
     val surfaceColor = if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f) else MaterialTheme.colorScheme.surface
     val strokeColor = MaterialTheme.colorScheme.outlineVariant

@@ -73,7 +73,7 @@ fun FluidTherapyCalculator(
     var dropFactorSelected by remember { mutableStateOf("15 gtts/ml") }
     var dripTimeMinutes by remember { mutableStateOf("30") }
 
-    val isDark = isSystemInDarkTheme()
+    val isDark = MaterialTheme.colorScheme.background.red < 0.3f
     val themeCardBg = if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) else Color.White
     val textSecondary = MaterialTheme.colorScheme.onSurfaceVariant
     val textPrimary = MaterialTheme.colorScheme.onSurface

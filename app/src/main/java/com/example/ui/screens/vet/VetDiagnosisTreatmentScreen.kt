@@ -143,7 +143,7 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
     }
 
     // Colors adaptation for both dark & light modes
-    val isDark = isSystemInDarkTheme()
+    val isDark = MaterialTheme.colorScheme.background.red < 0.3f
     val bgColor = if (isDark) MaterialTheme.colorScheme.background else Color(0xFFFAFBFB)
     val cardBgColor = if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f) else Color.White
     val strokeColor = if (isDark) Color(0xFF333333) else Color(0xFFE5E7EB)

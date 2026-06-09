@@ -129,7 +129,7 @@ fun CalorieCalculatorView(
     // Canned and Dry Food Calorie Data Database setup
     var activeClassTab by remember { mutableStateOf("Dry Food") } // "Dry Food" or "Canned Food"
 
-    val isDark = isSystemInDarkTheme()
+    val isDark = MaterialTheme.colorScheme.background.red < 0.3f
     val themeCardBg = if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) else Color.White
     val borderStrokeColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
     val textPrimary = MaterialTheme.colorScheme.onSurface
