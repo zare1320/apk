@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
@@ -116,7 +117,7 @@ fun BloodTransfusionCalculator(
                             value = targetPcv,
                             onValueChange = { targetPcv = it },
                             placeholder = { Text("Desired PCV %", fontSize = 12.sp) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
@@ -146,7 +147,7 @@ fun BloodTransfusionCalculator(
                             value = currentPcv,
                             onValueChange = { currentPcv = it },
                             placeholder = { Text("Current PCV %", fontSize = 12.sp) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
@@ -176,7 +177,7 @@ fun BloodTransfusionCalculator(
                             value = donorPcv,
                             onValueChange = { donorPcv = it },
                             placeholder = { Text("Donor PCV %", fontSize = 12.sp) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
@@ -188,33 +189,60 @@ fun BloodTransfusionCalculator(
                     }
 
                     // Compact customizable Weight Row
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("⚖️", fontSize = 16.sp)
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("Recipient Weight", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = textPrimary)
-                            }
-                            Text("Weight in Kg", fontSize = 11.sp, color = textSecondary)
-                        }
-                        
-                        OutlinedTextField(
-                            value = weightStr,
-                            onValueChange = { weightStr = it },
-                            placeholder = { Text("Weight in kg", fontSize = 12.sp) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                focusedBorderColor = MaterialTheme.colorScheme.primary
-                            ),
-                            singleLine = true,
-                            modifier = Modifier.width(150.dp)
+                    val currentWeightKg = weightStr.toDoubleOrNull() ?: 0.0
+                    val showWeightWarning = currentWeightKg > 0.0 && ((!isDog && currentWeightKg > 12.0) || (isDog && currentWeightKg > 80.0))
+                    val weightBorderColors = if (showWeightWarning) {
+                        OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedBorderColor = Color(0xFFF59E0B),
+                            unfocusedBorderColor = Color(0xFFF59E0B).copy(alpha = 0.6f),
+                            focusedLabelColor = Color(0xFFD97706),
+                            unfocusedLabelColor = Color(0xFFD97706).copy(alpha = 0.8f)
                         )
+                    } else {
+                        OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text("⚖️", fontSize = 16.sp)
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Recipient Weight", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = textPrimary)
+                                }
+                                Text("Weight in Kg", fontSize = 11.sp, color = textSecondary)
+                            }
+                            
+                            OutlinedTextField(
+                                value = weightStr,
+                                onValueChange = { weightStr = it },
+                                placeholder = { Text("Weight in kg", fontSize = 12.sp) },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                colors = weightBorderColors,
+                                singleLine = true,
+                                modifier = Modifier.width(150.dp)
+                            )
+                        }
+                        if (showWeightWarning) {
+                            Text(
+                                text = "⚠️ آیا از وزن وارد شده اطمینان دارید؟",
+                                color = Color(0xFFD97706),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(top = 4.dp).fillMaxWidth(),
+                                textAlign = TextAlign.Right
+                            )
+                        }
                     }
 
                     // Row 4: Blood Volume Output

@@ -1,9 +1,13 @@
 package com.example.ui.screens.owner
 
+import android.content.Intent
+import android.provider.CalendarContract
 import androidx.compose.animation.*
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -19,6 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -44,6 +51,14 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
     var eventDate by remember { mutableStateOf("") }
 
     val ownerPets = allPets.filter { it.ownerPhone == activeSession?.phoneNumber }
+
+    // Reactive selection of the active pet for roadmap and form
+    LaunchedEffect(ownerPets) {
+        if (selectedPetId == -1 && ownerPets.isNotEmpty()) {
+            selectedPetId = ownerPets[0].id
+            selectedPetName = ownerPets[0].name
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -79,6 +94,169 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
                 )
             }
         }
+
+        // ------------------ START OF GAMIFIED HEALTH ROAD ------------------
+        val selectedPet = ownerPets.find { it.id == selectedPetId } ?: ownerPets.firstOrNull()
+        if (selectedPet != null) {
+            val isCat = selectedPet.species.lowercase() == "cat" || selectedPet.species.contains("گربه") || selectedPet.species.contains("cat")
+            val milestones = if (isCat) {
+                listOf(
+                    VaccineMilestone("سه‌گانه نوبت اول", "FVRCP Dose 1", "محافظت در برابر هرپس‌ویروس، کلسی‌ویروس و پن‌لوکوپنی", "۸ هفتگی", "اول"),
+                    VaccineMilestone("سه‌گانه نوبت دوم", "FVRCP Dose 2", "تقویت ایمنی و یادآور سه‌گانه واکسن گربه‌ها", "۱۲ هفتگی", "دوم"),
+                    VaccineMilestone("واکسن هاری", "Rabies Vaccine", "واکسیناسیون الزامی برای پیشگیری از هاری گربه‌ها", "۱۶ هفتگی", "هاری"),
+                    VaccineMilestone("یادآور سالانه", "Annual Booster", "تقویت سیستم ایمنی به صورت سالانه", "هر سال", "سالانه")
+                )
+            } else {
+                listOf(
+                    VaccineMilestone("چندگانه نوبت اول", "DHPPi+L Dose 1", "دیستمپر، هپاتیت، پاروویروس، پاراآنفولانزا", "۶ هفتگی", "اول"),
+                    VaccineMilestone("چندگانه نوبت دوم", "DHPPi+L Dose 2", "تقویت ایمنی پنج‌گانه و یادآور اول", "۹ هفتگی", "دوم"),
+                    VaccineMilestone("چندگانه سوم + هاری", "DHPPi+L + Rabies", "کامل کردن سپر ایمنی بدن به همراه واکسن هاری", "۱۲ هفتگی", "هاری"),
+                    VaccineMilestone("یادآور سالانه", "Annual Booster", "تقویت سالانه سیستم ایمنی سگ بالغ", "هر سال", "سالانه")
+                )
+            }
+
+            val petVaccines = allEvents.filter { it.petName == selectedPet.name && it.eventType == "واکسیناسیون" }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp)
+                    .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), RoundedCornerShape(16.dp)),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(14.dp),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
+                            Text(
+                                text = "🛡️ نقشه راه سلامت و ایمنی پت (Status Roadmap)",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        
+                        if (ownerPets.size > 1) {
+                            Text(
+                                text = "تغییر پت 🔄",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f))
+                                    .clickable {
+                                        val currentIndex = ownerPets.indexOfFirst { it.id == selectedPetId }
+                                        val nextIndex = (currentIndex + 1) % ownerPets.size
+                                        selectedPetId = ownerPets[nextIndex].id
+                                        selectedPetName = ownerPets[nextIndex].name
+                                    }
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "طرح ایمن‌سازی بدنی فعال برای «${selectedPet.name}»: ${if (isCat) "🐱 گربه" else "🐶 سگ"}",
+                        fontSize = 11.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Right,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        milestones.forEachIndexed { index, milestone ->
+                            val isDone = petVaccines.any { it.isCompleted && (it.notes.contains(milestone.keyKeyword) || it.notes.contains(milestone.title)) }
+
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.width(95.dp).clickable {
+                                    if (!isDone) {
+                                        viewModel.addCalendarEvent(
+                                            petId = selectedPet.id,
+                                            petName = selectedPet.name,
+                                            eventType = "واکسیناسیون",
+                                            eventDate = "۱۴۰۵/",
+                                            notes = "واکسن ${milestone.title} - ${milestone.desc}"
+                                        )
+                                    }
+                                }
+                            ) {
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier.size(44.dp)
+                                ) {
+                                    if (isDone) {
+                                        // Green check translucency (تیک سبز نیمه‌شفاف)
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .clip(CircleShape)
+                                                .background(Color(0x3310B981)),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text("✔️", fontSize = 16.sp, color = Color(0xFF10B981))
+                                        }
+                                    } else {
+                                        // Dotted outline circle (دایره نقطه‌چین ملایم)
+                                        Canvas(modifier = Modifier.fillMaxSize()) {
+                                            drawCircle(
+                                                color = Color.Gray.copy(alpha = 0.5f),
+                                                style = Stroke(
+                                                    width = 1.5.dp.toPx(),
+                                                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(6f, 6f), 0f)
+                                                )
+                                            )
+                                        }
+                                        Text("🛡️", fontSize = 14.sp, color = Color.Gray.copy(alpha = 0.5f))
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text(
+                                    text = milestone.title,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isDone) Color(0xFF10B981) else MaterialTheme.colorScheme.onSurface,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 1,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                                Text(
+                                    text = milestone.weekText,
+                                    fontSize = 9.sp,
+                                    color = Color.Gray,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+
+                            if (index < milestones.size - 1) {
+                                Text("⬅️", fontSize = 10.sp, color = Color.Gray.copy(alpha = 0.3f))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // ------------------ END OF GAMIFIED HEALTH ROAD ------------------
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -343,8 +521,39 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                IconButton(onClick = { viewModel.deleteCalendarEvent(event) }) {
-                                    Icon(Icons.Default.Delete, contentDescription = "حذف", tint = Color.Red)
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    IconButton(onClick = { viewModel.deleteCalendarEvent(event) }) {
+                                        Icon(Icons.Default.Delete, contentDescription = "حذف", tint = Color.Red)
+                                    }
+                                    
+                                    val context = LocalContext.current
+                                    Button(
+                                        onClick = {
+                                            try {
+                                                val intent = Intent(Intent.ACTION_INSERT).apply {
+                                                    data = CalendarContract.Events.CONTENT_URI
+                                                    putExtra(CalendarContract.Events.TITLE, "🐾 ${event.eventType} - ${event.petName}")
+                                                    putExtra(CalendarContract.Events.DESCRIPTION, event.notes)
+                                                    putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, System.currentTimeMillis())
+                                                    putExtra(CalendarContract.Events.ACCESS_LEVEL, CalendarContract.Events.ACCESS_PUBLIC)
+                                                }
+                                                context.startActivity(intent)
+                                            } catch (e: Exception) {
+                                                // Fallback
+                                            }
+                                        },
+                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+                                        elevation = null,
+                                        shape = RoundedCornerShape(8.dp),
+                                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+                                        modifier = Modifier.height(28.dp)
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text("📅", fontSize = 10.sp)
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text("ثبت در تقویم گوگل", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                                        }
+                                    }
                                 }
                                 Text(
                                     text = "⏰ سررسید: ${event.eventDate}",
@@ -360,3 +569,11 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
         }
     }
 }
+
+data class VaccineMilestone(
+    val title: String,
+    val enTitle: String,
+    val desc: String,
+    val weekText: String,
+    val keyKeyword: String
+)

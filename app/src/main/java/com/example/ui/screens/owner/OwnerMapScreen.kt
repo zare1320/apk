@@ -1,5 +1,8 @@
 package com.example.ui.screens.owner
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -22,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -163,9 +167,84 @@ fun OwnerMapScreen(viewModel: MainViewModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // ------------------ START OF GOOGLE MAPS LIVE SEARCH ------------------
+        val context = LocalContext.current
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+                .border(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f), RoundedCornerShape(16.dp)),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(14.dp),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = "🌐 جستجوی زنده سراسری روی گوگل مپ واقعی",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = "با کلیک روی دکمه‌های زیر، نتایج زنده و واقعی اطراف خود را به صورت مستقیم در گوگل مپ باز کنید:",
+                    fontSize = 11.sp,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Right,
+                    modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    val searchItems = listOf(
+                        Triple("🏥 بیمارستان دامپزشکی", "veterinary hospital", MaterialTheme.colorScheme.errorContainer),
+                        Triple("🩺 کلینیک دامپزشکی", "veterinary clinic", MaterialTheme.colorScheme.primaryContainer),
+                        Triple("💊 داروخانه دامپزشکی", "veterinary pharmacy", MaterialTheme.colorScheme.tertiaryContainer)
+                    )
+
+                    searchItems.forEach { (label, query, bgColor) ->
+                        Button(
+                            onClick = {
+                                try {
+                                    val mapUri = Uri.parse("geo:0,0?q=${Uri.encode(query)}")
+                                    val intent = Intent(Intent.ACTION_VIEW, mapUri).apply {
+                                        setPackage("com.google.android.apps.maps")
+                                    }
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    try {
+                                        val webUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode(query)}")
+                                        val webIntent = Intent(Intent.ACTION_VIEW, webUri)
+                                        context.startActivity(webIntent)
+                                    } catch (ex: Exception) {
+                                        // Ignore
+                                    }
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = bgColor),
+                            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 6.dp),
+                            modifier = Modifier.weight(1f).height(44.dp)
+                        ) {
+                            Text(
+                                text = label,
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        // ------------------ END OF GOOGLE MAPS LIVE SEARCH ------------------
+
         // Spatial Vector Map Canvas Simulation
         Text(
-            text = "نقشه بصری و برداری مراکز درمانی شما:",
+            text = "نقشه بصری و برداری (دوبار ضربه یا کلیک مجدد بر روی تگ فعال برای مسیریابی با گوگل مپ):",
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
@@ -221,17 +300,49 @@ fun OwnerMapScreen(viewModel: MainViewModel) {
                     modifier = Modifier
                         .fillMaxSize()
                         .pointerInput(Unit) {
-                            detectTapGestures { offset ->
-                                // Detect which POI selected on Tap
-                                spatialPOIs.forEach { poi ->
-                                    val poiX = poi.x * size.width
-                                    val poiY = poi.y * size.height
-                                    val dist = kotlin.math.hypot(offset.x - poiX, offset.y - poiY)
-                                    if (dist < 40f) {
-                                        selectedLocationID = poi.id
+                            detectTapGestures(
+                                onTap = { offset ->
+                                    // Detect which POI selected on Tap
+                                    spatialPOIs.forEach { poi ->
+                                        if (selectedFilter == "همه مراجع" || poi.category == selectedFilter) {
+                                            val poiX = poi.x * size.width
+                                            val poiY = poi.y * size.height
+                                            val dist = kotlin.math.hypot(offset.x - poiX, offset.y - poiY)
+                                            if (dist < 40f) {
+                                                selectedLocationID = poi.id
+                                            }
+                                        }
+                                    }
+                                },
+                                onDoubleTap = { offset ->
+                                    // Launch Google Map for coordinates on double tap
+                                    spatialPOIs.forEach { poi ->
+                                        if (selectedFilter == "همه مراجع" || poi.category == selectedFilter) {
+                                            val poiX = poi.x * size.width
+                                            val poiY = poi.y * size.height
+                                            val dist = kotlin.math.hypot(offset.x - poiX, offset.y - poiY)
+                                            if (dist < 40f) {
+                                                selectedLocationID = poi.id
+                                                try {
+                                                    val mapUri = Uri.parse("geo:0,0?q=${Uri.encode("${poi.name} ${poi.address}")}")
+                                                    val intent = Intent(Intent.ACTION_VIEW, mapUri).apply {
+                                                        setPackage("com.google.android.apps.maps")
+                                                    }
+                                                    context.startActivity(intent)
+                                                } catch (e: Exception) {
+                                                    try {
+                                                        val webUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode("${poi.name} ${poi.address}")}")
+                                                        val webIntent = Intent(Intent.ACTION_VIEW, webUri)
+                                                        context.startActivity(webIntent)
+                                                    } catch (ex: Exception) {
+                                                        // Ignore
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
-                            }
+                            )
                         }
                 ) {
                     // Draw secondary grid lines to simulate GPS map matrix
@@ -272,9 +383,37 @@ fun OwnerMapScreen(viewModel: MainViewModel) {
                                 )
                                 .clip(RoundedCornerShape(4.dp))
                                 .background(if (isThisSelected) Color.Red else MaterialTheme.colorScheme.secondary)
+                                .clickable {
+                                    if (isThisSelected) {
+                                        // Tap twice or click already selected tag to launch Real Google Maps
+                                        try {
+                                            val mapUri = Uri.parse("geo:0,0?q=${Uri.encode("${poi.name} ${poi.address}")}")
+                                            val intent = Intent(Intent.ACTION_VIEW, mapUri).apply {
+                                                setPackage("com.google.android.apps.maps")
+                                            }
+                                            context.startActivity(intent)
+                                        } catch (e: Exception) {
+                                            try {
+                                                val webUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode("${poi.name} ${poi.address}")}")
+                                                val webIntent = Intent(Intent.ACTION_VIEW, webUri)
+                                                context.startActivity(webIntent)
+                                            } catch (ex: Exception) {
+                                                // Ignore
+                                            }
+                                        }
+                                    } else {
+                                        selectedLocationID = poi.id
+                                    }
+                                }
                                 .padding(horizontal = 4.dp, vertical = 2.dp)
                         ) {
-                            Text(poi.category, fontSize = 7.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(poi.category, fontSize = 7.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                                if (isThisSelected) {
+                                    Spacer(modifier = Modifier.width(2.dp))
+                                    Text("🧭", fontSize = 7.sp, color = Color.White)
+                                }
+                            }
                         }
                     }
                 }
@@ -306,10 +445,33 @@ fun OwnerMapScreen(viewModel: MainViewModel) {
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Button(onClick = { /* Call handle */ }) {
+                            Button(onClick = {
+                                try {
+                                    val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${poi.phone}"))
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    // Fallback
+                                }
+                            }) {
                                 Text("📞 تماس تلفنی با مرکز")
                             }
-                            Button(onClick = { /* Nav handle */ }) {
+                            Button(onClick = {
+                                try {
+                                    val mapUri = Uri.parse("geo:0,0?q=${Uri.encode("${poi.name} ${poi.address}")}")
+                                    val intent = Intent(Intent.ACTION_VIEW, mapUri).apply {
+                                        setPackage("com.google.android.apps.maps")
+                                    }
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    try {
+                                        val webUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode("${poi.name} ${poi.address}")}")
+                                        val webIntent = Intent(Intent.ACTION_VIEW, webUri)
+                                        context.startActivity(webIntent)
+                                    } catch (ex: Exception) {
+                                        // Ignore
+                                    }
+                                }
+                            }) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text("🧭")
                                     Spacer(modifier = Modifier.width(4.dp))

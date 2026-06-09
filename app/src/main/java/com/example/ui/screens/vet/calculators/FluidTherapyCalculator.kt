@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
@@ -144,6 +145,19 @@ fun FluidTherapyCalculator(
                     }
 
                     // STEP 1 Inputs
+                    val currentKg = weightKgInput.toDoubleOrNull() ?: 0.0
+                    val showWeightWarning = currentKg > 0.0 && ((!isDog && currentKg > 12.0) || (isDog && currentKg > 80.0))
+                    val weightBorderColors = if (showWeightWarning) {
+                        OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFFF59E0B),
+                            unfocusedBorderColor = Color(0xFFF59E0B).copy(alpha = 0.6f),
+                            focusedLabelColor = Color(0xFFD97706),
+                            unfocusedLabelColor = Color(0xFFD97706).copy(alpha = 0.8f)
+                        )
+                    } else {
+                        OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary)
+                    }
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -164,10 +178,10 @@ fun FluidTherapyCalculator(
                             readOnly = activePet != null,
                             label = { Text("Pounds") },
                             placeholder = { Text("lbs") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             modifier = Modifier.weight(1f),
                             singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary)
+                            colors = weightBorderColors
                         )
 
                         // Kilogram
@@ -185,10 +199,21 @@ fun FluidTherapyCalculator(
                             readOnly = activePet != null,
                             label = { Text("Kilogram") },
                             placeholder = { Text("kgs") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             modifier = Modifier.weight(1f),
                             singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary)
+                            colors = weightBorderColors
+                        )
+                    }
+
+                    if (showWeightWarning) {
+                        Text(
+                            text = "⚠️ آیا از وزن وارد شده اطمینان دارید؟",
+                            color = Color(0xFFD97706),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = 2.dp, bottom = 4.dp).fillMaxWidth(),
+                            textAlign = TextAlign.Right
                         )
                     }
 
@@ -256,7 +281,7 @@ fun FluidTherapyCalculator(
                             value = fluidTimeHrs,
                             onValueChange = { fluidTimeHrs = it },
                             label = { Text("Fluid Time (hrs)") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             modifier = Modifier.weight(1f),
                             singleLine = true
                         )
@@ -358,8 +383,8 @@ fun FluidTherapyCalculator(
                             Slider(
                                 value = dehydrationPctSlider,
                                 onValueChange = { dehydrationPctSlider = it },
-                                valueRange = 0f..15f,
-                                steps = 14,
+                                valueRange = 0f..20f,
+                                steps = 19,
                                 colors = SliderDefaults.colors(
                                     thumbColor = Color(0xFFF59E0B),
                                     activeTrackColor = Color(0xFFF59E0B)
@@ -369,9 +394,19 @@ fun FluidTherapyCalculator(
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                listOf("0", "5", "10", "15").forEach { label ->
+                                listOf("0", "5", "10", "15", "20").forEach { label ->
                                     Text(text = label, fontSize = 10.sp, color = textSecondary)
                                 }
+                            }
+                            if (dehydrationPctSlider >= 12f) {
+                                Text(
+                                    text = "⚠️ آیا از درصد دهیدراتاسیون وارد شده اطمینان دارید؟ درصد دهیدراتاسیون بالای ۱۲٪ نشان‌دهنده شوک بالینی شدید است.",
+                                    color = Color(0xFFD97706),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(top = 4.dp).fillMaxWidth(),
+                                    textAlign = TextAlign.Right
+                                )
                             }
                         }
                     }
@@ -464,7 +499,7 @@ fun FluidTherapyCalculator(
                                 value = replaceTimeHrs,
                                 onValueChange = { replaceTimeHrs = it },
                                 label = { Text("Time (hrs) to Replace Deficit and Losses") },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true
                             )
@@ -552,7 +587,7 @@ fun FluidTherapyCalculator(
                         value = dripVolumeInput,
                         onValueChange = { dripVolumeInput = it },
                         label = { Text("Volume to give (mls)") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
@@ -595,7 +630,7 @@ fun FluidTherapyCalculator(
                         value = dripTimeMinutes,
                         onValueChange = { dripTimeMinutes = it },
                         label = { Text("Time in Minutes") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
@@ -689,7 +724,7 @@ fun FluidTherapyCalculator(
                                 .width(85.dp)
                                 .height(44.dp),
                             textStyle = LocalTextStyle.current.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             singleLine = true
                         )
                     }
@@ -866,7 +901,7 @@ fun FluidTherapyCalculator(
                                 .width(85.dp)
                                 .height(44.dp),
                             textStyle = LocalTextStyle.current.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             singleLine = true
                         )
                     }
@@ -936,7 +971,7 @@ fun FluidTherapyCalculator(
                                 .width(85.dp)
                                 .height(44.dp),
                             textStyle = LocalTextStyle.current.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             singleLine = true
                         )
                     }
@@ -992,7 +1027,7 @@ fun FluidTherapyCalculator(
                                 .width(85.dp)
                                 .height(44.dp),
                             textStyle = LocalTextStyle.current.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             singleLine = true
                         )
                     }
@@ -1061,7 +1096,7 @@ fun FluidTherapyCalculator(
                                 .width(85.dp)
                                 .height(44.dp),
                             textStyle = LocalTextStyle.current.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             singleLine = true
                         )
                     }

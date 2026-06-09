@@ -131,12 +131,14 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         // Welcoming card
         Card(
             colors = CardDefaults.cardColors(containerColor = Color.Transparent),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(bottom = 16.dp)
                 .glassmorphic(accentGlow = true, cornerRadius = 16.dp)
         ) {
             Column(
@@ -144,22 +146,23 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = "سلام، ${activeSession?.fullName ?: "صاحب عزیز پت"} 👋",
+                    text = "سلام کاربر گرامی 👋",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Right,
+                    modifier = Modifier.fillMaxWidth()
                 )
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "به پورتال مدیریت پرونده‌های سلامت حیوانات خانگی خوش آمدید. اطلاعات کلینیکی همگام‌سازی شده با دامپزشک فورا در تب نسخه قابل بازرسی است.",
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+                    text = "به پورتال مدیریت پرونده‌های سلامت حیوانات خانگی خوش آمدید.",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.85f),
                     textAlign = TextAlign.Right,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         // Actions Bar
         Button(
