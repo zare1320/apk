@@ -34,8 +34,8 @@ private val LightColorScheme = lightColorScheme(
     surface = VetSurfaceLight,
     onPrimary = androidx.compose.ui.graphics.Color.White,
     onSecondary = androidx.compose.ui.graphics.Color.White,
-    onBackground = androidx.compose.ui.graphics.Color(0xFF0F172A),
-    onSurface = androidx.compose.ui.graphics.Color(0xFF1E293B)
+    onBackground = VetOnBackgroundLight,
+    onSurface = VetOnSurfaceLight
 )
 
 @Composable

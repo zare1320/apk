@@ -293,27 +293,49 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
         val isSpeciesChosen = activeSpecies != null && (activeSpecies != "exotic" || activeExotic != null)
 
         if (!isSpeciesChosen) {
-            // Disabled Callout
+            // High-Contrast Premium Info/Warning Card containing health-themed colors
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+                ),
+                shape = RoundedCornerShape(16.dp),
+                border = androidx.compose.foundation.BorderStroke(
+                    1.5.dp, 
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp)
-                    .glassmorphic(accentGlow = true)
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Icon(Icons.Default.Info, contentDescription = "قفل", tint = MaterialTheme.colorScheme.error)
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info, 
+                            contentDescription = "قفل", 
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                     Text(
                         text = "پذیرش بیمار غیرفعال است. جهت شروع معاینه و فعالسازی بخش‌های دارو، تشخیص و درمان ابتدا گونه حیوان (سگ/گربه/اگزوتیک) را در بالا انتخاب کنید.",
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.primary, // #1F6F5F - Highly readable and perfectly matches the aesthetic!
                         modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Right
+                        textAlign = TextAlign.Right,
+                        lineHeight = 20.sp
                     )
                 }
             }

@@ -2,12 +2,16 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Ionic Framework signature polished color palette
-val VetTealPrimary = Color(0xFF3880FF)       // Ionic Blue Primary
-val VetTealSecondary = Color(0xFF5260FF)     // Ionic Purple Accent
-val VetTealTertiary = Color(0xFF3DC2FF)      // Ionic Cyan Support
-val VetBackgroundLight = Color(0xFFF4F5F8)   // Ionic Light iOS Grey Background
-val VetSurfaceLight = Color(0xFFFFFFFF)
+// Premium Healthcare/Teal Soft Color Palette
+val VetTealPrimary = Color(0xFF1F6F5F)       // Dark Teal (#1F6F5F) - Exceptional accessibility contrast
+val VetTealSecondary = Color(0xFF2FA084)     // Medium Teal (#2FA084) - Healing action color
+val VetTealTertiary = Color(0xFF6FCF97)      // Soft Mint (#6FCF97) - Accent, highlights, badges
+val VetBackgroundLight = Color(0xFFEEEEEE)   // Light Grey (#EEEEEE) - Safe comfortable field canvas
+val VetSurfaceLight = Color(0xFFFFFFFF)      // Pure White for clean contrasting material cards
+
+// Contrast-preserving Typography ink
+val VetOnBackgroundLight = Color(0xFF111B19) // Ultra-dark charcoal teal for perfect readability
+val VetOnSurfaceLight = Color(0xFF162522)    // Deep slate-teal for secondary typographic weights
 
 // Ionic Dark themed custom elements
 val VetDarkPrimary = Color(0xFF3880FF)       // Active blue indicators
