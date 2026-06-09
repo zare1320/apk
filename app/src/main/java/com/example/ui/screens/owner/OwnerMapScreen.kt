@@ -74,7 +74,7 @@ fun OwnerMapScreen(viewModel: MainViewModel) {
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.End
+                horizontalAlignment = Alignment.Start
             ) {
                 Text(
                     text = "📍 رادیوسنترال خدمات دامپزشکی",
@@ -117,7 +117,7 @@ fun OwnerMapScreen(viewModel: MainViewModel) {
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.End) {
+                Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.Start) {
                     Text("🗣️ تالار گفتمان و مشاوره آنلاین", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -179,7 +179,7 @@ fun OwnerMapScreen(viewModel: MainViewModel) {
         ) {
             Column(
                 modifier = Modifier.padding(14.dp),
-                horizontalAlignment = Alignment.End
+                horizontalAlignment = Alignment.Start
             ) {
                 Text(
                     text = "🌐 جستجوی زنده سراسری روی گوگل مپ واقعی",
@@ -431,7 +431,7 @@ fun OwnerMapScreen(viewModel: MainViewModel) {
             ) {
                 Column(
                     modifier = Modifier.padding(14.dp),
-                    horizontalAlignment = Alignment.End
+                    horizontalAlignment = Alignment.Start
                 ) {
                     Text("🏢 مشخصات مرکز انتخاب شده:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.height(8.dp))

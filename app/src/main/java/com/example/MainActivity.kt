@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -52,6 +53,7 @@ import com.example.ui.screens.vet.VetDiagnosisTreatmentScreen
 import com.example.ui.screens.vet.VetDrugManualScreen
 import com.example.ui.screens.vet.VetProfileScreen
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import com.example.ui.theme.MyApplicationTheme
 import com.example.viewmodel.MainViewModel
 
@@ -93,27 +95,35 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    if (activeSession == null) {
-                        // User is NOT logged in - Auth screen stack
-                        Crossfade(targetState = authScreenState) { screen ->
-                            when (screen) {
-                                "login" -> LoginScreen(
-                                    viewModel = viewModel,
-                                    onNavigateToRegister = { authScreenState = "register" }
-                                )
-                                "register" -> RegisterScreen(
-                                    viewModel = viewModel,
-                                    onNavigateBack = { authScreenState = "login" }
-                                )
+                    AnimatedContent(
+                        targetState = Triple(themeMode, currentLanguage, activeSession == null),
+                        transitionSpec = {
+                            fadeIn(animationSpec = tween(400)) togetherWith fadeOut(animationSpec = tween(400))
+                        },
+                        label = "theme_and_lang_transition"
+                    ) { (_, _, isAuthEmpty) ->
+                        if (activeSession == null) {
+                            // User is NOT logged in - Auth screen stack
+                            Crossfade(targetState = authScreenState) { screen ->
+                                when (screen) {
+                                    "login" -> LoginScreen(
+                                        viewModel = viewModel,
+                                        onNavigateToRegister = { authScreenState = "register" }
+                                    )
+                                    "register" -> RegisterScreen(
+                                        viewModel = viewModel,
+                                        onNavigateBack = { authScreenState = "login" }
+                                    )
+                                }
                             }
-                        }
-                    } else {
-                        // User is Logged-In
-                        val role = activeSession?.userType ?: "vet"
-                        if (role == "vet") {
-                            VetLayoutContainer(viewModel = viewModel)
                         } else {
-                            OwnerLayoutContainer(viewModel = viewModel)
+                            // User is Logged-In
+                            val role = activeSession?.userType ?: "vet"
+                            if (role == "vet") {
+                                VetLayoutContainer(viewModel = viewModel)
+                            } else {
+                                OwnerLayoutContainer(viewModel = viewModel)
+                            }
                         }
                     }
                 }
@@ -270,130 +280,132 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
 fun OwnerLayoutContainer(viewModel: MainViewModel) {
     var activeOwnerTab by remember { mutableStateOf("داشبورد") }
 
-    Scaffold(
-        topBar = {
-            val session by viewModel.activeSession.collectAsState()
-            val themeMode by viewModel.themeMode.collectAsState()
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-                    )
-                    .statusBarsPadding()
-                    .padding(horizontal = 16.dp, vertical = 14.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        Scaffold(
+            topBar = {
+                val session by viewModel.activeSession.collectAsState()
+                val themeMode by viewModel.themeMode.collectAsState()
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                        )
+                        .statusBarsPadding()
+                        .padding(horizontal = 16.dp, vertical = 14.dp)
                 ) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(8.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("🐕", fontSize = 18.sp)
+                            }
+                            Text(
+                                text = "دستیار همراه صاحب پت",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
                         Box(
                             modifier = Modifier
                                 .size(36.dp)
-                                .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(8.dp)),
+                                .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(50.dp))
+                                .clickable { viewModel.toggleTheme() },
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("🐕", fontSize = 18.sp)
+                            Text(if (themeMode == "dark") "☀️" else "🌙", fontSize = 16.sp)
                         }
-                        Text(
-                            text = "دستیار همراه صاحب پت",
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
                     }
 
-                    Box(
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(
                         modifier = Modifier
-                            .size(36.dp)
-                            .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(50.dp))
-                            .clickable { viewModel.toggleTheme() },
-                        contentAlignment = Alignment.Center
+                            .fillMaxWidth()
+                            .background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(if (themeMode == "dark") "☀️" else "🌙", fontSize = 16.sp)
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "بخش مراقبت هوشمند و نوبت‌دهی",
-                            color = Color.White.copy(alpha = 0.85f),
-                            fontSize = 10.sp
-                        )
-                        Text(
-                            text = "خوش آمدید، " + (session?.fullName ?: "صاحب پت محترم"),
-                            color = Color.White,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .background(Color.White, RoundedCornerShape(50.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("👤", fontSize = 20.sp)
-                    }
-                }
-            }
-        },
-        bottomBar = {
-            NavigationBar(
-                windowInsets = WindowInsets.navigationBars
-            ) {
-                listOf(
-                    NavItem("داشبورد", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, "داشبورد"),
-                    NavItem("نسخه", Icons.Filled.Assignment, Icons.Outlined.Assignment, "نسخه"),
-                    NavItem("تقویم", Icons.Filled.CalendarToday, Icons.Outlined.CalendarToday, "تقویم"),
-                    NavItem("نقشه", Icons.Filled.Map, Icons.Outlined.Map, "نقشه"),
-                    NavItem("پروفایل", Icons.Filled.Person, Icons.Outlined.Person, "پروفایل")
-                ).forEach { item ->
-                    val isSelected = activeOwnerTab == item.tab
-                    NavigationBarItem(
-                        selected = isSelected,
-                        onClick = { activeOwnerTab = item.tab },
-                        icon = {
-                            Icon(
-                                imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
-                                contentDescription = item.label,
-                                modifier = Modifier.size(24.dp)
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "بخش مراقبت هوشمند و نوبت‌دهی",
+                                color = Color.White.copy(alpha = 0.85f),
+                                fontSize = 10.sp
                             )
-                        },
-                        label = { Text(item.label, fontSize = 9.sp, fontWeight = FontWeight.Bold) }
-                    )
+                            Text(
+                                text = "خوش آمدید، " + (session?.fullName ?: "صاحب پت محترم"),
+                                color = Color.White,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .background(Color.White, RoundedCornerShape(50.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("👤", fontSize = 20.sp)
+                        }
+                    }
+                }
+            },
+            bottomBar = {
+                NavigationBar(
+                    windowInsets = WindowInsets.navigationBars
+                ) {
+                    listOf(
+                        NavItem("داشبورد", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, "داشبورد"),
+                        NavItem("نسخه", Icons.Filled.Assignment, Icons.Outlined.Assignment, "نسخه"),
+                        NavItem("تقویم", Icons.Filled.CalendarToday, Icons.Outlined.CalendarToday, "تقویم"),
+                        NavItem("نقشه", Icons.Filled.Map, Icons.Outlined.Map, "نقشه"),
+                        NavItem("پروفایل", Icons.Filled.Person, Icons.Outlined.Person, "پروفایل")
+                    ).forEach { item ->
+                        val isSelected = activeOwnerTab == item.tab
+                        NavigationBarItem(
+                            selected = isSelected,
+                            onClick = { activeOwnerTab = item.tab },
+                            icon = {
+                                Icon(
+                                    imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                                    contentDescription = item.label,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            },
+                            label = { Text(item.label, fontSize = 9.sp, fontWeight = FontWeight.Bold) }
+                        )
+                    }
                 }
             }
-        }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            Crossfade(targetState = activeOwnerTab) { tab ->
-                when (tab) {
-                    "داشبورد" -> OwnerDashboardScreen(viewModel = viewModel)
-                    "نسخه" -> OwnerPrescriptionsScreen(viewModel = viewModel)
-                    "تقویم" -> OwnerCalendarScreen(viewModel = viewModel)
-                    "نقشه" -> OwnerMapScreen(viewModel = viewModel)
-                    "پروفایل" -> OwnerProfileScreen(viewModel = viewModel)
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                Crossfade(targetState = activeOwnerTab) { tab ->
+                    when (tab) {
+                        "داشبورد" -> OwnerDashboardScreen(viewModel = viewModel)
+                        "نسخه" -> OwnerPrescriptionsScreen(viewModel = viewModel)
+                        "تقویم" -> OwnerCalendarScreen(viewModel = viewModel)
+                        "نقشه" -> OwnerMapScreen(viewModel = viewModel)
+                        "پروفایل" -> OwnerProfileScreen(viewModel = viewModel)
+                    }
                 }
             }
         }

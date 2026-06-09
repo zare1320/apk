@@ -537,7 +537,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                             ) {
                                                 Text("🔗", fontSize = 16.sp)
                                             }
-                                            Column(horizontalAlignment = Alignment.End) {
+                                            Column(horizontalAlignment = Alignment.Start) {
                                                 Text(title, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textColor)
                                                 Spacer(modifier = Modifier.height(2.dp))
                                                 Text(link, fontSize = 11.sp, color = Color(0xFFEF4444))
@@ -660,7 +660,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text("فعال (این دستگاه)", color = Color(0xFF48BB78), fontWeight = FontWeight.Bold, fontSize = 11.sp)
-                                    Column(horizontalAlignment = Alignment.End) {
+                                    Column(horizontalAlignment = Alignment.Start) {
                                         Text("Xiaomi Redmi 12", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textColor)
                                         Text("آخرین فعالیت: هم‌اکنون", fontSize = 11.sp, color = mutedTextColor)
                                     }

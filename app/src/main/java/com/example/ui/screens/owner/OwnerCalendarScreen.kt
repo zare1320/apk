@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.database.CalendarEvent
 import com.example.viewmodel.MainViewModel
+import com.example.ui.theme.bounceClick
+import com.example.ui.theme.StaggeredFadeInItem
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -68,30 +70,32 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Welcome Header info node
-        Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.End
+        StaggeredFadeInItem(index = 0) {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp)
             ) {
-                Text(
-                    text = "📅 زمان‌بندی هوشمند سلامت پت",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Text(
-                    text = "واکسیناسیون‌ها، درمان‌های دوره‌ای و قرارهای ویزیت پزشک دلبندتان را در این صفحه مدیریت کنید. پیامک‌های اطلاع‌رسانی خودکار بر همین مبنا ارسال می‌گردد.",
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
-                    textAlign = TextAlign.Right,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = "📅 زمان‌بندی هوشمند سلامت پت",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Text(
+                        text = "واکسیناسیون‌ها، درمان‌های دوره‌ای و قرارهای ویزیت پزشک دلبندتان را در این صفحه مدیریت کنید. پیامک‌های اطلاع‌رسانی خودکار بر همین مبنا ارسال می‌گردد.",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                        textAlign = TextAlign.Right,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
 
@@ -127,7 +131,7 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
             ) {
                 Column(
                     modifier = Modifier.padding(14.dp),
-                    horizontalAlignment = Alignment.End
+                    horizontalAlignment = Alignment.Start
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -152,7 +156,7 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(6.dp))
                                     .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f))
-                                    .clickable {
+                                    .bounceClick {
                                         val currentIndex = ownerPets.indexOfFirst { it.id == selectedPetId }
                                         val nextIndex = (currentIndex + 1) % ownerPets.size
                                         selectedPetId = ownerPets[nextIndex].id
@@ -187,7 +191,7 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
 
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier.width(95.dp).clickable {
+                                modifier = Modifier.width(95.dp).bounceClick {
                                     if (!isDone) {
                                         viewModel.addCalendarEvent(
                                             petId = selectedPet.id,
@@ -290,7 +294,7 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.End
+                    horizontalAlignment = Alignment.Start
                 ) {
                     Text("⏰ زمان‌بندی رویداد سلامتی جدید", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     Spacer(modifier = Modifier.height(12.dp))
@@ -309,7 +313,7 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(8.dp))
                                             .background(bg)
-                                            .clickable {
+                                            .bounceClick {
                                                 selectedPetId = pet.id
                                                 selectedPetName = pet.name
                                             }
@@ -336,7 +340,7 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
                                         .weight(1f)
                                         .clip(RoundedCornerShape(8.dp))
                                         .background(bg)
-                                        .clickable { eventType = type }
+                                        .bounceClick { eventType = type }
                                         .defaultMinSize(minHeight = 48.dp)
                                         .padding(horizontal = 4.dp, vertical = 8.dp),
                                     contentAlignment = Alignment.Center
@@ -462,8 +466,9 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
                 }
             }
         } else {
-            ownerEvents.forEach { event ->
-                Card(
+            ownerEvents.forEachIndexed { i, event ->
+                StaggeredFadeInItem(index = i + 1) {
+                    Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 6.dp)
@@ -473,7 +478,7 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
                 ) {
                     Column(
                         modifier = Modifier.padding(14.dp),
-                        horizontalAlignment = Alignment.End
+                        horizontalAlignment = Alignment.Start
                     ) {
                         CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                             Row(
@@ -564,6 +569,7 @@ fun OwnerCalendarScreen(viewModel: MainViewModel) {
                             }
                         }
                     }
+                }
                 }
             }
         }

@@ -21,6 +21,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.viewmodel.MainViewModel
+import com.example.ui.theme.bounceClick
+import com.example.ui.theme.StaggeredFadeInItem
 
 @Composable
 fun OwnerPrescriptionsScreen(viewModel: MainViewModel) {
@@ -39,27 +41,29 @@ fun OwnerPrescriptionsScreen(viewModel: MainViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Upper sync status placard
-        Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.End
+        StaggeredFadeInItem(index = 0) {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = "📋 نسخه‌های درمانی همگام‌سازی شده",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Text(
-                    text = "نسخه‌های صادر شده برای حیوان شما توسط دکتر محقق در این قسمت بر اساس مطابقت شماره تلفن همراه با موفقیت لود شده‌اند. در دسترستان است تا جهت پرینت یا ارائه به داروخانه‌های همکار ارائه کنید.",
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
-                    textAlign = TextAlign.Right
-                )
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = "📋 نسخه‌های درمانی همگام‌سازی شده",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Text(
+                        text = "نسخه‌های صادر شده برای حیوان شما توسط دکتر محقق در این قسمت بر اساس مطابقت شماره تلفن همراه با موفقیت لود شده‌اند. در دسترستان است تا جهت پرینت یا ارائه به داروخانه‌های همکار ارائه کنید.",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                        textAlign = TextAlign.Right
+                    )
+                }
             }
         }
 
@@ -117,11 +121,12 @@ fun OwnerPrescriptionsScreen(viewModel: MainViewModel) {
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
-                        onClick = {
-                            clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(ownerPhoneNum))
-                        },
+                        onClick = {},
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.bounceClick {
+                            clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(ownerPhoneNum))
+                        }
                     ) {
                         Icon(Icons.Filled.Share, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
@@ -130,8 +135,9 @@ fun OwnerPrescriptionsScreen(viewModel: MainViewModel) {
                 }
             }
         } else {
-            ownerPrescriptions.forEach { prescription ->
-                Card(
+            ownerPrescriptions.forEachIndexed { i, prescription ->
+                StaggeredFadeInItem(index = i + 1) {
+                    Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 6.dp)
@@ -141,7 +147,7 @@ fun OwnerPrescriptionsScreen(viewModel: MainViewModel) {
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.End
+                        horizontalAlignment = Alignment.Start
                     ) {
                         CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
                             Row(
@@ -150,7 +156,7 @@ fun OwnerPrescriptionsScreen(viewModel: MainViewModel) {
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text("🧬", fontSize = 24.sp)
-                                Column(horizontalAlignment = Alignment.End) {
+                                Column(horizontalAlignment = Alignment.Start) {
                                     Text(
                                         text = "دارو: ${prescription.drugName}",
                                         fontWeight = FontWeight.Bold,
@@ -237,6 +243,7 @@ fun OwnerPrescriptionsScreen(viewModel: MainViewModel) {
                             }
                         }
                     }
+                }
                 }
             }
         }

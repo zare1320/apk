@@ -1,6 +1,7 @@
 package com.example.ui.screens.owner
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,6 +34,8 @@ import com.example.ui.screens.ExoticVectorIcon
 import com.example.data.database.Pet
 import com.example.viewmodel.MainViewModel
 import com.example.ui.theme.glassmorphic
+import com.example.ui.theme.bounceClick
+import com.example.ui.theme.StaggeredFadeInItem
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -132,45 +135,49 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Welcoming card
-        Card(
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .glassmorphic(accentGlow = true, cornerRadius = 16.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.End
+        StaggeredFadeInItem(index = 0) {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .glassmorphic(accentGlow = true, cornerRadius = 16.dp)
             ) {
-                Text(
-                    text = "سلام، ${activeSession?.fullName ?: "صاحب عزیز پت"} 👋",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = "به پورتال مدیریت پرونده‌های سلامت حیوانات خانگی خوش آمدید. اطلاعات کلینیکی همگام‌سازی شده با دامپزشک فورا در تب نسخه قابل بازرسی است.",
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
-                    textAlign = TextAlign.Right,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = "سلام، ${activeSession?.fullName ?: "صاحب عزیز پت"} 👋",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = "به پورتال مدیریت پرونده‌های سلامت حیوانات خانگی خوش آمدید. اطلاعات کلینیکی همگام‌سازی شده با دامپزشک فورا در تب نسخه قابل بازرسی است.",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+                        textAlign = TextAlign.Right,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Actions Bar
-        Button(
-            onClick = { showAddPetForm = !showAddPetForm },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("➕", fontSize = 14.sp)
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(if (showAddPetForm) "بستن فرم ورود" else "ثبت و افزودن حیوان خانگی جدید", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        StaggeredFadeInItem(index = 1) {
+            Button(
+                onClick = { showAddPetForm = !showAddPetForm },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("➕", fontSize = 14.sp)
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(if (showAddPetForm) "بستن فرم ورود" else "ثبت و افزودن حیوان خانگی جدید", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                }
             }
         }
 
@@ -186,7 +193,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.End
+                    horizontalAlignment = Alignment.Start
                 ) {
                     Text("🐾 مشخصات حیوان دلبند شما:", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     Spacer(modifier = Modifier.height(12.dp))
@@ -227,7 +234,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                                             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
                                             shape = RoundedCornerShape(12.dp)
                                         )
-                                        .clickable { newPetSpecies = code }
+                                        .bounceClick { newPetSpecies = code }
                                         .defaultMinSize(minHeight = 48.dp)
                                         .padding(horizontal = 4.dp, vertical = 10.dp),
                                     contentAlignment = Alignment.Center
@@ -334,7 +341,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(6.dp))
                                             .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f))
-                                            .clickable { 
+                                            .bounceClick { 
                                                 newPetBreed = option 
                                                 isBreedDropdownExpanded = false
                                             }
@@ -359,7 +366,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                                         .weight(1f)
                                         .clip(RoundedCornerShape(8.dp))
                                         .background(bg)
-                                        .clickable { newPetGender = gen }
+                                        .bounceClick { newPetGender = gen }
                                         .defaultMinSize(minHeight = 48.dp)
                                         .padding(horizontal = 4.dp, vertical = 8.dp),
                                     contentAlignment = Alignment.Center
@@ -473,68 +480,70 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                 }
             }
         } else {
-            ownerPetsList.forEach { pet ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .glassmorphic(cornerRadius = 16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.End
+            ownerPetsList.forEachIndexed { i, pet ->
+                StaggeredFadeInItem(index = 2 + i) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp)
+                            .glassmorphic(cornerRadius = 16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                        shape = RoundedCornerShape(16.dp)
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.Start
                         ) {
-                            Text("🐾", fontSize = 24.sp)
-                            Column(horizontalAlignment = Alignment.End) {
-                                Text(pet.name, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                                Text("گونه: " + if (pet.species == "dog") "سگ‌سان" else if (pet.species == "cat") "گربه‌سان" else "پرنده/اگزوتیک زیستی", fontSize = 11.sp, color = Color.Gray)
-                            }
-                        }
-
-                        Divider(modifier = Modifier.padding(vertical = 10.dp))
-
-                        CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Column(horizontalAlignment = Alignment.End) {
-                                    Text("نژاد حیوان:", fontSize = 10.sp, color = Color.Gray)
-                                    Text(pet.breed, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                }
-                                Column(horizontalAlignment = Alignment.End) {
-                                    Text("جنسیت و سن:", fontSize = 10.sp, color = Color.Gray)
-                                    Text("${pet.gender} | ${pet.age} ساله", fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                }
-                                Column(horizontalAlignment = Alignment.End) {
-                                    Text("وزن بالینی:", fontSize = 10.sp, color = Color.Gray)
-                                    Text("${pet.weight} کیلوگرم", fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        Icons.Default.Info,
-                                        contentDescription = "",
-                                        tint = MaterialTheme.colorScheme.secondary,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("شناسه پرونده: ${pet.recordNumber}", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text("🐾", fontSize = 24.sp)
+                                Column(horizontalAlignment = Alignment.Start) {
+                                    Text(pet.name, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                    Text("گونه: " + if (pet.species == "dog") "سگ‌سان" else if (pet.species == "cat") "گربه‌سان" else "پرنده/اگزوتیک زیستی", fontSize = 11.sp, color = Color.Gray)
+                                }
+                            }
+
+                            Divider(modifier = Modifier.padding(vertical = 10.dp))
+
+                            CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Column(horizontalAlignment = Alignment.Start) {
+                                        Text("نژاد حیوان:", fontSize = 10.sp, color = Color.Gray)
+                                        Text(pet.breed, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                    Column(horizontalAlignment = Alignment.Start) {
+                                        Text("جنسیت و سن:", fontSize = 10.sp, color = Color.Gray)
+                                        Text("${pet.gender} | ${pet.age} ساله", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                    Column(horizontalAlignment = Alignment.Start) {
+                                        Text("وزن بالینی:", fontSize = 10.sp, color = Color.Gray)
+                                        Text("${pet.weight} کیلوگرم", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            Icons.Default.Info,
+                                            contentDescription = "",
+                                            tint = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("شناسه پرونده: ${pet.recordNumber}", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                    }
                                 }
                             }
                         }
