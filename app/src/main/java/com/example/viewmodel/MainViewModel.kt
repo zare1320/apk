@@ -160,7 +160,8 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
         phoneNumber: String,
         userType: String,
         licenseNum: String,
-        specOrUni: String
+        specOrUni: String,
+        gender: String = "آقا"
     ) {
         simulateRegister(
             phone = phoneNumber,
@@ -169,7 +170,8 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
             idNumber = licenseNum,
             workplace = specOrUni,
             specialty = specOrUni,
-            petsData = emptyList()
+            petsData = emptyList(),
+            gender = gender
         )
     }
 
@@ -180,7 +182,8 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
         idNumber: String,
         workplace: String,
         specialty: String,
-        petsData: List<Pet> = emptyList()
+        petsData: List<Pet> = emptyList(),
+        gender: String = "آقا"
     ) {
         viewModelScope.launch {
             val session = UserSession(
@@ -191,7 +194,8 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
                 workplaceOrUni = workplace,
                 specialty = specialty,
                 isLoggedIn = true,
-                coins = 100
+                coins = 100,
+                gender = gender
             )
             repository.login(session)
 
@@ -208,7 +212,8 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
         emailOrId: String,
         fullName: String,
         userType: String,
-        provider: String
+        provider: String,
+        gender: String = "آقا"
     ) {
         viewModelScope.launch {
             val session = UserSession(
@@ -219,7 +224,8 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
                 workplaceOrUni = provider,
                 specialty = "تایید هویت سریع مستقل",
                 isLoggedIn = true,
-                coins = 100
+                coins = 100,
+                gender = gender
             )
             repository.login(session)
         }

@@ -311,6 +311,7 @@ fun LoginScreen(
 
                         googleAccounts.forEach { (name, email) ->
                             val detectedRole = if (email.contains("pet")) "owner" else "vet"
+                            val detectedGender = if (email.contains("samaneh")) "خانم" else "آقا"
                             Card(
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(containerColor = Color.Transparent),
@@ -318,7 +319,7 @@ fun LoginScreen(
                                     .fillMaxWidth()
                                     .glassmorphic(accentGlow = true, cornerRadius = 12.dp)
                                     .clickable {
-                                        viewModel.simulateSocialAuth(email, name, detectedRole, "Google")
+                                        viewModel.simulateSocialAuth(email, name, detectedRole, "Google", detectedGender)
                                         socialAuthChoice = null
                                     }
                             ) {
@@ -353,6 +354,7 @@ fun LoginScreen(
 
                         appleAccounts.forEach { (name, email) ->
                             val detectedRole = if (email.contains("ahmadi")) "owner" else "vet"
+                            val detectedGender = if (email.contains("ahmadi")) "خانم" else "آقا"
                             Card(
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(containerColor = Color.Transparent),
@@ -360,7 +362,7 @@ fun LoginScreen(
                                     .fillMaxWidth()
                                     .glassmorphic(accentGlow = true, cornerRadius = 12.dp)
                                     .clickable {
-                                        viewModel.simulateSocialAuth(email, name, detectedRole, "Apple")
+                                        viewModel.simulateSocialAuth(email, name, detectedRole, "Apple", detectedGender)
                                         socialAuthChoice = null
                                     }
                             ) {

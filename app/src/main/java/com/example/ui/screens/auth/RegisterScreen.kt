@@ -46,6 +46,7 @@ fun RegisterScreen(
 
     // General Fields
     var fullName by remember { mutableStateOf("") }
+    var genderSelected by remember { mutableStateOf("آقا") } // "آقا" or "خانم"
     var phoneNumber by remember { mutableStateOf("") }
     var otpCode by remember { mutableStateOf("") }
     var isOtpSent by remember { mutableStateOf(false) }
@@ -241,6 +242,49 @@ fun RegisterScreen(
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp)
                 )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Gender selector panel (Visual UI specification)
+                Text(
+                    text = "جنسیت و پیش‌وند نام:",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(bottom = 6.dp)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    listOf(
+                        Pair("آقا", "جناب آقای / دُکتر"),
+                        Pair("خانم", "سرکار خانم / دُکتر")
+                    ).forEach { (code, label) ->
+                        val isSel = genderSelected == code
+                        val bg = if (isSel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        val textColor = if (isSel) Color.White else MaterialTheme.colorScheme.onSurface
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(bg)
+                                .clickable { genderSelected = code }
+                                .defaultMinSize(minHeight = 44.dp)
+                                .padding(vertical = 10.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = if (code == "آقا") "👨 $label" else "👩 $label",
+                                color = textColor,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -711,7 +755,8 @@ fun RegisterScreen(
                                 phoneNumber = phoneNumber,
                                 userType = "vet",
                                 licenseNum = identificationCode,
-                                specOrUni = if (isStudentMode) schoolSelected else specialtySelected
+                                specOrUni = if (isStudentMode) schoolSelected else specialtySelected,
+                                gender = genderSelected
                             )
                         } else {
                             val doubleWeight = petWeight.toDoubleOrNull() ?: 1.0
@@ -733,7 +778,8 @@ fun RegisterScreen(
                                 phoneNumber = phoneNumber,
                                 userType = "owner",
                                 licenseNum = "",
-                                specOrUni = ""
+                                specOrUni = "",
+                                gender = genderSelected
                             )
                             viewModel.addNewPatient(newPet)
                         }

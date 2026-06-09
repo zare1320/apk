@@ -170,7 +170,7 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                                     .background(Color.White, androidx.compose.foundation.shape.CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("👨‍⚕️", fontSize = 24.sp)
+                                Text(if (session?.gender == "خانم") "👩‍⚕️" else "👨‍⚕️", fontSize = 24.sp)
                             }
 
                             // User Info column
@@ -178,13 +178,7 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.Start
                             ) {
-                                val isStudent = session?.workplaceOrUni?.contains("دانشگاه") == true && session?.fullName?.contains("دکتر") == false
-                                val displayName = session?.fullName?.replace("دکتر ", "")?.replace("دکتر", "")?.ifEmpty { "مسعود زارع" } ?: "مسعود زارع"
-                                val userTitle = if (isStudent) {
-                                    "دانشجوی گرامی $displayName"
-                                } else {
-                                    "آقای دکتر $displayName"
-                                }
+                                val userTitle = session?.getFullTitle() ?: "آقای دکتر مسعود زارع"
                                 val workplaceOrUni = session?.workplaceOrUni?.ifEmpty { "بیمارستان تخصصی پارس" } ?: "بیمارستان تخصصی پارس"
 
                                 Text(
@@ -347,7 +341,7 @@ fun OwnerLayoutContainer(viewModel: MainViewModel) {
                                 fontSize = 10.sp
                             )
                             Text(
-                                text = "خوش آمدید، " + (session?.fullName ?: "صاحب پت محترم"),
+                                text = "خوش آمدید، " + (session?.getFullTitle() ?: "صاحب پت محترم"),
                                 color = Color.White,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold
@@ -360,7 +354,7 @@ fun OwnerLayoutContainer(viewModel: MainViewModel) {
                                 .background(Color.White, RoundedCornerShape(50.dp)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("👤", fontSize = 20.sp)
+                            Text(if (session?.gender == "خانم") "👩" else "👨", fontSize = 20.sp)
                         }
                     }
                 }

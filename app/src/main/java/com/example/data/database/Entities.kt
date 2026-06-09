@@ -13,8 +13,23 @@ data class UserSession(
     val workplaceOrUni: String = "", // Workplace or University
     val specialty: String = "", // Vet specialty
     val isLoggedIn: Boolean = false,
-    val coins: Int = 100
-)
+    val coins: Int = 100,
+    val gender: String = "آقا" // "آقا" or "خانم"
+) {
+    fun getFullTitle(): String {
+        val cleanName = fullName.replace("دکتر ", "").replace("دکتر", "").trim()
+        return if (userType == "vet") {
+            val isStudent = workplaceOrUni.contains("دانشگاه")
+            if (isStudent) {
+                if (gender == "خانم") "خانم دکتر دانشجوی گرامی $cleanName" else "جناب آقای دکتر دانشجوی گرامی $cleanName"
+            } else {
+                if (gender == "خانم") "خانم دکتر $cleanName" else "آقای دکتر $cleanName"
+            }
+        } else {
+            if (gender == "خانم") "خانم $cleanName" else "جناب آقای $cleanName"
+        }
+    }
+}
 
 @Entity(tableName = "pets")
 data class Pet(

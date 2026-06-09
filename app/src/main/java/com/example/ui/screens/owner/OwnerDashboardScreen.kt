@@ -148,7 +148,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = "سلام، ${activeSession?.fullName ?: "صاحب عزیز پت"} 👋",
+                        text = "سلام، ${activeSession?.getFullTitle() ?: "صاحب عزیز پت"} 👋",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
