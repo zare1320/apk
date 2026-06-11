@@ -1,5 +1,7 @@
 package com.example.ui.screens.auth
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,11 +11,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.graphics.Path
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
@@ -41,221 +46,501 @@ fun LoginScreen(
     viewModel: MainViewModel,
     onNavigateToRegister: () -> Unit
 ) {
-    var phoneNumber by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var step by remember { mutableStateOf(1) } // 1: ورود / ثبت نام, 2: کد تایید (OTP + Register if new)
+    var inputUsername by remember { mutableStateOf("") }
+    
+    // Step 2 profile fields
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var otpCode by remember { mutableStateOf("") }
+    var isVetMode by remember { mutableStateOf(true) } // default vet, switcher in case they want owner
+    var secondsLeft by remember { mutableStateOf(114) } // 01:54 = 114 seconds
+    
     var showError by remember { mutableStateOf(false) }
     var socialAuthChoice by remember { mutableStateOf<String?>(null) }
+    val isDark = isSystemInDarkTheme()
+
+    // Timer countdown effect when step 2 active
+    LaunchedEffect(key1 = step) {
+        if (step == 2) {
+            secondsLeft = 114
+            while (secondsLeft > 0) {
+                kotlinx.coroutines.delay(1000)
+                secondsLeft--
+            }
+        }
+    }
+
+    val timerText = remember(secondsLeft) {
+        val mins = secondsLeft / 60
+        val secs = secondsLeft % 60
+        String.format("%02d:%02d", mins, secs)
+    }
 
     GlassBackgroundBox {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(20.dp)
                 .navigationBarsPadding()
                 .statusBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // App Emblem
-            Box(
-                modifier = Modifier
-                    .size(115.dp)
-                    .clip(RoundedCornerShape(26.dp))
-                    .background(Color(0xFF312E81).copy(alpha = 0.5f))
-                    .border(2.dp, Color(0xFF6366F1).copy(alpha = 0.4f), RoundedCornerShape(26.dp))
-                    .padding(4.dp),
-                contentAlignment = Alignment.Center
+            
+            // Header elements (App Info) can fade/slide
+            AnimatedVisibility(
+                visible = step == 1,
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut()
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.img_app_logo),
-                    contentDescription = "دستیار حرفه‌ای دامپزشکی لوگو",
-                    modifier = Modifier.fillMaxSize()
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    // App Emblem
+                    Box(
+                        modifier = Modifier
+                            .size(90.dp)
+                            .clip(RoundedCornerShape(22.dp))
+                            .background(Color(0xFF312E81).copy(alpha = 0.45f))
+                            .border(1.5.dp, Color(0xFF6366F1).copy(alpha = 0.35f), RoundedCornerShape(22.dp))
+                            .padding(4.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.img_app_logo),
+                            contentDescription = "Vetaris Logo",
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    Text(
+                        text = "Vetaris",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = "مرجع هوشمند دامپزشکی و همراه قابل اعتماد شما برای مدیریت سلامت حیوانات",
+                        fontSize = 12.sp,
+                        lineHeight = 18.sp,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 24.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Subtitle / Title
-            Text(
-                text = "دستیار حرفه‌ای دامپزشکی",
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "پلتفرم جامع محاسبات دارویی و پرونده‌های الکترونیک",
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Input Column (RTL visual ordering)
-            CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
-                OutlinedTextField(
-                    value = phoneNumber,
-                    onValueChange = {
-                        phoneNumber = it
-                        showError = false
-                    },
+            // Main Glassmorphic Card Container
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .testTag("phone_input"),
-                    label = { Text("شماره موبایل") },
-                    placeholder = { Text("مثال: 09121234567") },
-                    leadingIcon = { Icon(Icons.Default.Phone, contentDescription = "تلفن") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    singleLine = true,
-                    shape = RoundedCornerShape(16.dp)
+                        .glassmorphic(cornerRadius = 24.dp, accentGlow = step == 2)
+                        .padding(2.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        
+                        // Back Icon overlay for Step 2
+                        if (step == 2) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start
+                            ) {
+                                IconButton(
+                                    onClick = { step = 1 },
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowBack,
+                                        contentDescription = "بازگشت",
+                                        tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+                                    )
+                                }
+                            }
+                        }
+
+                        // --- STEP 1: LOGIN / REGISTER INITIAL ---
+                        if (step == 1) {
+                            Text(
+                                text = "ورود / ثبت نام",
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Right
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Text(
+                                text = "سلام!\nلطفا اطلاعات کاربری خود را وارد کنید",
+                                fontSize = 14.sp,
+                                lineHeight = 22.sp,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.65f),
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Right
+                            )
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            // Custom Textfield look matching screenshot 2
+                            val containerCol = if (isDark) Color.White.copy(alpha = 0.08f) else Color(0xFFF1F4F9)
+                            val borderCol = if (isDark) Color.White.copy(alpha = 0.12f) else Color(0xFFE2E8F0)
+
+                            OutlinedTextField(
+                                value = inputUsername,
+                                onValueChange = {
+                                    inputUsername = it
+                                    showError = false
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("phone_input"),
+                                placeholder = {
+                                    Text(
+                                        "شماره موبایل یا ایمیل یا نام کاربری",
+                                        fontSize = 13.sp,
+                                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                                    )
+                                },
+                                singleLine = true,
+                                shape = RoundedCornerShape(14.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedContainerColor = containerCol,
+                                    unfocusedContainerColor = containerCol,
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = borderCol,
+                                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground
+                                )
+                            )
+
+                            if (showError) {
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text(
+                                    text = "لطفاً مقداری معتبر وارد کنید.",
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Right
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(20.dp))
+
+                            // Action button matching color of screenshot (rust reddish-brown #B55D57)
+                            Button(
+                                onClick = {
+                                    if (inputUsername.length >= 4) {
+                                        step = 2
+                                    } else {
+                                        showError = true
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(54.dp)
+                                    .testTag("submit_button"),
+                                shape = RoundedCornerShape(14.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFFB55D57),
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Text(
+                                    text = "ورود",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+
+                        // --- STEP 2: VERIFICATION & REGISTRATION ---
+                        if (step == 2) {
+                            Text(
+                                text = "کد تایید",
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Right
+                            )
+
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            // Banner: "حساب کاربری با شماره موبایل ... وجود ندارد..."
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(14.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isDark) Color(0xFF33201F) else Color(0xFFFDF2F2)
+                                ),
+                                border = BorderStroke(1.dp, if (isDark) Color(0xFF5C3331) else Color(0xFFF5D0CE))
+                            ) {
+                                Text(
+                                    text = "حساب کاربری با شماره موبایل $inputUsername وجود ندارد. برای ساخت حساب جدید، کد تایید برای این شماره ارسال گردید.",
+                                    fontSize = 13.sp,
+                                    lineHeight = 22.sp,
+                                    color = if (isDark) Color(0xFFF4B3B0) else Color(0xFF9B2C2C),
+                                    modifier = Modifier.padding(14.dp),
+                                    textAlign = TextAlign.Right
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(20.dp))
+
+                            // First and Last Name in one side-by-side Row
+                            val containerCol = if (isDark) Color.White.copy(alpha = 0.08f) else Color(0xFFF1F4F9)
+                            val borderCol = if (isDark) Color.White.copy(alpha = 0.12f) else Color(0xFFE2E8F0)
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                OutlinedTextField(
+                                    value = firstName,
+                                    onValueChange = { firstName = it },
+                                    modifier = Modifier.weight(1f),
+                                    placeholder = {
+                                        Text(
+                                            "نام",
+                                            fontSize = 13.sp,
+                                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                                        )
+                                    },
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(14.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedContainerColor = containerCol,
+                                        unfocusedContainerColor = containerCol,
+                                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                        unfocusedBorderColor = borderCol,
+                                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground
+                                    )
+                                )
+
+                                OutlinedTextField(
+                                    value = lastName,
+                                    onValueChange = { lastName = it },
+                                    modifier = Modifier.weight(1f),
+                                    placeholder = {
+                                        Text(
+                                            "نام خانوادگی",
+                                            fontSize = 13.sp,
+                                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                                        )
+                                    },
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(14.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedContainerColor = containerCol,
+                                        unfocusedContainerColor = containerCol,
+                                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                        unfocusedBorderColor = borderCol,
+                                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground
+                                    )
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            // "کد تایید" input below them
+                            OutlinedTextField(
+                                value = otpCode,
+                                onValueChange = { otpCode = it },
+                                modifier = Modifier.fillMaxWidth(),
+                                placeholder = {
+                                    Text(
+                                        "کد تایید",
+                                        fontSize = 13.sp,
+                                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                                    )
+                                },
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                shape = RoundedCornerShape(14.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedContainerColor = containerCol,
+                                    unfocusedContainerColor = containerCol,
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = borderCol,
+                                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground
+                                )
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // Timer Text details: e.g. "01:54 تا دریافت مجدد کد"
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = if (secondsLeft > 0) "$timerText تا دریافت مجدد کد" else "ارسال مجدد کد تایید",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = if (secondsLeft > 0) MaterialTheme.colorScheme.onBackground.copy(alpha = 0.65f) else MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.clickable(enabled = secondsLeft == 0) {
+                                        secondsLeft = 114
+                                    }
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(20.dp))
+
+                            // Role Selection Tab Switcher so we keep features working
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(44.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(if (isDark) Color.White.copy(alpha = 0.05f) else Color(0xFFE2E8F0))
+                                    .padding(2.dp),
+                                horizontalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight()
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(if (isVetMode) MaterialTheme.colorScheme.primary else Color.Transparent)
+                                        .clickable { isVetMode = true },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "🩺 دامپزشک",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isVetMode) Color.White else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                                    )
+                                }
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight()
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(if (!isVetMode) MaterialTheme.colorScheme.secondary else Color.Transparent)
+                                        .clickable { isVetMode = false },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "🐾 صاحب حیوان",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (!isVetMode) Color.White else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            // Confirm Button matching screenshot
+                            Button(
+                                onClick = {
+                                    val finalFN = firstName.ifEmpty { "کاربر" }
+                                    val finalLN = lastName.ifEmpty { "جدید" }
+                                    viewModel.simulateRegistration(
+                                        fullName = "$finalFN $finalLN",
+                                        phoneNumber = inputUsername,
+                                        userType = if (isVetMode) "vet" else "owner",
+                                        licenseNum = if (isVetMode) "95843" else "",
+                                        specOrUni = if (isVetMode) "داخلی حیوانات کوچک" else "",
+                                        gender = "آقا"
+                                    )
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(54.dp)
+                                    .testTag("submit_button"),
+                                shape = RoundedCornerShape(14.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFFB55D57),
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Text(
+                                    text = "تایید",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            // Social Section displayed only in step 1 for visual premium looks
+            if (step == 1) {
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = "ثبت‌نام و ورود سریع با شبکه‌های اجتماعی",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.45f)
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("کلمه عبور") },
-                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "قفل") },
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    singleLine = true,
-                    shape = RoundedCornerShape(16.dp)
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "فراموشی رمز عبور؟",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable { /* Handle forgot pass */ }
-                    )
-                    Text(
-                        text = "فراموشی نام کاربری؟",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                        modifier = Modifier.clickable { /* Handle forgot user */ }
-                    )
-                }
-
-                if (showError) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "لطفاً شماره موبایل معتبر وارد کنید.",
-                        color = MaterialTheme.colorScheme.error,
-                        fontSize = 12.sp
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Button(
-                    onClick = {
-                        if (phoneNumber.length >= 10) {
-                            viewModel.simulateLogin(phoneNumber)
-                        } else {
-                            showError = true
+                    Button(
+                        onClick = { socialAuthChoice = "Google" },
+                        colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f)),
+                        shape = RoundedCornerShape(14.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(50.dp)
+                            .testTag("google_auth_btn")
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            GoogleVectorIcon(modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Google", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp)
                         }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .testTag("submit_button"),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Text(
-                        text = "ورود به حساب کاربری",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Alternative social logins
-            Text(
-                text = "ثبت‌نام و ورود سریع با شبکه‌های اجتماعی",
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Button(
-                    onClick = { socialAuthChoice = "Google" },
-                    colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface),
-                    shape = RoundedCornerShape(16.dp),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(50.dp)
-                        .testTag("google_auth_btn")
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+                    }
+                    Button(
+                        onClick = { socialAuthChoice = "Apple" },
+                        colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f)),
+                        shape = RoundedCornerShape(14.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(50.dp)
+                            .testTag("apple_auth_btn")
                     ) {
-                        GoogleVectorIcon(modifier = Modifier.size(20.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Google", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp)
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            AppleVectorIcon(modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurface)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Apple ID", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp)
+                        }
                     }
                 }
-                Button(
-                    onClick = { socialAuthChoice = "Apple" },
-                    colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface),
-                    shape = RoundedCornerShape(16.dp),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(50.dp)
-                        .testTag("apple_auth_btn")
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        AppleVectorIcon(modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onSurface)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Apple ID", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp)
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onNavigateToRegister() },
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "حساب کاربری ندارید؟ ",
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                )
-                Text(
-                    text = "ثبت‌نام کاربر جدید",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
             }
         }
     }
@@ -280,119 +565,121 @@ fun LoginScreen(
                 }
             },
             text = {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "لطفاً حساب کاربری و نقش خود را برای ورود تایید کنید:",
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                        textAlign = TextAlign.Right,
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.fillMaxWidth()
-                    )
-
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-
-                    // Choose Profile / Account option
-                    if (provider == "Google") {
-                        val googleAccounts = listOf(
-                            Pair("خانم دکتر سمانه زارع", "samaneh.zare@gmail.com"),
-                            Pair("امیرحسین زارعی (صاحب پت)", "amir.zarei.pet@gmail.com")
+                    ) {
+                        Text(
+                            text = "لطفاً حساب کاربری و نقش خود را برای ورود تایید کنید:",
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                            textAlign = TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth()
                         )
 
-                        googleAccounts.forEach { (name, email) ->
-                            val detectedRole = if (email.contains("pet")) "owner" else "vet"
-                            val detectedGender = if (email.contains("samaneh")) "خانم" else "آقا"
-                            Card(
-                                shape = RoundedCornerShape(12.dp),
-                                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .glassmorphic(accentGlow = true, cornerRadius = 12.dp)
-                                    .clickable {
-                                        viewModel.simulateSocialAuth(email, name, detectedRole, "Google", detectedGender)
-                                        socialAuthChoice = null
-                                    }
-                            ) {
-                                Row(
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+                        // Choose Profile / Account option
+                        if (provider == "Google") {
+                            val googleAccounts = listOf(
+                                Pair("خانم دکتر سمانه زارع", "samaneh.zare@gmail.com"),
+                                Pair("امیرحسین زارعی (صاحب پت)", "amir.zarei.pet@gmail.com")
+                            )
+
+                            googleAccounts.forEach { (name, email) ->
+                                val detectedRole = if (email.contains("pet")) "owner" else "vet"
+                                val detectedGender = if (email.contains("samaneh")) "خانم" else "آقا"
+                                Card(
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(12.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                        .glassmorphic(accentGlow = true, cornerRadius = 12.dp)
+                                        .clickable {
+                                            viewModel.simulateSocialAuth(email, name, detectedRole, "Google", detectedGender)
+                                            socialAuthChoice = null
+                                        }
                                 ) {
-                                    Box(
+                                    Row(
                                         modifier = Modifier
-                                            .size(36.dp)
-                                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), CircleShape),
-                                        contentAlignment = Alignment.Center
+                                            .fillMaxWidth()
+                                            .padding(12.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                                     ) {
-                                        Text(name.take(1), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                                    }
+                                        Box(
+                                            modifier = Modifier
+                                                .size(36.dp)
+                                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), CircleShape),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(name.take(1), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                                        }
 
-                                    Column {
-                                        Text(name, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                                        Text(email, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                        Column {
+                                            Text(name, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                            Text(email, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            val appleAccounts = listOf(
+                                Pair("دکتر نوید کریمی", "n.karimi@icloud.com"),
+                                Pair("سارا احمدی (پت اونر)", "sara.ahmadi@icloud.com")
+                            )
+
+                            appleAccounts.forEach { (name, email) ->
+                                val detectedRole = if (email.contains("ahmadi")) "owner" else "vet"
+                                val detectedGender = if (email.contains("ahmadi")) "خانم" else "آقا"
+                                Card(
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .glassmorphic(accentGlow = true, cornerRadius = 12.dp)
+                                        .clickable {
+                                            viewModel.simulateSocialAuth(email, name, detectedRole, "Apple", detectedGender)
+                                            socialAuthChoice = null
+                                        }
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(12.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(36.dp)
+                                                .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f), CircleShape),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text("", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
+                                        }
+
+                                        Column {
+                                            Text(name, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                            Text(email, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                        }
                                     }
                                 }
                             }
                         }
-                    } else {
-                        val appleAccounts = listOf(
-                            Pair("دکتر نوید کریمی", "n.karimi@icloud.com"),
-                            Pair("سارا احمدی (پت اونر)", "sara.ahmadi@icloud.com")
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        Text(
+                            text = "💡 با کلیک روی هر کدام از گزینه‌های بالا، عملیات ثبت‌نام و ورود به صورت فوری با ۱۰۰ سکه هدیه آغازین انجام می‌شود.",
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.primary,
+                            lineHeight = 16.sp,
+                            textAlign = TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth()
                         )
-
-                        appleAccounts.forEach { (name, email) ->
-                            val detectedRole = if (email.contains("ahmadi")) "owner" else "vet"
-                            val detectedGender = if (email.contains("ahmadi")) "خانم" else "آقا"
-                            Card(
-                                shape = RoundedCornerShape(12.dp),
-                                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .glassmorphic(accentGlow = true, cornerRadius = 12.dp)
-                                    .clickable {
-                                        viewModel.simulateSocialAuth(email, name, detectedRole, "Apple", detectedGender)
-                                        socialAuthChoice = null
-                                    }
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(12.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(36.dp)
-                                            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f), CircleShape),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text("", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
-                                    }
-
-                                    Column {
-                                        Text(name, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                                        Text(email, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
-                                    }
-                                }
-                            }
-                        }
                     }
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    Text(
-                        text = "💡 با کلیک روی هر کدام از گزینه‌های بالا، عملیات ثبت‌نام و ورود به صورت فوری با ۱۰۰ سکه هدیه آغازین انجام می‌شود.",
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.primary,
-                        lineHeight = 16.sp,
-                        textAlign = TextAlign.Right,
-                        modifier = Modifier.fillMaxWidth()
-                    )
                 }
             },
             confirmButton = {},
@@ -404,6 +691,7 @@ fun LoginScreen(
         )
     }
 }
+
 
 @Composable
 fun GoogleVectorIcon(modifier: Modifier = Modifier) {

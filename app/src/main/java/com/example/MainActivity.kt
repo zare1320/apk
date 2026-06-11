@@ -210,9 +210,9 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Text "دستیار حرفه‌ای دامپزشکی" brought under application user details
+                    // Text "Vetaris" brought under application user details
                     Text(
-                        text = "دستیار حرفه‌ای دامپزشکی",
+                        text = "Vetaris",
                         color = Color.White,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
