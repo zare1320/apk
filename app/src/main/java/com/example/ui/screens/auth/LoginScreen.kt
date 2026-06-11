@@ -1,6 +1,8 @@
 package com.example.ui.screens.auth
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,12 +23,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.R
 import com.example.viewmodel.MainViewModel
 import com.example.ui.theme.glassmorphic
 import com.example.ui.theme.GlassBackgroundBox
@@ -55,30 +59,18 @@ fun LoginScreen(
             // App Emblem
             Box(
                 modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(30.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-                    .padding(16.dp),
+                    .size(115.dp)
+                    .clip(RoundedCornerShape(26.dp))
+                    .background(Color(0xFF312E81).copy(alpha = 0.5f))
+                    .border(2.dp, Color(0xFF6366F1).copy(alpha = 0.4f), RoundedCornerShape(26.dp))
+                    .padding(4.dp),
                 contentAlignment = Alignment.Center
             ) {
-                // Symbolic Cross / Medical Shield
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(45.dp)
-                            .padding(8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "🐾",
-                            fontSize = 24.sp,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
+                Image(
+                    painter = painterResource(id = R.drawable.img_app_logo),
+                    contentDescription = "دستیار حرفه‌ای دامپزشکی لوگو",
+                    modifier = Modifier.fillMaxSize()
+                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
