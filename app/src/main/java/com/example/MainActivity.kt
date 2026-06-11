@@ -212,7 +212,7 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
 
                     // Text "Vetaris" brought under application user details
                     Text(
-                        text = "Vetaris",
+                        text = "Vetaris دستیار هوشمند دامپزشکی و مدیریت حیوانات خانگی",
                         color = Color.White,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
@@ -253,15 +253,23 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(innerPadding),
+            contentAlignment = Alignment.TopCenter
         ) {
-            Crossfade(targetState = activeVetTab) { tab ->
-                when (tab) {
-                    "داشبورد" -> VetDashboardScreen(viewModel = viewModel)
-                    "دارونامه" -> VetDrugManualScreen(viewModel = viewModel)
-                    "تشخیص و درمان" -> VetDiagnosisTreatmentScreen(viewModel = viewModel)
-                    "ابزار محاسبه‌گر" -> VetCalculatorScreen(viewModel = viewModel)
-                    "پروفایل" -> VetProfileScreen(viewModel = viewModel)
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .widthIn(max = 760.dp)
+                    .fillMaxWidth()
+            ) {
+                Crossfade(targetState = activeVetTab) { tab ->
+                    when (tab) {
+                        "داشبورد" -> VetDashboardScreen(viewModel = viewModel)
+                        "دارونامه" -> VetDrugManualScreen(viewModel = viewModel)
+                        "تشخیص و درمان" -> VetDiagnosisTreatmentScreen(viewModel = viewModel)
+                        "ابزار محاسبه‌گر" -> VetCalculatorScreen(viewModel = viewModel)
+                        "پروفایل" -> VetProfileScreen(viewModel = viewModel)
+                    }
                 }
             }
         }
@@ -390,15 +398,23 @@ fun OwnerLayoutContainer(viewModel: MainViewModel) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
+                    .padding(innerPadding),
+                contentAlignment = Alignment.TopCenter
             ) {
-                Crossfade(targetState = activeOwnerTab) { tab ->
-                    when (tab) {
-                        "داشبورد" -> OwnerDashboardScreen(viewModel = viewModel)
-                        "نسخه" -> OwnerPrescriptionsScreen(viewModel = viewModel)
-                        "تقویم" -> OwnerCalendarScreen(viewModel = viewModel)
-                        "نقشه" -> OwnerMapScreen(viewModel = viewModel)
-                        "پروفایل" -> OwnerProfileScreen(viewModel = viewModel)
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .widthIn(max = 760.dp)
+                        .fillMaxWidth()
+                ) {
+                    Crossfade(targetState = activeOwnerTab) { tab ->
+                        when (tab) {
+                            "داشبورد" -> OwnerDashboardScreen(viewModel = viewModel)
+                            "نسخه" -> OwnerPrescriptionsScreen(viewModel = viewModel)
+                            "تقویم" -> OwnerCalendarScreen(viewModel = viewModel)
+                            "نقشه" -> OwnerMapScreen(viewModel = viewModel)
+                            "پروفایل" -> OwnerProfileScreen(viewModel = viewModel)
+                        }
                     }
                 }
             }

@@ -371,39 +371,33 @@ fun SharedSpeciesCircleButton(
             contentAlignment = Alignment.Center
         ) {
             when (speciesKey) {
-                "dog" -> Image(
-                    painter = painterResource(id = R.drawable.img_species_dog),
-                    contentDescription = label,
-                    modifier = Modifier.fillMaxSize()
+                "dog" -> DogVectorIcon(
+                    modifier = Modifier.fillMaxSize(0.65f),
+                    tint = Color.White
                 )
-                "cat" -> Image(
-                    painter = painterResource(id = R.drawable.img_species_cat),
-                    contentDescription = label,
-                    modifier = Modifier.fillMaxSize()
+                "cat" -> CatVectorIcon(
+                    modifier = Modifier.fillMaxSize(0.68f),
+                    tint = Color.White
                 )
-                "bird" -> Image(
-                    painter = painterResource(id = R.drawable.img_species_bird),
-                    contentDescription = label,
-                    modifier = Modifier.fillMaxSize()
+                "bird" -> ExoticVectorIcon(
+                    modifier = Modifier.fillMaxSize(0.65f),
+                    tint = Color.White
                 )
-                "rodent" -> Image(
-                    painter = painterResource(id = R.drawable.img_species_rodent),
-                    contentDescription = label,
-                    modifier = Modifier.fillMaxSize()
+                "rodent" -> RodentVectorIcon(
+                    modifier = Modifier.fillMaxSize(0.65f),
+                    tint = Color.White
                 )
-                "aquatic" -> Image(
-                    painter = painterResource(id = R.drawable.img_species_aquatic),
-                    contentDescription = label,
-                    modifier = Modifier.fillMaxSize(0.9f)
+                "aquatic" -> AquaticVectorIcon(
+                    modifier = Modifier.fillMaxSize(0.65f),
+                    tint = Color.White
                 )
-                "amphibian" -> Image(
-                    painter = painterResource(id = R.drawable.img_species_amphibian),
-                    contentDescription = label,
-                    modifier = Modifier.fillMaxSize(0.9f)
+                "amphibian" -> AmphibianVectorIcon(
+                    modifier = Modifier.fillMaxSize(0.65f),
+                    tint = Color.White
                 )
                 else -> {
                     ReptileVectorIcon(
-                        modifier = Modifier.fillMaxSize(0.7f),
+                        modifier = Modifier.fillMaxSize(0.65f),
                         tint = Color.White
                     )
                 }
@@ -415,6 +409,116 @@ fun SharedSpeciesCircleButton(
             fontSize = 12.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
             color = textCol
+        )
+    }
+}
+
+@Composable
+fun RodentVectorIcon(
+    modifier: Modifier = Modifier,
+    tint: Color = Color.White
+) {
+    Canvas(modifier = modifier) {
+        val width = size.width
+        val cx = width / 2f
+        val cy = size.height / 2f
+        val radius = width * 0.35f
+
+        // Ears
+        drawCircle(color = tint, radius = radius * 0.4f, center = Offset(cx - radius * 0.6f, cy - radius * 0.6f))
+        drawCircle(color = tint, radius = radius * 0.4f, center = Offset(cx + radius * 0.6f, cy - radius * 0.6f))
+        
+        // Inner ears
+        drawCircle(color = Color(0xFFFDA4AF), radius = radius * 0.25f, center = Offset(cx - radius * 0.6f, cy - radius * 0.6f))
+        drawCircle(color = Color(0xFFFDA4AF), radius = radius * 0.25f, center = Offset(cx + radius * 0.6f, cy - radius * 0.6f))
+
+        // Head/Body
+        drawCircle(color = tint, radius = radius, center = Offset(cx, cy))
+
+        // Eyes
+        drawCircle(color = Color(0xFF1E293B), radius = radius * 0.1f, center = Offset(cx - radius * 0.35f, cy - radius * 0.1f))
+        drawCircle(color = Color(0xFF1E293B), radius = radius * 0.1f, center = Offset(cx + radius * 0.35f, cy - radius * 0.1f))
+
+        // Nose (pink triangle)
+        val nose = Path().apply {
+            moveTo(cx - radius * 0.1f, cy + radius * 0.1f)
+            lineTo(cx + radius * 0.1f, cy + radius * 0.1f)
+            lineTo(cx, cy + radius * 0.2f)
+            close()
+        }
+        drawPath(nose, Color(0xFFFDA4AF))
+    }
+}
+
+@Composable
+fun AquaticVectorIcon(
+    modifier: Modifier = Modifier,
+    tint: Color = Color.White
+) {
+    Canvas(modifier = modifier) {
+        val width = size.width
+        val cx = width / 2f
+        val cy = size.height / 2f
+        val radius = width * 0.35f
+
+        // Tail Fin
+        val tail = Path().apply {
+            moveTo(cx - radius * 0.2f, cy)
+            lineTo(cx - radius * 1.0f, cy - radius * 0.6f)
+            lineTo(cx - radius * 0.7f, cy)
+            lineTo(cx - radius * 1.0f, cy + radius * 0.6f)
+            close()
+        }
+        drawPath(tail, tint)
+
+        // Main body (Ovoid)
+        drawOval(
+            color = tint,
+            topLeft = Offset(cx - radius * 0.6f, cy - radius * 0.5f),
+            size = Size(radius * 1.4f, radius * 1.0f)
+        )
+
+        // Eye
+        drawCircle(color = Color(0xFF1E293B), radius = radius * 0.12f, center = Offset(cx + radius * 0.3f, cy - radius * 0.15f))
+        drawCircle(color = Color.White, radius = radius * 0.04f, center = Offset(cx + radius * 0.32f, cy - radius * 0.17f))
+    }
+}
+
+@Composable
+fun AmphibianVectorIcon(
+    modifier: Modifier = Modifier,
+    tint: Color = Color.White
+) {
+    Canvas(modifier = modifier) {
+        val width = size.width
+        val cx = width / 2f
+        val cy = size.height / 2f
+        val radius = width * 0.35f
+
+        // Big Frog Eyes
+        drawCircle(color = tint, radius = radius * 0.3f, center = Offset(cx - radius * 0.45f, cy - radius * 0.4f))
+        drawCircle(color = tint, radius = radius * 0.3f, center = Offset(cx + radius * 0.45f, cy - radius * 0.4f))
+
+        // Pupil of frog eyes
+        drawCircle(color = Color(0xFF1E293B), radius = radius * 0.14f, center = Offset(cx - 0.45f * radius, cy - 0.4f * radius))
+        drawCircle(color = Color(0xFF1E293B), radius = radius * 0.14f, center = Offset(cx + 0.45f * radius, cy - 0.4f * radius))
+
+        // Face
+        drawOval(
+            color = tint,
+            topLeft = Offset(cx - radius, cy - radius * 0.4f),
+            size = Size(radius * 2f, radius * 1.2f)
+        )
+
+        // Cute smile
+        val smile = Path().apply {
+            moveTo(cx - radius * 0.4f, cy + radius * 0.1f)
+            quadraticTo(cx, cy + radius * 0.4f, cx + radius * 0.4f, cy + radius * 0.1f)
+        }
+        drawPath(
+            path = smile,
+            color = Color(0xFF1E293B),
+            style = androidx.compose.ui.graphics.drawscope.Stroke(width = 4f)
         )
     }
 }

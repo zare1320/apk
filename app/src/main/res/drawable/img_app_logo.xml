@@ -1,0 +1,46 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="240dp"
+    android:viewportWidth="240"
+    android:viewportHeight="240">
+
+    <!-- Gradient Background (Circular Shield) -->
+    <path
+        android:pathData="M120,20 C64.77,20 20,64.77 20,120 C20,175.23 64.77,220 120,220 C175.23,220 220,175.23 220,120 C220,64.77 175.23,20 120,20 Z"
+        android:fillColor="#4F46E5" />
+
+    <!-- A circular inner ring -->
+    <path
+        android:pathData="M120,35 C73.05,35 35,73.05 35,120 C35,166.95 73.05,205 120,205 C166.95,205 205,166.95 205,120 C205,73.05 166.95,35 120,35 Z"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:fillColor="#00000000"/>
+
+    <!-- Medical/Veterinary Cross (rounded) -->
+    <path
+        android:pathData="M75,108 L165,108 C169.97,108 174,112.03 174,117 L174,123 C174,127.97 169.97,132 165,132 L75,132 C70.03,132 66,127.97 66,123 L66,117 C66,112.03 70.03,108 75,108 Z"
+        android:fillColor="#FFFFFF" />
+    <path
+        android:pathData="M108,75 L108,165 C108,169.97 112.03,174 117,174 L123,174 C127.97,174 132,169.97 132,165 L132,75 C132,70.03 127.97,66 123,66 L117,66 C112.03,66 108,70.03 108,75 Z"
+        android:fillColor="#FFFFFF" />
+
+    <!-- Paw print in center of cross -->
+    <!-- Center Pad -->
+    <path
+        android:pathData="M120,118 C112,118 107,123 107,130 C107,137 112,142 120,142 C128,142 133,137 133,130 C133,123 128,118 120,118 Z"
+        android:fillColor="#4F46E5" />
+
+    <!-- Toes: Left Outer, Left Inner, Right Inner, Right Outer -->
+    <path
+        android:pathData="M104,113 C101.24,113 99,115.24 99,118 C99,120.76 101.24,123 104,123 C106.76,123 109,120.76 109,118 C109,115.24 106.76,113 104,113 Z"
+        android:fillColor="#4F46E5" />
+    <path
+        android:pathData="M113,106 C110.24,106 108,108.24 108,111 C108,113.76 110.24,116 113,116 C115.76,116 118,113.76 118,111 C118,108.24 115.76,106 113,106 Z"
+        android:fillColor="#4F46E5" />
+    <path
+        android:pathData="M127,106 C124.24,106 122,108.24 122,111 C122,113.76 124.24,116 127,116 C129.76,116 132,113.76 132,111 C132,108.24 129.76,106 127,106 Z"
+        android:fillColor="#4F46E5" />
+    <path
+        android:pathData="M136,113 C133.24,113 131,115.24 131,118 C131,120.76 133.24,123 136,123 C138.76,123 141,120.76 141,118 C141,115.24 138.76,113 136,113 Z"
+        android:fillColor="#4F46E5" />
+</vector>

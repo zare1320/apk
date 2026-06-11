@@ -307,25 +307,6 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                                     }
                                     Spacer(modifier = Modifier.height(24.dp))
                                 } else {
-                                    // Professional Doctor Illustration / App Logo Image with permanent fallback layout
-                                    Box(
-                                        modifier = Modifier
-                                            .size(120.dp)
-                                            .clip(RoundedCornerShape(24.dp))
-                                            .background(if (isDark) CardDefaults.cardColors().containerColor else Color.White)
-                                            .border(2.dp, accentTeal.copy(alpha = 0.5f), RoundedCornerShape(24.dp))
-                                            .padding(8.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.img_app_logo),
-                                            contentDescription = "Pet App Logo",
-                                            modifier = Modifier.fillMaxSize()
-                                        )
-                                    }
-
-                                    Spacer(modifier = Modifier.height(18.dp))
-
                                     // Primary Headline matching Screenshot 1 exactly
                                     Text(
                                         text = "DIFFERENTIAL DIAGNOSES AND TRAINING IN FELINE AND CANINE MEDICINE.",
@@ -340,65 +321,121 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                                     Spacer(modifier = Modifier.height(24.dp))
                                 }
 
-                                // 2x2 Grid of Main Categories (Screenshot 1 Bottom)
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                                ) {
-                                    // 1. Historical Signs Card
-                                    GridActionCard(
-                                        title = "Historical\nsigns",
-                                        bgColor = cardBgColor,
-                                        strokeColor = strokeColor,
-                                        textColor = primaryText,
-                                        icon = { HistoricalSignsIcon(modifier = Modifier.fillMaxSize(), color = accentTeal) },
-                                        badgeContainer = accentTealContainer,
-                                        onClick = { currentSubScreen = "historical" },
-                                        modifier = Modifier.weight(1f)
-                                    )
+                                // Responsive Grid of Main Categories
+                                val screenWidth = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp
+                                val isTablet = screenWidth >= 600
 
-                                    // 2. Physical Signs Card
-                                    GridActionCard(
-                                        title = "Physical\nsigns",
-                                        bgColor = cardBgColor,
-                                        strokeColor = strokeColor,
-                                        textColor = primaryText,
-                                        icon = { PhysicalSignsIcon(modifier = Modifier.fillMaxSize(), color = accentTeal) },
-                                        badgeContainer = accentTealContainer,
-                                        onClick = { currentSubScreen = "physical" },
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                }
+                                if (isTablet) {
+                                    // Single elegant horizontal row of 4 cards on tablet for optimal widescreen appearance!
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                    ) {
+                                        GridActionCard(
+                                            title = "Historical\nsigns",
+                                            bgColor = cardBgColor,
+                                            strokeColor = strokeColor,
+                                            textColor = primaryText,
+                                            icon = { HistoricalSignsIcon(modifier = Modifier.fillMaxSize(), color = accentTeal) },
+                                            badgeContainer = accentTealContainer,
+                                            onClick = { currentSubScreen = "historical" },
+                                            modifier = Modifier.weight(1f)
+                                        )
 
-                                Spacer(modifier = Modifier.height(16.dp))
+                                        GridActionCard(
+                                            title = "Physical\nsigns",
+                                            bgColor = cardBgColor,
+                                            strokeColor = strokeColor,
+                                            textColor = primaryText,
+                                            icon = { PhysicalSignsIcon(modifier = Modifier.fillMaxSize(), color = accentTeal) },
+                                            badgeContainer = accentTealContainer,
+                                            onClick = { currentSubScreen = "physical" },
+                                            modifier = Modifier.weight(1f)
+                                        )
 
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                                ) {
-                                    // 3. Laboratory Findings Card
-                                    GridActionCard(
-                                        title = "Laboratory\nfindings",
-                                        bgColor = cardBgColor,
-                                        strokeColor = strokeColor,
-                                        textColor = primaryText,
-                                        icon = { LaboratoryFindingsIcon(modifier = Modifier.fillMaxSize(), color = accentTeal) },
-                                        badgeContainer = accentTealContainer,
-                                        onClick = { currentSubScreen = "lab" },
-                                        modifier = Modifier.weight(1f)
-                                    )
+                                        GridActionCard(
+                                            title = "Laboratory\nfindings",
+                                            bgColor = cardBgColor,
+                                            strokeColor = strokeColor,
+                                            textColor = primaryText,
+                                            icon = { LaboratoryFindingsIcon(modifier = Modifier.fillMaxSize(), color = accentTeal) },
+                                            badgeContainer = accentTealContainer,
+                                            onClick = { currentSubScreen = "lab" },
+                                            modifier = Modifier.weight(1f)
+                                        )
 
-                                    // 4. Combine (pro) Card
-                                    GridActionCard(
-                                        title = "Combine\n(pro)",
-                                        bgColor = cardBgColor,
-                                        strokeColor = strokeColor,
-                                        textColor = primaryText,
-                                        icon = { CombineIcon(modifier = Modifier.fillMaxSize(), color = accentTeal) },
-                                        badgeContainer = accentTealContainer,
-                                        onClick = { currentSubScreen = "combine" },
-                                        modifier = Modifier.weight(1f)
-                                    )
+                                        GridActionCard(
+                                            title = "Combine\n(pro)",
+                                            bgColor = cardBgColor,
+                                            strokeColor = strokeColor,
+                                            textColor = primaryText,
+                                            icon = { CombineIcon(modifier = Modifier.fillMaxSize(), color = accentTeal) },
+                                            badgeContainer = accentTealContainer,
+                                            onClick = { currentSubScreen = "combine" },
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    }
+                                } else {
+                                    // Standard 2x2 Grid of Main Categories on mobile matching visual specs
+                                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                        ) {
+                                            // 1. Historical Signs Card
+                                            GridActionCard(
+                                                title = "Historical\nsigns",
+                                                bgColor = cardBgColor,
+                                                strokeColor = strokeColor,
+                                                textColor = primaryText,
+                                                icon = { HistoricalSignsIcon(modifier = Modifier.fillMaxSize(), color = accentTeal) },
+                                                badgeContainer = accentTealContainer,
+                                                onClick = { currentSubScreen = "historical" },
+                                                modifier = Modifier.weight(1f)
+                                            )
+
+                                            // 2. Physical Signs Card
+                                            GridActionCard(
+                                                title = "Physical\nsigns",
+                                                bgColor = cardBgColor,
+                                                strokeColor = strokeColor,
+                                                textColor = primaryText,
+                                                icon = { PhysicalSignsIcon(modifier = Modifier.fillMaxSize(), color = accentTeal) },
+                                                badgeContainer = accentTealContainer,
+                                                onClick = { currentSubScreen = "physical" },
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                        }
+
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                        ) {
+                                            // 3. Laboratory Findings Card
+                                            GridActionCard(
+                                                title = "Laboratory\nfindings",
+                                                bgColor = cardBgColor,
+                                                strokeColor = strokeColor,
+                                                textColor = primaryText,
+                                                icon = { LaboratoryFindingsIcon(modifier = Modifier.fillMaxSize(), color = accentTeal) },
+                                                badgeContainer = accentTealContainer,
+                                                onClick = { currentSubScreen = "lab" },
+                                                modifier = Modifier.weight(1f)
+                                            )
+
+                                            // 4. Combine (pro) Card
+                                            GridActionCard(
+                                                title = "Combine\n(pro)",
+                                                bgColor = cardBgColor,
+                                                strokeColor = strokeColor,
+                                                textColor = primaryText,
+                                                icon = { CombineIcon(modifier = Modifier.fillMaxSize(), color = accentTeal) },
+                                                badgeContainer = accentTealContainer,
+                                                onClick = { currentSubScreen = "combine" },
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                        }
+                                    }
                                 }
 
                                 // Dynamic computed differential diagnosis list from selected symptoms
@@ -1479,11 +1516,18 @@ fun GridActionCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isTablet = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp >= 600
     Card(
         onClick = onClick,
         colors = CardDefaults.cardColors(containerColor = bgColor),
         modifier = modifier
-            .aspectRatio(1.1f)
+            .run {
+                if (isTablet) {
+                    this.aspectRatio(1.35f)
+                } else {
+                    this.aspectRatio(1.1f)
+                }
+            }
             .border(1.dp, strokeColor, RoundedCornerShape(12.dp)),
         shape = RoundedCornerShape(12.dp)
     ) {

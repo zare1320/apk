@@ -202,7 +202,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
     ) {
         // Core Species Select Grid matching user's visual reference
         Text(
-            text = "گونه",
+            text = "گونه مورد نظر خود را انتخاب کنید",
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
