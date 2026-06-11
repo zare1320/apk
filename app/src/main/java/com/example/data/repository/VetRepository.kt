@@ -13,6 +13,7 @@ class VetRepository(private val db: AppDatabase) {
     // --- Authentication / User Session ---
     val activeSession: Flow<UserSession?> = userSessionDao.getActiveSession()
     suspend fun getActiveSessionSync(): UserSession? = userSessionDao.getActiveSessionSync()
+    suspend fun getSessionByPhone(phone: String): UserSession? = userSessionDao.getSessionByPhone(phone)
 
     suspend fun insertSession(session: UserSession) {
         userSessionDao.insertSession(session)

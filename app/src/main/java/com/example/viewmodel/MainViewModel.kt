@@ -235,8 +235,8 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
         val flow = MutableSharedFlow<Boolean>()
         viewModelScope.launch {
             // Check if user session exists in db (even if logged out)
-            // Just simulate success login
-            val session = UserSession(
+            val existing = repository.getSessionByPhone(phone)
+            val session = existing?.copy(isLoggedIn = true) ?: UserSession(
                 phoneNumber = phone,
                 userType = if (phone.contains("98") || phone.startsWith("09")) "vet" else "owner",
                 fullName = "دکتر دامپزشک نمونه",
@@ -249,6 +249,10 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
             repository.login(session)
         }
         return flow { emit(true) }
+    }
+
+    suspend fun checkUserExists(phone: String): UserSession? {
+        return repository.getSessionByPhone(phone)
     }
 
     fun logout() {

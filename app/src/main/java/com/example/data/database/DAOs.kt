@@ -11,6 +11,9 @@ interface UserSessionDao {
     @Query("SELECT * FROM user_sessions WHERE isLoggedIn = 1 LIMIT 1")
     suspend fun getActiveSessionSync(): UserSession?
 
+    @Query("SELECT * FROM user_sessions WHERE phoneNumber = :phone LIMIT 1")
+    suspend fun getSessionByPhone(phone: String): UserSession?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSession(session: UserSession)
 

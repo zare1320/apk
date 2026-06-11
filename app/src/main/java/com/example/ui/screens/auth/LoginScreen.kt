@@ -1,5 +1,6 @@
 package com.example.ui.screens.auth
 
+import kotlinx.coroutines.launch
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
@@ -48,6 +49,10 @@ fun LoginScreen(
 ) {
     var step by remember { mutableStateOf(1) } // 1: ورود / ثبت نام, 2: کد تایید (OTP + Register if new)
     var inputUsername by remember { mutableStateOf("") }
+    
+    val coroutineScope = rememberCoroutineScope()
+    var isCheckingUser by remember { mutableStateOf(false) }
+    var existingSession by remember { mutableStateOf<com.example.data.database.UserSession?>(null) }
     
     // Step 2 profile fields
     var firstName by remember { mutableStateOf("") }
@@ -245,7 +250,27 @@ fun LoginScreen(
                             Button(
                                 onClick = {
                                     if (inputUsername.length >= 4) {
-                                        step = 2
+                                        isCheckingUser = true
+                                        coroutineScope.launch {
+                                            val found = viewModel.checkUserExists(inputUsername)
+                                            existingSession = found
+                                            if (found != null) {
+                                                val spaceIndex = found.fullName.trim().indexOf(' ')
+                                                if (spaceIndex != -1) {
+                                                    firstName = found.fullName.substring(0, spaceIndex).trim()
+                                                    lastName = found.fullName.substring(spaceIndex + 1).trim()
+                                                } else {
+                                                    firstName = found.fullName
+                                                    lastName = ""
+                                                }
+                                                isVetMode = (found.userType == "vet")
+                                            } else {
+                                                firstName = ""
+                                                lastName = ""
+                                            }
+                                            isCheckingUser = false
+                                            step = 2
+                                        }
                                     } else {
                                         showError = true
                                     }
@@ -254,16 +279,48 @@ fun LoginScreen(
                                     .fillMaxWidth()
                                     .height(54.dp)
                                     .testTag("submit_button"),
+                                enabled = !isCheckingUser,
                                 shape = RoundedCornerShape(14.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color(0xFFB55D57),
                                     contentColor = Color.White
                                 )
                             ) {
+                                if (isCheckingUser) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(24.dp),
+                                        color = Color.White,
+                                        strokeWidth = 2.dp
+                                    )
+                                } else {
+                                    Text(
+                                        text = "ورود",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Text(
-                                    text = "ورود",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold
+                                    text = "هنوز ثبت‌نام نکرده‌اید؟ ",
+                                    fontSize = 13.sp,
+                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                                )
+                                Text(
+                                    text = "ایجاد حساب کاربری جدید",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier
+                                        .clickable { onNavigateToRegister() }
+                                        .testTag("navigate_to_register")
                                 )
                             }
                         }
@@ -281,20 +338,39 @@ fun LoginScreen(
 
                             Spacer(modifier = Modifier.height(14.dp))
 
-                            // Banner: "حساب کاربری با شماره موبایل ... وجود ندارد..."
+                            // Banner: Dynamic greeting based on user status
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(14.dp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = if (isDark) Color(0xFF33201F) else Color(0xFFFDF2F2)
+                                    containerColor = if (existingSession != null) {
+                                        if (isDark) Color(0xFF1E3A1E) else Color(0xFFE6F4EA)
+                                    } else {
+                                        if (isDark) Color(0xFF33201F) else Color(0xFFFDF2F2)
+                                    }
                                 ),
-                                border = BorderStroke(1.dp, if (isDark) Color(0xFF5C3331) else Color(0xFFF5D0CE))
+                                border = BorderStroke(
+                                    1.dp,
+                                    if (existingSession != null) {
+                                        if (isDark) Color(0xFF2E7D32) else Color(0xFFA3E2AB)
+                                    } else {
+                                        if (isDark) Color(0xFF5C3331) else Color(0xFFF5D0CE)
+                                    }
+                                )
                             ) {
                                 Text(
-                                    text = "حساب کاربری با شماره موبایل $inputUsername وجود ندارد. برای ساخت حساب جدید، کد تایید برای این شماره ارسال گردید.",
+                                    text = if (existingSession != null) {
+                                        "خوش‌آمدید! حساب کاربری شما با عنوان «${existingSession?.fullName}» یافت شد. برای ورود به سامانه، لطفاً کد تایید پیامک‌شده را وارد کنید (می‌توانید کدهای دلخواه یا ۱۲۳۴۵۶ را تایپ کنید)."
+                                    } else {
+                                        "حساب کاربری با شماره موبایل $inputUsername وجود ندارد. برای ساخت حساب جدید، کد تایید برای این شماره ارسال گردید (می‌توانید کدهای دلخواه یا ۱۲۳۴۵۶ را وارد کنید)."
+                                    },
                                     fontSize = 13.sp,
                                     lineHeight = 22.sp,
-                                    color = if (isDark) Color(0xFFF4B3B0) else Color(0xFF9B2C2C),
+                                    color = if (existingSession != null) {
+                                        if (isDark) Color(0xFF81C784) else Color(0xFF1E4620)
+                                    } else {
+                                        if (isDark) Color(0xFFF4B3B0) else Color(0xFF9B2C2C)
+                                    },
                                     modifier = Modifier.padding(14.dp),
                                     textAlign = TextAlign.Right
                                 )
@@ -302,64 +378,69 @@ fun LoginScreen(
 
                             Spacer(modifier = Modifier.height(20.dp))
 
-                            // First and Last Name in one side-by-side Row
+                            // First and Last Name in one side-by-side Row - REGISTER ONLY
+                            if (existingSession == null) {
+                                val containerCol = if (isDark) Color.White.copy(alpha = 0.08f) else Color(0xFFF1F4F9)
+                                val borderCol = if (isDark) Color.White.copy(alpha = 0.12f) else Color(0xFFE2E8F0)
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    OutlinedTextField(
+                                        value = firstName,
+                                        onValueChange = { firstName = it },
+                                        modifier = Modifier.weight(1f),
+                                        placeholder = {
+                                            Text(
+                                                "نام",
+                                                fontSize = 13.sp,
+                                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                                            )
+                                        },
+                                        singleLine = true,
+                                        shape = RoundedCornerShape(14.dp),
+                                        colors = OutlinedTextFieldDefaults.colors(
+                                            focusedContainerColor = containerCol,
+                                            unfocusedContainerColor = containerCol,
+                                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                            unfocusedBorderColor = borderCol,
+                                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground
+                                        )
+                                    )
+
+                                    OutlinedTextField(
+                                        value = lastName,
+                                        onValueChange = { lastName = it },
+                                        modifier = Modifier.weight(1f),
+                                        placeholder = {
+                                            Text(
+                                                "نام خانوادگی",
+                                                fontSize = 13.sp,
+                                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                                            )
+                                        },
+                                        singleLine = true,
+                                        shape = RoundedCornerShape(14.dp),
+                                        colors = OutlinedTextFieldDefaults.colors(
+                                            focusedContainerColor = containerCol,
+                                            unfocusedContainerColor = containerCol,
+                                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                            unfocusedBorderColor = borderCol,
+                                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground
+                                        )
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(14.dp))
+                            }
+
+                            // "کد تایید" input below them
                             val containerCol = if (isDark) Color.White.copy(alpha = 0.08f) else Color(0xFFF1F4F9)
                             val borderCol = if (isDark) Color.White.copy(alpha = 0.12f) else Color(0xFFE2E8F0)
 
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                OutlinedTextField(
-                                    value = firstName,
-                                    onValueChange = { firstName = it },
-                                    modifier = Modifier.weight(1f),
-                                    placeholder = {
-                                        Text(
-                                            "نام",
-                                            fontSize = 13.sp,
-                                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-                                        )
-                                    },
-                                    singleLine = true,
-                                    shape = RoundedCornerShape(14.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedContainerColor = containerCol,
-                                        unfocusedContainerColor = containerCol,
-                                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                        unfocusedBorderColor = borderCol,
-                                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground
-                                    )
-                                )
-
-                                OutlinedTextField(
-                                    value = lastName,
-                                    onValueChange = { lastName = it },
-                                    modifier = Modifier.weight(1f),
-                                    placeholder = {
-                                        Text(
-                                            "نام خانوادگی",
-                                            fontSize = 13.sp,
-                                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-                                        )
-                                    },
-                                    singleLine = true,
-                                    shape = RoundedCornerShape(14.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedContainerColor = containerCol,
-                                        unfocusedContainerColor = containerCol,
-                                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                        unfocusedBorderColor = borderCol,
-                                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground
-                                    )
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(14.dp))
-
-                            // "کد تایید" input below them
                             OutlinedTextField(
                                 value = otpCode,
                                 onValueChange = { otpCode = it },
@@ -404,65 +485,71 @@ fun LoginScreen(
 
                             Spacer(modifier = Modifier.height(20.dp))
 
-                            // Role Selection Tab Switcher so we keep features working
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(44.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(if (isDark) Color.White.copy(alpha = 0.05f) else Color(0xFFE2E8F0))
-                                    .padding(2.dp),
-                                horizontalArrangement = Arrangement.spacedBy(2.dp)
-                            ) {
-                                Box(
+                            // Role Selection Tab Switcher - REGISTER ONLY
+                            if (existingSession == null) {
+                                Row(
                                     modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight()
-                                        .clip(RoundedCornerShape(10.dp))
-                                        .background(if (isVetMode) MaterialTheme.colorScheme.primary else Color.Transparent)
-                                        .clickable { isVetMode = true },
-                                    contentAlignment = Alignment.Center
+                                        .fillMaxWidth()
+                                        .height(44.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(if (isDark) Color.White.copy(alpha = 0.05f) else Color(0xFFE2E8F0))
+                                        .padding(2.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(2.dp)
                                 ) {
-                                    Text(
-                                        text = "🩺 دامپزشک",
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = if (isVetMode) Color.White else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxHeight()
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(if (isVetMode) MaterialTheme.colorScheme.primary else Color.Transparent)
+                                            .clickable { isVetMode = true },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "🩺 دامپزشک",
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (isVetMode) Color.White else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                                        )
+                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxHeight()
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(if (!isVetMode) MaterialTheme.colorScheme.secondary else Color.Transparent)
+                                            .clickable { isVetMode = false },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "🐾 صاحب حیوان",
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (!isVetMode) Color.White else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                                        )
+                                    }
                                 }
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight()
-                                        .clip(RoundedCornerShape(10.dp))
-                                        .background(if (!isVetMode) MaterialTheme.colorScheme.secondary else Color.Transparent)
-                                        .clickable { isVetMode = false },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "🐾 صاحب حیوان",
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = if (!isVetMode) Color.White else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-                                    )
-                                }
-                            }
 
-                            Spacer(modifier = Modifier.height(24.dp))
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
 
                             // Confirm Button matching screenshot
                             Button(
                                 onClick = {
-                                    val finalFN = firstName.ifEmpty { "کاربر" }
-                                    val finalLN = lastName.ifEmpty { "جدید" }
-                                    viewModel.simulateRegistration(
-                                        fullName = "$finalFN $finalLN",
-                                        phoneNumber = inputUsername,
-                                        userType = if (isVetMode) "vet" else "owner",
-                                        licenseNum = if (isVetMode) "95843" else "",
-                                        specOrUni = if (isVetMode) "داخلی حیوانات کوچک" else "",
-                                        gender = "آقا"
-                                    )
+                                    if (existingSession != null) {
+                                        viewModel.simulateLogin(inputUsername)
+                                    } else {
+                                        val finalFN = firstName.ifEmpty { "کاربر" }
+                                        val finalLN = lastName.ifEmpty { "جدید" }
+                                        viewModel.simulateRegistration(
+                                            fullName = "$finalFN $finalLN",
+                                            phoneNumber = inputUsername,
+                                            userType = if (isVetMode) "vet" else "owner",
+                                            licenseNum = if (isVetMode) "95843" else "",
+                                            specOrUni = if (isVetMode) "داخلی حیوانات کوچک" else "",
+                                            gender = "آقا"
+                                        )
+                                    }
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
