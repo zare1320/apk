@@ -1,6 +1,9 @@
 package com.example.ui.screens.vet
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -149,13 +152,14 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
     val customCreatedDrugs by viewModel.customDrugs.collectAsState()
 
     var searchQuery by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf("تمامی داروها") }
+    var selectedCategory by remember { mutableStateOf("همه داروها") }
+    var isCategoriesExpanded by remember { mutableStateOf(false) }
 
     // Custom Drug Add Form state
     var showAddDrugForm by remember { mutableStateOf(false) }
     var newGeneric by remember { mutableStateOf("") }
     var newScientific by remember { mutableStateOf("") }
-    var newCategory by remember { mutableStateOf("آنتی‌بیوتیک‌ها") }
+    var newCategory by remember { mutableStateOf("داروهای ضدعفونت (ضدمیکروبی)") }
     var newConcentrationVal by remember { mutableStateOf("") }
     var newConcentrationTxt by remember { mutableStateOf("") }
     var newRangeMin by remember { mutableStateOf("") }
@@ -171,20 +175,27 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
 
     // Premium categories with custom medical icons and emojis
     val categoriesWithIcons = listOf(
-        Pair("تمامی داروها", "🩺"),
-        Pair("بیهوشی و بی‌حسی", "💤"),
-        Pair("آنتی‌بیوتیک‌ها", "🦠"),
-        Pair("ضد قارچ", "🍄"),
-        Pair("ضد انگل", "🪱"),
-        Pair("داروهای اعصاب و روان", "🧠"),
-        Pair("داروهای قلب و عروق", "❤️"),
-        Pair("مولتی‌ویتامین‌ها", "🧪")
+        Pair("همه داروها", "🩺"),
+        Pair("داروهای بیهوشی، ضددرد و ضدالتهاب (NSAIDs)", "💤"),
+        Pair("داروهای ضدعفونت (ضدمیکروبی)", "🦠"),
+        Pair("داروهای ضدسرطان (ضدنئوپلاستیک)", "🧬"),
+        Pair("اصلاح‌کننده‌های رفتار", "🧠"),
+        Pair("خون و سیستم ایمنی", "🩸"),
+        Pair("قلبی و عروقی", "❤️"),
+        Pair("پوست و مو (درماتولوژیک)", "🩹"),
+        Pair("گوارش و کبد", "🧪"),
+        Pair("دستگاه تناسلی و ادراری", "💦"),
+        Pair("متابولیک و غدد درون‌ریز", "🔥"),
+        Pair("سیستم عصبی و عضلانی", "⚡"),
+        Pair("مکمل‌های تغذیه‌ای و مایع‌درمانی", "🥤"),
+        Pair("داروهای چشم‌پزشکی (چشمی)", "👁️"),
+        Pair("سیستم تنفسی", "🫁")
     )
     val categoriesList = categoriesWithIcons.map { it.first }
 
     // Filtered drugs
     val filteredDrugs = fullCatalog.filter { drug ->
-        val matchesCategory = selectedCategory == "تمامی داروها" || drug.category == selectedCategory
+        val matchesCategory = selectedCategory == "همه داروها" || drug.category == selectedCategory
         val matchesSearch = drug.nameGeneric.contains(searchQuery, ignoreCase = true) ||
                 drug.nameScientific.contains(searchQuery, ignoreCase = true)
         matchesCategory && matchesSearch
@@ -288,76 +299,242 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Categories Grid Layout Selector
-            Text(
-                text = "دسته‌بندی‌های دارویی:",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                textAlign = TextAlign.Right
-            )
-
-            FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                categoriesWithIcons.forEach { (catName, emoji) ->
-                    val isChosen = selectedCategory == catName
-                    val bgCol = if (isChosen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                    val textCol = if (isChosen) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                    val borderCol = if (isChosen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
-
-                    Box(
+            // Categories Area
+            CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Row(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(bgCol)
-                            .border(1.dp, borderCol, RoundedCornerShape(12.dp))
-                            .clickable { selectedCategory = catName }
-                            .defaultMinSize(minHeight = 48.dp)
-                            .padding(horizontal = 14.dp, vertical = 8.dp),
-                        contentAlignment = Alignment.Center
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        Text(
+                            text = "دسته‌بندی‌های دارویی:",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+
+                        // Elegant Expand / Collapse Toggle Button
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f))
+                                .clickable { isCategoriesExpanded = !isCategoriesExpanded }
+                                .padding(horizontal = 10.dp, vertical = 6.dp)
                         ) {
-                            Text(emoji, fontSize = 14.sp)
-                            Text(
-                                text = catName,
-                                fontSize = 11.sp,
-                                color = textCol,
-                                fontWeight = if (isChosen) FontWeight.ExtraBold else FontWeight.Medium
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = if (isCategoriesExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                    contentDescription = "تغییر نمای دسته‌بندی",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Text(
+                                    text = if (isCategoriesExpanded) "نمای فشرده (افقی)" else "مشاهده همه دسته‌ها (۱۵)",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         }
                     }
-                }
 
-                // Custom drug button
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f))
-                        .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-                        .clickable { showAddDrugForm = !showAddDrugForm }
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    // 1. COMPACT SCROLLABLE ROW (Default / Non-expanded view)
+                    AnimatedVisibility(
+                        visible = !isCategoriesExpanded,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
                     ) {
-                        Text("➕", fontSize = 11.sp)
-                        Text(
-                            text = "افزودن داروی جدید +",
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            LazyRow(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(vertical = 4.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                contentPadding = PaddingValues(horizontal = 4.dp)
+                            ) {
+                                items(categoriesWithIcons) { (catName, emoji) ->
+                                    val isChosen = selectedCategory == catName
+                                    val bgCol = if (isChosen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                                    val textCol = if (isChosen) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                                    val borderCol = if (isChosen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(20.dp))
+                                            .background(bgCol)
+                                            .border(1.dp, borderCol, RoundedCornerShape(20.dp))
+                                            .clickable { selectedCategory = catName }
+                                            .defaultMinSize(minHeight = 40.dp)
+                                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                        ) {
+                                            Text(emoji, fontSize = 14.sp)
+                                            Text(
+                                                text = catName,
+                                                fontSize = 11.sp,
+                                                color = textCol,
+                                                fontWeight = if (isChosen) FontWeight.Bold else FontWeight.Medium
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Quick add short chip
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(20.dp))
+                                    .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f))
+                                    .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
+                                    .clickable { showAddDrugForm = !showAddDrugForm }
+                                    .defaultMinSize(minHeight = 40.dp)
+                                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Text("➕", fontSize = 11.sp)
+                                    Text(
+                                        text = "داروی جدید",
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // 2. EXPANDED PREMIUM USER-FRIENDLY SELECTION GRID (Prevention of selection errors)
+                    AnimatedVisibility(
+                        visible = isCategoriesExpanded,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
+                                .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+                                .padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "جهت فیلتر دقیق‌تر و جلوگیری از خطا، گروه مورد نظر را انتخاب کنید:",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+
+                            val rows = categoriesWithIcons.chunked(2)
+                            rows.forEach { rowPairs ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    rowPairs.forEach { (catName, emoji) ->
+                                        val isChosen = selectedCategory == catName
+                                        val bgCol = if (isChosen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                                        val borderCol = if (isChosen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                                        val textCol = if (isChosen) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+
+                                        Box(
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(bgCol)
+                                                .border(1.2.dp, borderCol, RoundedCornerShape(12.dp))
+                                                .clickable { selectedCategory = catName }
+                                                .defaultMinSize(minHeight = 48.dp)
+                                                .padding(horizontal = 10.dp, vertical = 8.dp),
+                                            contentAlignment = Alignment.CenterStart
+                                        ) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(28.dp)
+                                                        .background(
+                                                            if (isChosen) Color.White.copy(alpha = 0.2f)
+                                                            else MaterialTheme.colorScheme.surfaceVariant,
+                                                            CircleShape
+                                                        ),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Text(emoji, fontSize = 13.sp)
+                                                }
+
+                                                Text(
+                                                    text = catName,
+                                                    fontSize = 11.sp,
+                                                    color = textCol,
+                                                    fontWeight = if (isChosen) FontWeight.ExtraBold else FontWeight.Medium,
+                                                    lineHeight = 14.sp,
+                                                    modifier = Modifier.weight(1f)
+                                                )
+
+                                                if (isChosen) {
+                                                    Text(
+                                                        text = "✓",
+                                                        fontSize = 14.sp,
+                                                        color = textCol,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // Placeholder if odd number
+                                    if (rowPairs.size == 1) {
+                                        Box(modifier = Modifier.weight(1f))
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(4.dp))
+
+                            // Large interactive Add Custom Drug Button
+                            Button(
+                                onClick = { showAddDrugForm = !showAddDrugForm },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                                contentPadding = PaddingValues(vertical = 12.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Text("➕", fontSize = 12.sp)
+                                    Text(
+                                        text = "افزودن داروی جدید به دارونامه +",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -401,7 +578,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                             // Category Select
                             Text("دسته‌بندی دارو:", fontSize = 11.sp)
                             FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(vertical = 4.dp)) {
-                                categoriesList.filter { it != "تمامی داروها" }.forEach { name ->
+                                categoriesList.filter { it != "همه داروها" }.forEach { name ->
                                     val isSel = newCategory == name
                                     val col = if (isSel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
                                     Box(
