@@ -140,7 +140,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VetLayoutContainer(viewModel: MainViewModel) {
-    var activeVetTab by remember { mutableStateOf("داشبورد") }
+    var activeVetTab by remember { mutableStateOf("Dashboard") }
 
     Scaffold(
         topBar = {
@@ -159,7 +159,9 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                     .statusBarsPadding()
                     .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
-                CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides LayoutDirection.Rtl) {
+                val currentLanguage by viewModel.currentLanguage.collectAsState()
+                val layoutDirection = if (currentLanguage == "en") LayoutDirection.Ltr else LayoutDirection.Rtl
+                CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides layoutDirection) {
                     // 1. App Title "Vetaris" at the very top (centered and clean)
                     Box(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
@@ -182,7 +184,7 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Right Side in RTL: Avatar circle + "سلام مسعود 👋" (no cards)
+                        // Right Side in LTR: Avatar circle + "Hello Masoud 👋"
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -193,19 +195,19 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                                     .background(Color.White, androidx.compose.foundation.shape.CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(if (session?.gender == "خانم") "👩‍⚕️" else "👨‍⚕️", fontSize = 24.sp)
+                                Text(if (session?.gender == "خانم" || session?.gender == "Female") "👩‍⚕️" else "👨‍⚕️", fontSize = 24.sp)
                             }
 
-                            val firstName = session?.fullName?.replace("دکتر", "")?.trim()?.split(" ")?.firstOrNull() ?: "مسعود"
+                            val firstName = session?.fullName?.replace("دکتر", "")?.replace("Dr.", "")?.trim()?.split(" ")?.firstOrNull() ?: "Masoud"
                             Text(
-                                text = "سلام $firstName 👋",
+                                text = "Hello $firstName 👋",
                                 color = Color.White,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         }
 
-                        // Left Side in RTL: Notification + Theme switcher row with a custom vertical divider
+                        // Left Side in LTR: Notification + Theme switcher row with a custom vertical divider
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -259,11 +261,11 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                 windowInsets = WindowInsets.navigationBars
             ) {
                 listOf(
-                    NavItem("داشبورد", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, "داشبورد"),
-                    NavItem("دارونامه", Icons.Filled.MedicalServices, Icons.Outlined.MedicalServices, "دارونامه"),
-                    NavItem("تشخیص و درمان", Icons.Filled.Healing, Icons.Outlined.Healing, "تشخیص هوشمند"),
-                    NavItem("ابزار محاسبه‌گر", Icons.Filled.Calculate, Icons.Outlined.Calculate, "محاسبه‌گر"),
-                    NavItem("پروفایل", Icons.Filled.Person, Icons.Outlined.Person, "پروفایل")
+                    NavItem("Dashboard", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, "Dashboard"),
+                    NavItem("Drug Manual", Icons.Filled.MedicalServices, Icons.Outlined.MedicalServices, "Drugs"),
+                    NavItem("Smart Diagnosis", Icons.Filled.Healing, Icons.Outlined.Healing, "Diagnosis"),
+                    NavItem("Calculator", Icons.Filled.Calculate, Icons.Outlined.Calculate, "Calculators"),
+                    NavItem("Profile", Icons.Filled.Person, Icons.Outlined.Person, "Profile")
                 ).forEach { item ->
                     val isSelected = activeVetTab == item.tab
                     NavigationBarItem(
@@ -296,11 +298,11 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
             ) {
                 Crossfade(targetState = activeVetTab) { tab ->
                     when (tab) {
-                        "داشبورد" -> VetDashboardScreen(viewModel = viewModel)
-                        "دارونامه" -> VetDrugManualScreen(viewModel = viewModel)
-                        "تشخیص و درمان" -> VetDiagnosisTreatmentScreen(viewModel = viewModel)
-                        "ابزار محاسبه‌گر" -> VetCalculatorScreen(viewModel = viewModel)
-                        "پروفایل" -> VetProfileScreen(viewModel = viewModel)
+                        "Dashboard" -> VetDashboardScreen(viewModel = viewModel)
+                        "Drug Manual" -> VetDrugManualScreen(viewModel = viewModel)
+                        "Smart Diagnosis" -> VetDiagnosisTreatmentScreen(viewModel = viewModel)
+                        "Calculator" -> VetCalculatorScreen(viewModel = viewModel)
+                        "Profile" -> VetProfileScreen(viewModel = viewModel)
                     }
                 }
             }
@@ -312,9 +314,12 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OwnerLayoutContainer(viewModel: MainViewModel) {
-    var activeOwnerTab by remember { mutableStateOf("داشبورد") }
+    var activeOwnerTab by remember { mutableStateOf("Dashboard") }
 
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+    val currentLanguage by viewModel.currentLanguage.collectAsState()
+    val layoutDirection = if (currentLanguage == "en") LayoutDirection.Ltr else LayoutDirection.Rtl
+
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
         Scaffold(
             topBar = {
                 val session by viewModel.activeSession.collectAsState()
@@ -347,7 +352,7 @@ fun OwnerLayoutContainer(viewModel: MainViewModel) {
                                 Text("🐕", fontSize = 18.sp)
                             }
                             Text(
-                                text = "دستیار همراه صاحب پت",
+                                text = "Pet Owner Companion",
                                 color = Color.White,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
@@ -376,12 +381,17 @@ fun OwnerLayoutContainer(viewModel: MainViewModel) {
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "بخش مراقبت هوشمند و نوبت‌دهی",
+                                text = "Smart Care & Scheduling Companion",
                                 color = Color.White.copy(alpha = 0.85f),
                                 fontSize = 10.sp
                             )
+                            val title = if (session?.fullName?.startsWith("دکتر") == true) {
+                                "Dr. " + session?.fullName?.replace("دکتر", "")?.trim()
+                            } else {
+                                session?.fullName ?: "Dear Pet Owner"
+                            }
                             Text(
-                                text = "خوش آمدید، " + (session?.getFullTitle() ?: "صاحب پت محترم"),
+                                text = "Welcome, $title",
                                 color = Color.White,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold
@@ -394,7 +404,7 @@ fun OwnerLayoutContainer(viewModel: MainViewModel) {
                                 .background(Color.White, RoundedCornerShape(50.dp)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(if (session?.gender == "خانم") "👩" else "👨", fontSize = 20.sp)
+                            Text(if (session?.gender == "خانم" || session?.gender == "Female") "👩" else "👨", fontSize = 20.sp)
                         }
                     }
                 }
@@ -404,11 +414,11 @@ fun OwnerLayoutContainer(viewModel: MainViewModel) {
                     windowInsets = WindowInsets.navigationBars
                 ) {
                     listOf(
-                        NavItem("داشبورد", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, "داشبورد"),
-                        NavItem("نسخه", Icons.Filled.Assignment, Icons.Outlined.Assignment, "نسخه"),
-                        NavItem("تقویم", Icons.Filled.CalendarToday, Icons.Outlined.CalendarToday, "تقویم"),
-                        NavItem("نقشه", Icons.Filled.Map, Icons.Outlined.Map, "نقشه"),
-                        NavItem("پروفایل", Icons.Filled.Person, Icons.Outlined.Person, "پروفایل")
+                        NavItem("Dashboard", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, "Dashboard"),
+                        NavItem("Prescriptions", Icons.Filled.Assignment, Icons.Outlined.Assignment, "Rx"),
+                        NavItem("Calendar", Icons.Filled.CalendarToday, Icons.Outlined.CalendarToday, "Calendar"),
+                        NavItem("Map", Icons.Filled.Map, Icons.Outlined.Map, "Map"),
+                        NavItem("Profile", Icons.Filled.Person, Icons.Outlined.Person, "Profile")
                     ).forEach { item ->
                         val isSelected = activeOwnerTab == item.tab
                         NavigationBarItem(
@@ -441,11 +451,11 @@ fun OwnerLayoutContainer(viewModel: MainViewModel) {
                 ) {
                     Crossfade(targetState = activeOwnerTab) { tab ->
                         when (tab) {
-                            "داشبورد" -> OwnerDashboardScreen(viewModel = viewModel)
-                            "نسخه" -> OwnerPrescriptionsScreen(viewModel = viewModel)
-                            "تقویم" -> OwnerCalendarScreen(viewModel = viewModel)
-                            "نقشه" -> OwnerMapScreen(viewModel = viewModel)
-                            "پروفایل" -> OwnerProfileScreen(viewModel = viewModel)
+                            "Dashboard" -> OwnerDashboardScreen(viewModel = viewModel)
+                            "Prescriptions" -> OwnerPrescriptionsScreen(viewModel = viewModel)
+                            "Calendar" -> OwnerCalendarScreen(viewModel = viewModel)
+                            "Map" -> OwnerMapScreen(viewModel = viewModel)
+                            "Profile" -> OwnerProfileScreen(viewModel = viewModel)
                         }
                     }
                 }

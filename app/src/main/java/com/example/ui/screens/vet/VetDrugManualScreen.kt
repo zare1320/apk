@@ -48,99 +48,99 @@ data class DrugDetails(
 private fun getDrugDetails(drugId: String): DrugDetails {
     return when (drugId) {
         "1" -> DrugDetails(
-            contraindications = "بیماران با سابقه گلوکوم (فشار داخل چشم بالا)، نارسایی‌های شدید قلبی و سابقه فشار خون حاد. در گربه‌های دیابتیک یا مبتلا به نارسایی حاد کلیه با احتیاط بسیار فراوان تجویز شود.",
-            sideEffects = "افزایش جریان ترشحات دهانی و بزاق کاذب، لرزش متوسط تا شدید عضلانی، ریکاوری بالینی هیجانی در غیاب آرام‌بخش اولیه، نوسان ضربان قلب.",
-            clinicalPearls = "ترکیب هم‌زمان یا پیش‌دارویی با زایلازین یا دیازپام جهت پیشگیری از سفتی گربه‌سانان و تسهیل فاز ریکاوری قویاً توصیه می‌گردد."
+            contraindications = "Hypertrophic cardiomyopathy (HCM) in felines, severe heart failure, uncontrolled hypertension. Use with extreme caution in diabetic pets or patients with acute renal insufficiency.",
+            sideEffects = "Sialorrhea (hypersalivation), moderate to severe muscle tremors, rough emergence delirium in the absence of proper pre-anesthetic sedation, fluctuating heart rate.",
+            clinicalPearls = "Co-administration or pre-medication with diazepam or xylazine is highly recommended to prevent muscle rigidity and facilitate a smooth recovery phase."
         )
         "2" -> DrugDetails(
-            contraindications = "سه‌ماهه آخر بارداری دام (ریسک بالا در ایجاد زایمان زودرس و سقط)، انسداد فیزیکی مجاری تنفسی، بیماری‌های حاد دریچه میترال قلب.",
-            sideEffects = "کاهش بارز ریتم قلبی (برادی‌کاردی شدید)، فلج موقت و نفخ شکمی در نشخوارکنندگان، واکنش استفراغ کوتاه‌مدت بلافاصله پس از تزریق در گربه‌ها.",
-            clinicalPearls = "داروی یوهیمبین (Yohimbine) و یا آتی‌پامزول به عنوان پادزهر و آنتاگونیست اختصاصی جهت برگرداندن اثر سداتیو زایلازین کاربرد دارند."
+            contraindications = "Last trimester of pregnancy (high risk of premature labor or abortion), upper airway obstruction, severe mitral valve disease.",
+            sideEffects = "Severe bradycardia, transient rumen stasis/bloat in ruminants, early emesis immediately following injection in felines.",
+            clinicalPearls = "Yohimbine or atipamezole serve as specific antagonists to quickly reverse the sedative and physiological effects of xylazine."
         )
         "3" -> DrugDetails(
-            contraindications = "نارسایی کبدی پیشرفته. سرعت تزریق بسیار سریع وریدی ممکن است منجر به دپرسیون حاد تنفسی یا ترومبوفلبیت موضعی شود.",
-            sideEffects = "کاهش خفیف عمق تنفس، آتاکسی موقت حرکتی (عدم تعادل عضلانی) در دقایق اولیه پس از تجویز ثانویه.",
-            clinicalPearls = "دیازپام انتخاب اول درمان کلینیکی اورژانس در کنترل و خاتمه‌بخشی به تشنج‌های صرعی فعال (Status Epilepticus) در دام کوچک است."
+            contraindications = "Advanced hepatic insufficiency. Rapid IV bolus may trigger acute respiratory depression or local thrombophlebitis.",
+            sideEffects = "Mild respiratory depression, transient muscle ataxia in the initial minutes following intravenous administration.",
+            clinicalPearls = "Diazepam is the primary emergency drug of choice for controlling active epileptic seizures (Status Epilepticus) in veterinary medicine."
         )
         "4" -> DrugDetails(
-            contraindications = "شوک شدید سیستمیک هیپوولمیک (کم‌آبی حاد عروقی)، نارسایی قلبی احتقانی و جبران‌نشده.",
-            sideEffects = "دپرسیون تنفسی موقت (آپنه گذرا) در صورت تزریق شتاب‌زده، کاهش فشار خون شریانی همراه با شل شدن کامل عضلات ارادی و اسفنکترها.",
-            clinicalPearls = "تزریق حتماً باید به روش وریدی بسیار آهسته (Slow IV over 60 seconds) انجام شود تا از ایست تنفسی ناگهانی ممانعت به عمل آید."
+            contraindications = "Severe hypovolemic shock, uncompensated congestive heart failure, extreme systemic dehydration.",
+            sideEffects = "Transient respiratory apnea if injected too rapidly, arterial hypotension accompanied by complete skeletal muscle relaxation.",
+            clinicalPearls = "Must be administered via slow IV route (over 60 seconds) to prevent sudden apnea or acute respiratory arrest."
         )
         "5" -> DrugDetails(
-            contraindications = "حساسیت شناخته‌شده به آنتی‌بیوتیک‌های خانواده پنی‌سیلین و بتالاکتام‌ها. تجویز خوراکی این دارو در جوندگان کوچک (خرگوش، خوکچه هندی و همستر) به علت تخریب فلور روده کشنده است.",
-            sideEffects = "اختلال گوارشی موقت، اسهال ملایم ناشی از تغییر فلور میکروبی، واکنش‌های آلرژیک پوستی و کهیر پوستی گذرا.",
-            clinicalPearls = "فرمولاسیون طولانی‌اثر (LA) این آنتی‌بیوتیک، سطح درمانی فعال دارو را تا ۴۸ ساعت مداوم در جریان خون دام به حد مطلوب نگه می‌دارد."
+            contraindications = "Known hypersensitivity to penicillins or beta-lactams. Oral administration is fatal to small hindgut fermenting rodents (rabbits, guinea pigs, hamsters).",
+            sideEffects = "Transient GI upset, companion microflora diarrhea, skin rashes, and mild hypersensitivity reactions.",
+            clinicalPearls = "Long-acting (LA) formulations maintain active therapeutic blood and tissue levels for up to 48 consecutive hours."
         )
         "6" -> DrugDetails(
-            contraindications = "بیماران دارای پیشینه آلرژی شدید به سفالوسپورین‌ها. تداخل شدید دارویی با داروهای آمینوگلیکوزید نفروتوکسیک.",
-            sideEffects = "احساس سوزش و درد موضعی در محل تزریق عضلانی، واکنش‌های خفیف تا متوسط دستگاه گوارش نظیر حالت تهوع ملایم.",
-            clinicalPearls = "به دلیل قابلیت عبور فوق‌العاده از سد خونی-مغزی (BBB)، سفتریاکسون داروی کلیدی ممتاز در درمان عفونت‌های مننژیت مغزی می‌باشد."
+            contraindications = "Known hypersensitivity or allergy to cephalosporins. Significant risk of nephrotoxicity when co-administered with aminoglycosides.",
+            sideEffects = "Temporary localized pain or sting at deep IM injection sites, mild gastrointestinal distress.",
+            clinicalPearls = "Due to exceptional blood-brain barrier (BBB) penetration, ceftriaxone is excellent for treating bacterial meningitis."
         )
         "7" -> DrugDetails(
-            contraindications = "توله سگ‌های در حال رشد (زیر ۸ تا ۱۲ ماه) به دلیل آسیب مستقیم به غضروف مفصلی. گربه‌های با دوز بالا به علت ریسک مسمومیت شبکیه چشم و نابینایی.",
-            sideEffects = "تخریب صفحات رشد و غضروف مفصلی در حیوانات در حال رشد سریع، اختلالات گوارشی گذرا شامل بی‌اشتهایی و استفراغ فردی.",
-            clinicalPearls = "این دارو از آنتی‌بیوتیک‌های خط اول بسیار قدرتمند در کنترل تفصیلی عفونت‌های عمیق مجاری ادراری، غده پروستات و سیستم تنفسی است."
+            contraindications = "Rapidly growing puppies (under 8 to 12 months) due to joint cartilage damage. High doses in felines pose risk of retinal toxicity and blindness.",
+            sideEffects = "Articular cartilage degeneration in juvenile patients, temporary anorexia or emesis.",
+            clinicalPearls = "Highly effective first-line fluoroquinolone for deep urinary tract infections, prostatitis, and severe respiratory tract infections."
         )
         "8" -> DrugDetails(
-            contraindications = "بیماری‌های حاد نارسایی کلیوی، دهیدراتاسیون شدید بدن حیوان بیمار، استفاده هم‌زمان با سایر داروهای سمی برای بافت کلیه.",
-            sideEffects = "سمیت شدید کلیوی در اثر انباشت دارو (Nephrotoxicity) و آسیب دائم به عصب دهلیزی-حلزونی شنوایی در گوش داخلی (Ototoxicity).",
-            clinicalPearls = "هیدراتاسیون یا آبرسانی دقیق بدن بیمار و پایش غلظت کراتینین خون در طول دوره درمان با آمینوگلیکوزیدها الزامی و حیاتی است."
+            contraindications = "Pre-existing acute renal insufficiency, severe dehydration, concurrent use of other nephrotoxic medications.",
+            sideEffects = "Accumulative nephrotoxicity and permanent auditory/vestibular ototoxicity from eighth cranial nerve damage.",
+            clinicalPearls = "Ensure the patient is well-hydrated and monitor blood creatinine levels closely during aminoglycoside therapy."
         )
         "9" -> DrugDetails(
-            contraindications = "بیماری‌های حاد و پیشرفته بافت کبد (هپاتوپاتی شدید)، نارسایی احتقانی قلب سگ‌سانان.",
-            sideEffects = "کاهش اشتهای ملایم، تهوع گذرا، افزایش غلظت آنزیم‌های جگر (ALT , AST) وابسته به مقدار دوزاژ مصرفی.",
-            clinicalPearls = "تجویز خوراکی ایتراکونازول در حضور وعده غذایی حاوی چربی به مقدار چشمگیری فراهمی زیستی و جذب روده را بالا می‌برد."
+            contraindications = "Pre-existing advanced hepatic dysfunction, congestive heart failure.",
+            sideEffects = "Mild anorexia, transient emesis, dose-dependent hepatic enzyme elevations (ALT/AST).",
+            clinicalPearls = "Oral itraconazole absorption and clinical bioavailability are significantly enhanced if given with a fatty meal."
         )
         "10" -> DrugDetails(
-            contraindications = "اختلال شدید عملکرد کبد، سگ‌های مبتلا به نارسایی غده فوق کلیه (Hypoadrenocorticism).",
-            sideEffects = "ریزش موی موضعی، خارش، تهوع، مهار موقت ساخت هورمون تستوسترون و کورتیزول بدن دام.",
-            clinicalPearls = "به عنوان یک مهارکننده قوی آنزیم سیتوکروم P450 کبد، کوفاکتورهای دارویی هم‌زمان باید با دوز تعدیل‌شده تجویز شوند."
+            contraindications = "Severe hepatic impairment, patients with hypoadrenocorticism (Addison's disease).",
+            sideEffects = "Temporary alopecia, pruritus, emesis, temporary inhibition of testosterone and cortisol synthesis.",
+            clinicalPearls = "Potent cytochrome P450 inhibitor. Co-administered drugs cleared via this pathway require dose downward adjustments."
         )
         "11" -> DrugDetails(
-            contraindications = "سگ‌های حساس نژاد کالی (Collies)، شتلند، ژرمن شپرد با جهش ژنتیکی مستند در ژن MDR1 به دلیل مسمومیت و مرگ مغزی حاد.",
-            sideEffects = "گشاد شدن شدید مردمک چشم (میدریاز)، عدم تعادل حرکتی شدید، تشنج‌های منقطع مغزی در صورت مصرف دوزهای غیراستاندارد بالینی.",
-            clinicalPearls = "دوزهای پیشگیری‌کننده کرم قلب بسیار ناچیز و ایمن است، اما دوزهای درمانی جرب پوستی (Demodex) در نژاد کالی کاملاً ممنوع است."
+            contraindications = "Herding breeds (Collies, Shetland Sheepdogs, German Shepherds) with MDR1 mutations due to neurotoxicity.",
+            sideEffects = "Mydriasis, severe ataxia, depression, tremors, seizures if standard dosage limits are exceeded.",
+            clinicalPearls = "Heartworm preventative doses are extremely low and safe, but demographic MDR1 precaution remains mandatory."
         )
         "12" -> DrugDetails(
-            contraindications = "سه‌ماهه اول بارداری کلیه گونه‌های دام، اختلالات پویای عصبی و صرع فعال.",
-            sideEffects = "عوارض شدید اعصاب مرکزی نظیر نیستاگموس (لرزش افقی چشم)، بی‌آشتهایی مطلق، و احساس طعم نامطبوع فلزی در دهان.",
-            clinicalPearls = "در صورت مشاهده کوچک‌ترین آتاکسی، سرگیجه یا چرخش سر دام، مصرف دارو را فوراً قطع کرده و درمان حمایتی با دیازپام را شروع کنید."
+            contraindications = "First trimester of pregnancy, pre-existing active central nervous system or neurological disorder.",
+            sideEffects = "Neurotoxic symptoms (ataxia, horizontal nystagmus, head tilt), profound lethargy, metallic taste anorexia.",
+            clinicalPearls = "If vestibular signs or ataxia manifest, stop therapy immediately and supportively treat with diazepam."
         )
         "13" -> DrugDetails(
-            contraindications = "عوارض منع مصرف قطعی ثبت نشده است. این دارو از حیث دارویی دارای حاشیه ایمنی بسیار بالایی در کلیه پستانداران اهلی حیوانات خانگی است.",
-            sideEffects = "کمی تهوع گوارشی، بی‌اشتهایی موقت و ملایم پس از اولین دوز مصرفی.",
-            clinicalPearls = "دوره استاندارد پاکسازی انگل‌های داخلی (کرم‌های لوله‌ای) معمولاً در ۳ روز متوالی با دوز ثابت روزانه انجام می‌پذیرد."
+            contraindications = "No absolute contraindications reported. Extremely wide margin of safety in companion animals and livestock.",
+            sideEffects = "Very rare mild GI distress, transient nausea on the first dosing instance.",
+            clinicalPearls = "Standard therapeutic course for internal parasites (roundworms, whipworms) requires 3 consecutive daily doses."
         )
         "14" -> DrugDetails(
-            contraindications = "شوک شدید قلبی عروقی، دهیدراتاسیون، سگ‌های نژاد باکسر (Boxer) به علت حساسیت ژنتیکی بیولوژیک مفرط به سنکوپ و ایست قلبی.",
-            sideEffects = "کاهش ناگهانی و شدید فشار خون شریانی، رخوت عمیق عضلانی، بیرون‌زدگی یا پرولاپس پلک سوم چشم دام به صورت موقت.",
-            clinicalPearls = "آسپرومایزین صرفاً آرام‌بخش حرکتی است و به تنهایی فاقد هرگونه خواص ضد دردی (Analgesic) جهت جراحی‌ها می‌باشد."
+            contraindications = "Hypovolemia, shock, patients with a genotype predisposition to cardiovascular syncope (e.g. Boxer breed).",
+            sideEffects = "Risk of severe hypotension, profound sedation, transient protrusion of the third eyelid (nictitating membrane).",
+            clinicalPearls = "Acepromazine provides tranquilization/sedation only; it has zero analgesic properties for surgical pain management."
         )
         "15" -> DrugDetails(
-            contraindications = "نارسایی کبدی حاد، آسیب‌های مغزی ریوی ناشی از خفگی یا انسداد تنفسی متوسط.",
-            sideEffects = "پلی‌یوریا و پلی‌دیپسیا (پرخوری و پرنوشی مفرط)، رخوت موقتی حیوان در دو هفته ابتدایی شروع درمان کنترل تشنج صرع.",
-            clinicalPearls = "پایش سیستماتیک سطح سرمی فنوپاربیتال خون هر ۶ ماه یکبار جهت تنظیم دقیق دوز ضد تشنج در درمان‌های صرعی الزامی است."
+            contraindications = "Acute hepatic failure, respiratory depression, severe pre-existing pulmonary disease.",
+            sideEffects = "Polyuria, polydipsia, polyphagia, transient sedation/lethargy in the first two weeks of epilepsy therapy.",
+            clinicalPearls = "Monitor therapeutic serum concentrations every 6 months to adjust seizure control dosage effectively."
         )
         "16" -> DrugDetails(
-            contraindications = "شوک غیرقلبی، نارسایی بی‌آوری شدید آب بدن، آنوری (قطع خروجی ادرار به علت خرابی کامل نفرون‌های کلیه).",
-            sideEffects = "کاهش پوتاسیوم خون (هیپوکالمی)، دهیدراتاسیون شدید، افزایش ثانویه غلظت اوره و کراتینین خون دام در اثر کم‌آبی.",
-            clinicalPearls = "فوروزماید قوی‌ترین دیورتیک برای کاهش ادم حاد ریوی گربه‌ها و سگ‌ها در نارسایی احتقانی قلب شمرده می‌شود."
+            contraindications = "Anuria, progressive renal failure, severe pre-existing dehydration or electrolyte depletion.",
+            sideEffects = "Hypokalemia, systemic dehydration, secondary prerenal azotemia.",
+            clinicalPearls = "Primary diuretic of choice for rapid treatment of cardiogenic pulmonary edema in cats and dogs."
         )
         "17" -> DrugDetails(
-            contraindications = "کاردیومیوپاتی هیپرتروفیک (HCM) در گربه‌ها، انسداد خروجی جریان بطن چپ و تنگی آئورت قلب.",
-            sideEffects = "افزایش ملایم نرخ ضربان قلب، اسهال دوره‌ای بسیار سبک و گذرا در موارد حاد مصرف بالینی.",
-            clinicalPearls = "پیموبندان با افزایش قدرت انقباض ماهیچه قلب و گشاد کردن عروق، کارآمدی چشمگیری در بهبود نارسایی احتقانی قلب (CHF) دارد."
+            contraindications = "Hypertrophic cardiomyopathy (HCM) in cats, left ventricular outflow tract obstruction, aortic stenosis.",
+            sideEffects = "Mild tachycardia, transient loose stools or GI irritation.",
+            clinicalPearls = "Acts as a positive inotrope and vasodilator, greatly improving survival in dogs with CHF secondary to DCM or MMVD."
         )
         "18" -> DrugDetails(
-            contraindications = "سابقه آلرژی و پاسخ آنافیلاکتیک به کمپلکس ویتامین‌های خانواده ب.",
-            sideEffects = "احساس سوزش و ناآرامی موضعی و کوتاه پس از تزریق عضلانی عمیق دارو.",
-            clinicalPearls = "تزریق به صورت زیرجلدی آهسته (SQ) جهت کاهش اثر سوزش موضعی در کلینیک توصیه می‌گردد."
+            contraindications = "History of hypersensitivity or anaphylactoid reactions to vitamin B components.",
+            sideEffects = "Temporary localized stinging or burning sensation after injection.",
+            clinicalPearls = "Administer slow subcutaneous (SQ) injection to minimize transient pain associated with deeper muscular dosing."
         )
         else -> DrugDetails(
-            contraindications = "در دام‌های مبتلا به افت شدید عملکردهای فیلتراسیون کلیه و تصفیه جگر با احتیاط و ارزیابی دقیق دوزاژ مصرف شود.",
-            sideEffects = "اختلالات گذرا و ملایم در دستگاه گوارش حیوان یا التهاب جزئی و برگشت‌پذیر در موضع تزریق دارو.",
-            clinicalPearls = "اندازه‌گیری دقیق دوز تجویزی صرفاً بر حسب وزن بدن (کیلوگرم) و ویژگی‌های اختصاصی هر بیمار انجام شود."
+            contraindications = "Use with caution in patients with renal or hepatic compromise. Adjust dosage carefully.",
+            sideEffects = "Potential transient gastrointestinal irritation or mild localized reaction at injection site.",
+            clinicalPearls = "Dose calculation should be strictly verified based on specific lean body weight and patient parameters."
         )
     }
 }
@@ -152,14 +152,14 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
     val customCreatedDrugs by viewModel.customDrugs.collectAsState()
 
     var searchQuery by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf("همه داروها") }
+    var selectedCategory by remember { mutableStateOf("All drugs") }
     var isCategoriesExpanded by remember { mutableStateOf(false) }
 
     // Custom Drug Add Form state
     var showAddDrugForm by remember { mutableStateOf(false) }
     var newGeneric by remember { mutableStateOf("") }
     var newScientific by remember { mutableStateOf("") }
-    var newCategory by remember { mutableStateOf("داروهای ضدعفونت (ضدمیکروبی)") }
+    var newCategory by remember { mutableStateOf("Anti-infectives") }
     var newConcentrationVal by remember { mutableStateOf("") }
     var newConcentrationTxt by remember { mutableStateOf("") }
     var newRangeMin by remember { mutableStateOf("") }
@@ -175,27 +175,27 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
 
     // Premium categories with custom medical icons and emojis
     val categoriesWithIcons = listOf(
-        Pair("همه داروها", "🩺"),
-        Pair("داروهای بیهوشی، ضددرد و ضدالتهاب (NSAIDs)", "💤"),
-        Pair("داروهای ضدعفونت (ضدمیکروبی)", "🦠"),
-        Pair("داروهای ضدسرطان (ضدنئوپلاستیک)", "🧬"),
-        Pair("اصلاح‌کننده‌های رفتار", "🧠"),
-        Pair("خون و سیستم ایمنی", "🩸"),
-        Pair("قلبی و عروقی", "❤️"),
-        Pair("پوست و مو (درماتولوژیک)", "🩹"),
-        Pair("گوارش و کبد", "🧪"),
-        Pair("دستگاه تناسلی و ادراری", "💦"),
-        Pair("متابولیک و غدد درون‌ریز", "🔥"),
-        Pair("سیستم عصبی و عضلانی", "⚡"),
-        Pair("مکمل‌های تغذیه‌ای و مایع‌درمانی", "🥤"),
-        Pair("داروهای چشم‌پزشکی (چشمی)", "👁️"),
-        Pair("سیستم تنفسی", "🫁")
+        Pair("All drugs", "🩺"),
+        Pair("Anaesthetic analgesics and NSAIDs", "💤"),
+        Pair("Anti-infectives", "🦠"),
+        Pair("Anti-neoplastic", "🧬"),
+        Pair("Behaviour modifiers", "🧠"),
+        Pair("Blood and immune system", "🩸"),
+        Pair("Cardiovascular", "❤️"),
+        Pair("Dermatological", "🩹"),
+        Pair("Gastrointestinal and hepatic", "🧪"),
+        Pair("Genito-urinary tract", "💦"),
+        Pair("Metabolic", "🔥"),
+        Pair("Neuromuscular system", "⚡"),
+        Pair("Nutritional/fluids", "🥤"),
+        Pair("Ophthalmic", "👁️"),
+        Pair("Respiratory system", "🫁")
     )
     val categoriesList = categoriesWithIcons.map { it.first }
 
-    // Filtered drugs, sorted alphabetically by Persian generic name (nameGeneric)
+    // Filtered drugs, sorted alphabetically by Generic name
     val filteredDrugs = fullCatalog.filter { drug ->
-        val matchesCategory = selectedCategory == "همه داروها" || drug.category == selectedCategory
+        val matchesCategory = selectedCategory == "All drugs" || drug.category == selectedCategory
         val matchesSearch = drug.nameGeneric.contains(searchQuery, ignoreCase = true) ||
                 drug.nameScientific.contains(searchQuery, ignoreCase = true)
         matchesCategory && matchesSearch
@@ -229,120 +229,116 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                         ) {
                             Column(horizontalAlignment = Alignment.Start, modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "🐾 محاسبات دارویی برای: ${pet.name}",
+                                    text = "🐾 Dosage Calculations for: ${pet.name}",
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                                     modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Right
+                                    textAlign = TextAlign.Left
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
-                                    text = "گونه: ${pet.species} | نژاد: ${pet.breed} | وزن بیمار: ${pet.weight} کیلوگرم",
+                                    text = "Species: ${pet.species} | Breed: ${pet.breed} | Weight: ${pet.weight} kg",
                                     fontSize = 11.sp,
                                     color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
                                     modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Right
+                                    textAlign = TextAlign.Left
                                 )
                             }
                         }
                     }
                 }
             } ?: run {
-                CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f)),
-                        shape = RoundedCornerShape(16.dp),
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f)),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                ) {
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 12.dp)
+                            .padding(14.dp),
+                        horizontalAlignment = Alignment.Start
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(14.dp),
-                            horizontalAlignment = Alignment.Start
-                        ) {
-                            Text(
-                                text = "⚠️ بیمار فعالی انتخاب نشده است",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onErrorContainer,
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Right
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "محاسبات دارویی بر مبنای وزن پیش‌فرض ۱ کیلوگرم انجام می‌شود. لطفاً برای محاسبه دقیق ابتدا در تب داشبورد پرونده مراجعه‌کننده را فعال کنید.",
-                                fontSize = 11.sp,
-                                color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f),
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Right
-                            )
-                        }
+                        Text(
+                            text = "⚠️ No Active Patient Selected",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Left
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Dosage calculations are based on a default weight of 1 kg. Please activate a patient record under the dashboard first for precise calculations.",
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f),
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Left
+                        )
                     }
                 }
             }
 
-            // Quick search bar
-            CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("جستجوی سریع نام یا عنوان علمی دارو") },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "") },
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp)
-                )
-            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Search generic name or scientific title...") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "") },
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp)
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Categories Area
-            CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "دسته‌بندی‌های دارویی:",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Drug Classifications:",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
 
-                        // Elegant Expand / Collapse Toggle Button
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f))
-                                .clickable { isCategoriesExpanded = !isCategoriesExpanded }
-                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                    // Elegant Expand / Collapse Toggle Button
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f))
+                            .clickable { isCategoriesExpanded = !isCategoriesExpanded }
+                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                Icon(
-                                    imageVector = if (isCategoriesExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                                    contentDescription = "تغییر نمای دسته‌بندی",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Text(
-                                    text = if (isCategoriesExpanded) "نمای فشرده (افقی)" else "مشاهده همه دسته‌ها (۱۵)",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
+                            Icon(
+                                imageVector = if (isCategoriesExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                contentDescription = "Toggle category view",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Text(
+                                text = if (isCategoriesExpanded) "Compact View (Horizontal)" else "Show All Categories (15)",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
+                }
 
                     // 1. COMPACT SCROLLABLE ROW (Default / Non-expanded view)
                     AnimatedVisibility(
@@ -411,7 +407,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                 ) {
                                     Text("➕", fontSize = 11.sp)
                                     Text(
-                                        text = "داروی جدید",
+                                        text = "New Drug",
                                         fontSize = 11.sp,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                                         fontWeight = FontWeight.Bold
@@ -436,7 +432,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Text(
-                                text = "جهت فیلتر دقیق‌تر و جلوگیری از خطا، گروه مورد نظر را انتخاب کنید:",
+                                text = "Select a group to filter and prevent errors:",
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                                 fontWeight = FontWeight.Bold,
@@ -528,7 +524,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                 ) {
                                     Text("➕", fontSize = 12.sp)
                                     Text(
-                                        text = "افزودن داروی جدید به دارونامه +",
+                                        text = "Add New Custom Drug +",
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -537,7 +533,6 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                         }
                     }
                 }
-            }
 
             // Add Custom Drug Form
             AnimatedVisibility(visible = showAddDrugForm) {
@@ -550,9 +545,9 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.End
+                        horizontalAlignment = Alignment.Start
                     ) {
-                        Text("➕ ثبت داروی جدید در نسخه دمو", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                        Text("➕ Add Custom Drug - Demo Mode", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.height(12.dp))
 
                         CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
@@ -560,8 +555,8 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                 value = newGeneric,
                                 onValueChange = { newGeneric = it },
                                 modifier = Modifier.fillMaxWidth(),
-                                label = { Text("نام ژنریک (فارسی)") },
-                                placeholder = { Text("مثال: سفالکسین") },
+                                label = { Text("Generic Name") },
+                                placeholder = { Text("e.g. Cephalexin") },
                                 singleLine = true
                             )
                             Spacer(modifier = Modifier.height(8.dp))
@@ -569,16 +564,16 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                 value = newScientific,
                                 onValueChange = { newScientific = it },
                                 modifier = Modifier.fillMaxWidth(),
-                                label = { Text("عنوان علمی (لاتین)") },
-                                placeholder = { Text("مثال: Cephalexin") },
+                                label = { Text("Scientific Name") },
+                                placeholder = { Text("e.g. Cephalexin Monohydrate") },
                                 singleLine = true
                             )
                             Spacer(modifier = Modifier.height(8.dp))
 
                             // Category Select
-                            Text("دسته‌بندی دارو:", fontSize = 11.sp)
+                            Text("Drug Classification:", fontSize = 11.sp)
                             FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(vertical = 4.dp)) {
-                                categoriesList.filter { it != "همه داروها" }.forEach { name ->
+                                categoriesList.filter { it != "All drugs" }.forEach { name ->
                                     val isSel = newCategory == name
                                     val col = if (isSel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
                                     Box(
@@ -602,7 +597,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                     value = newConcentrationVal,
                                     onValueChange = { newConcentrationVal = it },
                                     modifier = Modifier.weight(1f),
-                                    label = { Text("غلظت (mg/ml)") },
+                                    label = { Text("Concentration (mg/ml)") },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     singleLine = true
                                 )
@@ -610,8 +605,8 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                     value = newConcentrationTxt,
                                     onValueChange = { newConcentrationTxt = it },
                                     modifier = Modifier.weight(1.5f),
-                                    label = { Text("واحد موجود") },
-                                    placeholder = { Text("مثال: 50 mg/ml") },
+                                    label = { Text("Concentration Label") },
+                                    placeholder = { Text("e.g. 50 mg/ml") },
                                     singleLine = true
                                 )
                             }
@@ -623,7 +618,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                     value = newRangeMin,
                                     onValueChange = { newRangeMin = it },
                                     modifier = Modifier.weight(1f),
-                                    label = { Text("حداقل دوز (mg/kg)") },
+                                    label = { Text("Min Dose (mg/kg)") },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     singleLine = true
                                 )
@@ -631,7 +626,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                     value = newRangeMax,
                                     onValueChange = { newRangeMax = it },
                                     modifier = Modifier.weight(1f),
-                                    label = { Text("حداکثر دوز") },
+                                    label = { Text("Max Dose (mg/kg)") },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     singleLine = true
                                 )
@@ -639,7 +634,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                     value = newRoute,
                                     onValueChange = { newRoute = it },
                                     modifier = Modifier.weight(1.2f),
-                                    label = { Text("روش تجویز") },
+                                    label = { Text("Route") },
                                     singleLine = true
                                 )
                             }
@@ -650,7 +645,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                 value = newDefaultDosage,
                                 onValueChange = { newDefaultDosage = it },
                                 modifier = Modifier.fillMaxWidth(),
-                                label = { Text("دوز پیش‌فرض میانگین (mg/kg)") },
+                                label = { Text("Default Avg Dose (mg/kg)") },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 singleLine = true
                             )
@@ -692,7 +687,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                 },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text("ثبت و درج در فارماکوپه")
+                                Text("Save & Add to Pharmacopoeia")
                             }
                         }
                     }
@@ -703,14 +698,14 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
 
             // Drug Table & Dosage Calculation Calculator
             Text(
-                text = "دارونامه و تجویز هوشمند:",
+                text = "Drug Manual & Smart Prescription:",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
-                textAlign = TextAlign.Right
+                textAlign = TextAlign.Left
             )
 
             if (filteredDrugs.isEmpty()) {
@@ -738,14 +733,14 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "دارویی یافت نشد",
+                            text = "No Drugs Found",
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "هیچ داروی پیش‌فرض یا دست‌سازی با جستجوی شما مطابقت ندارد. می‌توانید غلظت و دوزهای اختصاصی را در قالب فرمول جدید به سیستم اضافه کنید.",
+                            text = "No default or custom drugs match your search query. You can add unique concentrations and custom dosages.",
                             fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                             textAlign = TextAlign.Center,
@@ -761,7 +756,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                         ) {
                             Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("افزودن فرمول داروی جدید", fontSize = 11.sp)
+                            Text("Add Custom Drug Formula", fontSize = 11.sp)
                         }
                     }
                 }
@@ -817,17 +812,17 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                 
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = getEnglishName(drug.nameGeneric),
+                                        text = drug.nameGeneric,
                                         fontWeight = FontWeight.ExtraBold, // FONT-EXTRABOLD: Maximum focal weight
                                         fontSize = 17.sp,
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Spacer(modifier = Modifier.height(2.dp))
                                     Text(
-                                        text = "ژنریک: ${getPersianName(drug.nameGeneric)}",
+                                        text = "Scientific: ${drug.nameScientific}",
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f) // Distinctive Persian Theme
+                                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
                                     )
                                 }
                                 
@@ -887,7 +882,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                                 Text("⚠️", fontSize = 16.sp)
                                                 Spacer(modifier = Modifier.width(6.dp))
                                                 Text(
-                                                    text = "راهنمای عوارض و منع مصرف تخصصی دامپزشکی",
+                                                    text = "Veterinary Contraindications & Side Effects Guide",
                                                     fontWeight = FontWeight.ExtraBold,
                                                     fontSize = 12.sp,
                                                     color = MaterialTheme.colorScheme.error
@@ -937,7 +932,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                                 // Contraindications (منع مصرف)
                                                 Column(modifier = Modifier.fillMaxWidth()) {
                                                     Text(
-                                                        text = "🚫 موارد منع مصرف بالینی قطعی:",
+                                                        text = "🚫 Absolute Contraindications:",
                                                         fontSize = 11.sp,
                                                         fontWeight = FontWeight.ExtraBold,
                                                         color = Color(0xFFC2410C) // Tailwind Orange 700
@@ -947,14 +942,14 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                                         fontSize = 11.sp,
                                                         color = MaterialTheme.colorScheme.onSurface,
                                                         modifier = Modifier.padding(start = 12.dp, top = 2.dp),
-                                                        textAlign = TextAlign.Right
+                                                        textAlign = TextAlign.Left
                                                     )
                                                 }
 
                                                 // Side Effects (عوارض جانبی عمده)
                                                 Column(modifier = Modifier.fillMaxWidth()) {
                                                     Text(
-                                                        text = "🚨 عوارض جانبی گزارش شده:",
+                                                        text = "🚨 Reported Side Effects & Adverse Events:",
                                                         fontSize = 11.sp,
                                                         fontWeight = FontWeight.ExtraBold,
                                                         color = Color(0xFFB91C1C) // Tailwind Red 700
@@ -964,14 +959,14 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                                         fontSize = 11.sp,
                                                         color = MaterialTheme.colorScheme.onSurface,
                                                         modifier = Modifier.padding(start = 12.dp, top = 2.dp),
-                                                        textAlign = TextAlign.Right
+                                                        textAlign = TextAlign.Left
                                                     )
                                                 }
 
                                                 // Clinical Pearl (نکات کلینییکال)
                                                 Column(modifier = Modifier.fillMaxWidth()) {
                                                     Text(
-                                                        text = "💡 نکته مهارتی و کلیدی دامپزشک:",
+                                                        text = "💡 Expert Clinical Pearl & Tip:",
                                                         fontSize = 11.sp,
                                                         fontWeight = FontWeight.ExtraBold,
                                                         color = Color(0xFF0369A1) // Tailwind Sky 700
@@ -981,7 +976,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                                         fontSize = 11.sp,
                                                         color = MaterialTheme.colorScheme.onSurface,
                                                         modifier = Modifier.padding(start = 12.dp, top = 2.dp),
-                                                        textAlign = TextAlign.Right
+                                                        textAlign = TextAlign.Left
                                                     )
                                                 }
                                             }
@@ -999,7 +994,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                 horizontalArrangement = Arrangement.Start
                             ) {
                                 Text(
-                                    text = "بازه دوز مرجع: ${drug.rangeAndRoute.substringBeforeLast(" ")}",
+                                    text = "Ref Dose Range: ${drug.rangeAndRoute.substringBeforeLast(" ")}",
                                     fontSize = 11.sp,
                                     color = Color.Gray,
                                     fontWeight = FontWeight.Bold
@@ -1145,7 +1140,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                             calculatedVolume = calculatedVolume
                                         )
                                         coroutineScope.launch {
-                                            snackbarHostState.showSnackbar("داروی ${drug.nameGeneric} به نسخه بیمار اضافه شد!")
+                                            snackbarHostState.showSnackbar("Drug ${drug.nameGeneric} has been added to the prescription!")
                                         }
                                     },
                                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
@@ -1160,7 +1155,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                         )
                                         Spacer(modifier = Modifier.width(4.dp))
                                         Text(
-                                            text = "افزودن به نسخه",
+                                            text = "Add to Prescription",
                                             fontSize = 11.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = MaterialTheme.colorScheme.primary
@@ -1196,22 +1191,22 @@ private fun RouteBadges(routeStr: String) {
                 cleanR.contains("IV") -> Triple(
                     Color(0xFFE0F2FE), // Blue/Sky background
                     Color(0xFF0284C7), // Blue/Sky foreground
-                    "IV (وریدی)"
+                    "IV (Intravenous)"
                 )
                 cleanR.contains("IM") -> Triple(
                     Color(0xFFF3E8FF), // Purple background
                     Color(0xFF7C3AED), // Purple foreground
-                    "IM (عضلانی)"
+                    "IM (Intramuscular)"
                 )
                 cleanR.contains("SC") || cleanR.contains("SQ") -> Triple(
                     Color(0xFFD1FAE5), // Mint/Emerald background
                     Color(0xFF059669), // Mint/Emerald foreground
-                    "SC (زیرجلدی)"
+                    "SC (Subcutaneous)"
                 )
                 cleanR.contains("PO") -> Triple(
                     Color(0xFFFEF3C7), // Amber background
                     Color(0xFFD97706), // Amber foreground
-                    "PO (خوراکی)"
+                    "PO (Oral)"
                 )
                 else -> Triple(
                     Color(0xFFF3F4F6), 

@@ -17,7 +17,7 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
     private val _themeMode = MutableStateFlow("dark") // "light" or "dark" (default dark to feel premium)
     val themeMode: StateFlow<String> = _themeMode.asStateFlow()
 
-    private val _currentLanguage = MutableStateFlow("fa") // "fa", "en", "ar"
+    private val _currentLanguage = MutableStateFlow("en") // "fa", "en", "ar"
     val currentLanguage: StateFlow<String> = _currentLanguage.asStateFlow()
 
     private val _activeSubscription = MutableStateFlow("gold") // "free", "silver", "gold", "diamond"
@@ -127,7 +127,7 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
                 isNeutered = isNeutered,
                 ownerName = ownerName,
                 ownerPhone = ownerPhone,
-                healthStatus = "بیمار",
+                healthStatus = "Under Treatment",
                 recordNumber = recordNumber
             )
 
@@ -239,10 +239,10 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
             val session = existing?.copy(isLoggedIn = true) ?: UserSession(
                 phoneNumber = phone,
                 userType = if (phone.contains("98") || phone.startsWith("09")) "vet" else "owner",
-                fullName = "دکتر دامپزشک نمونه",
+                fullName = "Dr. Jane Smith",
                 identification = "9901123",
-                workplaceOrUni = "دانشگاه تهران",
-                specialty = "دام‌های کوچک",
+                workplaceOrUni = "Tehran Medical Vet",
+                specialty = "Small Animals Medicine",
                 isLoggedIn = true,
                 coins = 100
             )
@@ -298,9 +298,9 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
             val docSession = repository.getActiveSessionSync()
             val prescription = Prescription(
                 petId = pet?.id ?: 0,
-                petName = pet?.name ?: "حیوان نامشخص",
+                petName = pet?.name ?: "Unknown Patient",
                 ownerPhone = pet?.ownerPhone ?: "",
-                doctorName = docSession?.fullName ?: "دکتر دامپزشک",
+                doctorName = docSession?.fullName ?: "Dr. Veterinarian",
                 drugName = drug.nameGeneric + " (" + drug.nameScientific + ")",
                 concentration = drug.concentrationText,
                 rangeRoute = drug.rangeAndRoute,
@@ -398,7 +398,7 @@ data class DrugItem(
     val id: String,
     val nameGeneric: String,
     val nameScientific: String,
-    val category: String, // e.g. "آنتی‌بیوتیک‌ها", "بیهوشی و بی‌حسی", etc
+    val category: String, // e.g. Antibiotics, Anesthetics etc.
     val concentrationVal: Double, // in mg/ml
     val concentrationText: String, // available packaging
     val rangeAndRoute: String, // e.g. "10-20 mg/kg SC"
@@ -410,34 +410,34 @@ data class DrugItem(
 
 val staticDrugCatalog = listOf(
     // Anesthetics
-    DrugItem("1", "کتامین (Ketamine)", "Ketamine Hydrocholoride", "داروهای بیهوشی، ضددرد و ضدالتهاب (NSAIDs)", 100.0, "100 mg/ml (۱۰٪)", "5-15 mg/kg IM/IV", 5.0, 15.0, "IM/IV", 10.0),
-    DrugItem("2", "زایلازین (Xylazine)", "Xylazine 2%", "داروهای بیهوشی، ضددرد و ضدالتهاب (NSAIDs)", 20.0, "20 mg/ml (۲٪)", "1-2 mg/kg IM/SC", 1.0, 2.0, "IM/SC", 1.5),
-    DrugItem("3", "دیازپام (Diazepam)", "Diazepam 5mg/ml", "داروهای بیهوشی، ضددرد و ضدالتهاب (NSAIDs)", 5.0, "5 mg/ml", "0.2-0.5 mg/kg IV", 0.2, 0.5, "IV", 0.3),
-    DrugItem("4", "پروپوفول (Propofol)", "Propofol 1%", "داروهای بیهوشی، ضددرد و ضدالتهاب (NSAIDs)", 10.0, "10 mg/ml", "4-6 mg/kg IV", 4.0, 6.0, "IV", 5.0),
+    DrugItem("1", "Ketamine", "Ketamine Hydrocholoride", "Anaesthetic analgesics and NSAIDs", 100.0, "100 mg/ml (10%)", "5-15 mg/kg IM/IV", 5.0, 15.0, "IM/IV", 10.0),
+    DrugItem("2", "Xylazine", "Xylazine 2%", "Anaesthetic analgesics and NSAIDs", 20.0, "20 mg/ml (2%)", "1-2 mg/kg IM/SC", 1.0, 2.0, "IM/SC", 1.5),
+    DrugItem("3", "Diazepam", "Diazepam 5mg/ml", "Anaesthetic analgesics and NSAIDs", 5.0, "5 mg/ml", "0.2-0.5 mg/kg IV", 0.2, 0.5, "IV", 0.3),
+    DrugItem("4", "Propofol", "Propofol 1%", "Anaesthetic analgesics and NSAIDs", 10.0, "10 mg/ml", "4-6 mg/kg IV", 4.0, 6.0, "IV", 5.0),
     
     // Antibiotics
-    DrugItem("5", "آموکسی‌سیلین (Amoxicillin)", "Amoxicillin LA", "داروهای ضدعفونت (ضدمیکروبی)", 150.0, "150 mg/ml (۱۵٪)", "10-20 mg/kg SC/IM", 10.0, 20.0, "SC/IM", 15.0),
-    DrugItem("6", "سفتریاکسون (Ceftriaxone)", "Ceftriaxone 1g Sodium", "داروهای ضدعفونت (ضدمیکروبی)", 100.0, "100 mg/ml (پودر حل شده)", "15-30 mg/kg IV/IM", 15.0, 30.0, "IV/IM", 20.0),
-    DrugItem("7", "انروفلوکساسین (Enrofloxacin)", "Enrofloxacin 10%", "داروهای ضدعفونت (ضدمیکروبی)", 100.0, "100 mg/ml (۱۰٪)", "5-10 mg/kg SC/PO", 5.0, 10.0, "SC/PO", 7.5),
-    DrugItem("8", "جنتامایسین (Gentamicin)", "Gentamicin 5% Injection", "داروهای ضدعفونت (ضدمیکروبی)", 50.0, "50 mg/ml (۵٪)", "2-4 mg/kg IV/IM/SC", 2.0, 4.0, "IV/IM/SC", 3.0),
+    DrugItem("5", "Amoxicillin", "Amoxicillin LA", "Anti-infectives", 150.0, "150 mg/ml (15%)", "10-20 mg/kg SC/IM", 10.0, 20.0, "SC/IM", 15.0),
+    DrugItem("6", "Ceftriaxone", "Ceftriaxone 1g Sodium", "Anti-infectives", 100.0, "100 mg/ml (reconstituted powder)", "15-30 mg/kg IV/IM", 15.0, 30.0, "IV/IM", 20.0),
+    DrugItem("7", "Enrofloxacin", "Enrofloxacin 10%", "Anti-infectives", 100.0, "100 mg/ml (10%)", "5-10 mg/kg SC/PO", 5.0, 10.0, "SC/PO", 7.5),
+    DrugItem("8", "Gentamicin", "Gentamicin 5% Injection", "Anti-infectives", 50.0, "50 mg/ml (5%)", "2-4 mg/kg IV/IM/SC", 2.0, 4.0, "IV/IM/SC", 3.0),
     
     // Antifungal
-    DrugItem("9", "ایتراکونازول (Itraconazole)", "Itraconazole 100mg", "داروهای ضدعفونت (ضدمیکروبی)", 10.0, "10 mg/ml (سوسپانسیون خوراکی)", "5-10 mg/kg PO", 5.0, 10.0, "PO", 7.5),
-    DrugItem("10", "کتوکونازول (Ketoconazole)", "Ketoconazole 200mg", "داروهای ضدعفونت (ضدمیکروبی)", 20.0, "20 mg/ml", "5-10 mg/kg PO", 5.0, 10.0, "PO", 8.0),
+    DrugItem("9", "Itraconazole", "Itraconazole 100mg", "Anti-infectives", 10.0, "10 mg/ml (oral suspension)", "5-10 mg/kg PO", 5.0, 10.0, "PO", 7.5),
+    DrugItem("10", "Ketoconazole", "Ketoconazole 200mg", "Anti-infectives", 20.0, "20 mg/ml", "5-10 mg/kg PO", 5.0, 10.0, "PO", 8.0),
     
     // Antiparasitics
-    DrugItem("11", "ایورمکتین (Ivermectin)", "Ivermectin 1%", "داروهای ضدعفونت (ضدمیکروبی)", 10.0, "10 mg/ml (۱٪)", "0.2-0.4 mg/kg SC", 0.2, 0.4, "SC", 0.25),
-    DrugItem("12", "مترونیدازول (Metronidazole)", "Metronidazole Intravenous Infusion", "داروهای ضدعفونت (ضدمیکروبی)", 5.0, "5 mg/ml (۰.۵٪)", "15-25 mg/kg IV", 15.0, 25.0, "IV", 20.0),
-    DrugItem("13", "فنبندازول (Fenbendazole)", "Fenbendazole Oral", "داروهای ضدعفونت (ضدمیکروبی)", 100.0, "100 mg/ml (۱۰٪)", "50 mg/kg PO", 50.0, 50.0, "PO", 50.0),
+    DrugItem("11", "Ivermectin", "Ivermectin 1%", "Anti-infectives", 10.0, "10 mg/ml (1%)", "0.2-0.4 mg/kg SC", 0.2, 0.4, "SC", 0.25),
+    DrugItem("12", "Metronidazole", "Metronidazole Intravenous Infusion", "Anti-infectives", 5.0, "5 mg/ml (0.5%)", "15-25 mg/kg IV", 15.0, 25.0, "IV", 20.0),
+    DrugItem("13", "Fenbendazole", "Fenbendazole Oral", "Anti-infectives", 100.0, "100 mg/ml (10%)", "50 mg/kg PO", 50.0, 50.0, "PO", 50.0),
     
     // Psychotropics
-    DrugItem("14", "آسپرومایزین (Acepromazine)", "Acepromazine 10mg/ml", "اصلاح‌کننده‌های رفتار", 10.0, "10 mg/ml", "0.05-0.1 mg/kg IM/SC", 0.05, 0.1, "IM/SC", 0.05),
-    DrugItem("15", "فنوپاربیتال (Phenobarbital)", "Phenobarbital Sodium", "سیستم عصبی و عضلانی", 30.0, "30 mg/ml", "2-5 mg/kg IV", 2.0, 5.0, "IV", 3.0),
-
+    DrugItem("14", "Acepromazine", "Acepromazine 10mg/ml", "Behaviour modifiers", 10.0, "10 mg/ml", "0.05-0.1 mg/kg IM/SC", 0.05, 0.1, "IM/SC", 0.05),
+    DrugItem("15", "Phenobarbital", "Phenobarbital Sodium", "Neuromuscular system", 30.0, "30 mg/ml", "2-5 mg/kg IV", 2.0, 5.0, "IV", 3.0),
+ 
     // Cardiovasculars
-    DrugItem("16", "فاروزماید (Furosemide)", "Lasix 5% Injection", "قلبی و عروقی", 50.0, "50 mg/ml (۵٪)", "1-4 mg/kg IV/IM", 1.0, 4.0, "IV/IM", 2.0),
-    DrugItem("17", "پیموبندان (Pimobendan)", "Pimobendan Vetmedin", "قلبی و عروقی", 5.0, "5 mg/ml", "0.2-0.6 mg/kg PO (تقسیم در دو دوز)", 0.2, 0.6, "PO", 0.3),
-
+    DrugItem("16", "Furosemide", "Lasix 5% Injection", "Cardiovascular", 50.0, "50 mg/ml (5%)", "1-4 mg/kg IV/IM", 1.0, 4.0, "IV/IM", 2.0),
+    DrugItem("17", "Pimobendan", "Pimobendan Vetmedin", "Cardiovascular", 5.0, "5 mg/ml", "0.2-0.6 mg/kg PO (divided in two doses)", 0.2, 0.6, "PO", 0.3),
+ 
     // Multivitamins
-    DrugItem("18", "ب-کمپلکس (B-Complex)", "Vitamin B Complex", "مکمل‌های تغذیه‌ای و مایع‌درمانی", 50.0, "۵۰ میلی‌گرم بر میلی‌لیتر ترکیبی", "0.1-0.2 ml/kg SC/IM", 0.1, 0.2, "SC/IM", 0.15)
+    DrugItem("18", "B-Complex", "Vitamin B Complex", "Nutritional/fluids", 50.0, "50 mg/ml Combined", "0.1-0.2 ml/kg SC/IM", 0.1, 0.2, "SC/IM", 0.15)
 )
