@@ -154,6 +154,7 @@ fun RegisterScreen(
     val textfieldBg = if (isDark) Color.White.copy(alpha = 0.08f) else Color(0xFFF1F4F9)
     val textfieldBorder = if (isDark) Color.White.copy(alpha = 0.12f) else Color(0xFFE2E8F0)
     val customAccentColor = Color(0xFFB55D57) // reddish rust premium color
+    val activeThemeColor = if (isVetMode) customAccentColor else MaterialTheme.colorScheme.secondary
 
     GlassBackgroundBox {
         Column(
@@ -323,11 +324,11 @@ fun RegisterScreen(
                                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                                 ) {
                                     listOf(
-                                        Pair("آقا", "جناب آقای / دُکتر"),
-                                        Pair("خانم", "سرکار خانم / دُکتر")
+                                        Pair("آقا", if (isVetMode) "آقای دکتر" else "جناب آقای"),
+                                        Pair("خانم", if (isVetMode) "خانم دکتر" else "سرکار خانم")
                                     ).forEach { (code, label) ->
                                         val isSel = genderSelected == code
-                                        val bg = if (isSel) customAccentColor else textfieldBg
+                                        val bg = if (isSel) (if (isVetMode) customAccentColor else MaterialTheme.colorScheme.secondary) else textfieldBg
                                         val textColor = if (isSel) Color.White else MaterialTheme.colorScheme.onSurface
                                         Box(
                                             modifier = Modifier
@@ -387,7 +388,7 @@ fun RegisterScreen(
                                             .height(50.dp),
                                         shape = RoundedCornerShape(14.dp),
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = MaterialTheme.colorScheme.secondary,
+                                            containerColor = activeThemeColor,
                                             contentColor = Color.White
                                         )
                                     ) {
@@ -938,7 +939,7 @@ fun RegisterScreen(
                                         .testTag("submit_button"),
                                     shape = RoundedCornerShape(14.dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = customAccentColor,
+                                        containerColor = activeThemeColor,
                                         contentColor = Color.White
                                     )
                                 ) {

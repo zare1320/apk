@@ -51,6 +51,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
     var showUpdateDialog by remember { mutableStateOf(false) }
     var showSupportDialog by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var userRating by remember { mutableStateOf(5) }
 
     // Interactivity state copies
     var editedName by remember { mutableStateOf("صاحب پت گرامی") }
@@ -1132,26 +1133,138 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
             }
 
             if (showLogoutDialog) {
+                val context = androidx.compose.ui.platform.LocalContext.current
                 AlertDialog(
                     onDismissRequest = { showLogoutDialog = false },
-                    title = { Text("خروج از سیستم", fontWeight = FontWeight.Bold) },
-                    text = {
-                        Text("آیا مطمئن هستید که می‌خواهید از حساب کاربری خود خارج شوید؟", fontSize = 14.sp, color = textColor)
-                    },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                showLogoutDialog = false
-                                viewModel.logout()
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
-                        ) {
-                            Text("خروج")
+                    title = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Star,
+                                contentDescription = null,
+                                tint = Color(0xFFFFB300),
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("میزان رضایت شما از برنامه", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         }
                     },
-                    dismissButton = {
-                        TextButton(onClick = { showLogoutDialog = false }) {
-                            Text("انصراف")
+                    text = {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "کاربر گرامی، خوشحال می‌شویم پیش از خروج، میزان رضایت خود را اعلام کنید تا در بروزرسانی‌های بعدی مورد استفاده قرار گیرد:",
+                                fontSize = 13.sp,
+                                color = textColor,
+                                textAlign = TextAlign.Justify,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                for (i in 1..5) {
+                                    val isSelected = i <= userRating
+                                    Icon(
+                                        imageVector = Icons.Default.Star,
+                                        contentDescription = "Star $i",
+                                        tint = if (isSelected) Color(0xFFFFB300) else Color.LightGray.copy(alpha = 0.5f),
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .clickable { userRating = i }
+                                            .padding(horizontal = 4.dp)
+                                    )
+                                }
+                            }
+                            
+                            Spacer(modifier = Modifier.height(16.dp))
+                            
+                            val feedbackMsg = when (userRating) {
+                                5 -> "بسیار عالی! از حمایت شما سپاسگزاریم. صمیمانه دعوت می‌کنیم با ثبت امتیاز در گوگل پلی ما را همراهی کنید. 🥰"
+                                4 -> "سپاس فراوان از بازخورد خوب شما! لطفاً با ثبت نظر در گوگل پلی به ما در بهبود برنامه کمک کنید. 🌸"
+                                3 -> "ممنون از رای شما. تمام تلاش خود را برای ارتقای امکانات به کار خواهیم بست. 💡"
+                                else -> "پوزش می‌خواهیم که رضایت کامل شما جلب نشد. نظرات شما به ما در ارتقای اپلیکیشن یاری می‌رساند. 🛠️"
+                            }
+                            
+                            Text(
+                                text = feedbackMsg,
+                                fontSize = 13.sp,
+                                color = if (userRating >= 4) Color(0xFF10B981) else Color(0xFFF59E0B),
+                                fontWeight = FontWeight.Medium,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        color = if (userRating >= 4) Color(0xFF10B981).copy(alpha = 0.08f) else Color(0xFFF59E0B).copy(alpha = 0.08f),
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
+                                    .padding(8.dp)
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Button(
+                                onClick = {
+                                    showLogoutDialog = false
+                                    val playStoreIntent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+                                        data = android.net.Uri.parse("market://details?id=" + context.packageName)
+                                    }
+                                    try {
+                                        context.startActivity(playStoreIntent)
+                                    } catch (e: Exception) {
+                                        val webIntent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://play.google.com/store/apps/details?id=" + context.packageName))
+                                        try {
+                                            context.startActivity(webIntent)
+                                        } catch (ex: Exception) {
+                                            // Fallback
+                                        }
+                                    }
+                                    viewModel.logout()
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Icon(imageVector = Icons.Default.Star, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("ثبت در گوگل پلی و خروج", fontWeight = FontWeight.Bold)
+                                }
+                            }
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                TextButton(
+                                    onClick = {
+                                        showLogoutDialog = false
+                                        viewModel.logout()
+                                    },
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text("خروج بدون ثبت نظر", color = Color(0xFFEF4444), fontSize = 12.sp)
+                                }
+                                
+                                TextButton(
+                                    onClick = { showLogoutDialog = false },
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text("انصراف", color = textColor.copy(alpha = 0.6f), fontSize = 12.sp)
+                                }
+                            }
                         }
                     }
                 )
