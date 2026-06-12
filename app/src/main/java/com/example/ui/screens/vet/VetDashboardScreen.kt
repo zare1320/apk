@@ -1,5 +1,6 @@
 package com.example.ui.screens.vet
 
+// Force clean recompilation of VetDashboardScreen to resolve classloading NoClassDefFoundError at runtime
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,6 +30,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.screens.SharedSpeciesCircleButton
+import com.example.ui.screens.DogVectorIcon
+import com.example.ui.screens.CatVectorIcon
+import com.example.ui.screens.ExoticVectorIcon
+import com.example.ui.screens.ReptileVectorIcon
+import com.example.ui.screens.RodentVectorIcon
+import com.example.ui.screens.AquaticVectorIcon
+import com.example.ui.screens.AmphibianVectorIcon
 import com.example.data.database.Pet
 import com.example.viewmodel.MainViewModel
 import com.example.ui.theme.glassmorphic
@@ -74,6 +82,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
 
     var isAddingNewRecord by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
+    var showRecordNumberHelp by remember { mutableStateOf(false) }
 
     // Populate standard lists of breed based on species in Persian and English
     val breedOptions = when (activeSpecies) {
@@ -218,126 +227,137 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                 .padding(vertical = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Row 1: Cat, Dog, Bird (RTL order matching screenshot: right to left)
+            // Main row of 4 columns: سگ, گربه, پرنده, اگزوتیک
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Cat (right)
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    SharedSpeciesCircleButton(
-                        speciesKey = "cat",
-                        label = "گربه",
-                        isSelected = localSpeciesSelection == "cat",
-                        onClick = {
-                            viewModel.selectSpecies("cat")
-                            petBreed = ""
-                        }
-                    )
-                }
+                // سگ (Dog)
+                WhiteSpeciesCircleButton(
+                    speciesKey = "dog",
+                    label = "سگ",
+                    isSelected = activeSpecies == "dog",
+                    onClick = {
+                        viewModel.selectSpecies("dog")
+                        petBreed = ""
+                    }
+                )
 
-                // Dog (middle)
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    SharedSpeciesCircleButton(
-                        speciesKey = "dog",
-                        label = "سگ",
-                        isSelected = localSpeciesSelection == "dog",
-                        onClick = {
-                            viewModel.selectSpecies("dog")
-                            petBreed = ""
-                        }
-                    )
-                }
+                // گربه (Cat)
+                WhiteSpeciesCircleButton(
+                    speciesKey = "cat",
+                    label = "گربه",
+                    isSelected = activeSpecies == "cat",
+                    onClick = {
+                        viewModel.selectSpecies("cat")
+                        petBreed = ""
+                    }
+                )
 
-                // Bird (left)
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    SharedSpeciesCircleButton(
-                        speciesKey = "bird",
-                        label = "پرنده",
-                        isSelected = localSpeciesSelection == "bird",
-                        onClick = {
-                            viewModel.selectSpecies("exotic")
-                            viewModel.selectExoticOption("bird")
-                            petBreed = ""
+                // پرنده (Bird)
+                WhiteSpeciesCircleButton(
+                    speciesKey = "bird",
+                    label = "پرنده",
+                    isSelected = activeSpecies == "exotic" && activeExotic == "bird",
+                    onClick = {
+                        viewModel.selectSpecies("exotic")
+                        viewModel.selectExoticOption("bird")
+                        petBreed = ""
+                    }
+                )
+
+                // اگزوتیک (Exotic)
+                val isExoticSelected = activeSpecies == "exotic" && activeExotic != "bird"
+                WhiteSpeciesCircleButton(
+                    speciesKey = "exotic",
+                    label = "اگزوتیک",
+                    isSelected = isExoticSelected,
+                    onClick = {
+                        viewModel.selectSpecies("exotic")
+                        if (activeExotic == "bird") {
+                            viewModel.selectExoticOption(null)
                         }
-                    )
-                }
+                        petBreed = ""
+                    }
+                )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Row 2: Mammal (Rodent), Reptile, Amphibian (RTL order: right to left)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+            // Sub-row of 4 columns if "اگزوتیک" is selected: جونده, خزنده, دوزیست, ماهی
+            AnimatedVisibility(
+                visible = activeSpecies == "exotic" && activeExotic != "bird",
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
             ) {
-                // Mammal (Rodent - Bunny image helper) (right)
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    SharedSpeciesCircleButton(
-                        speciesKey = "rodent",
-                        label = "پستاندار",
-                        isSelected = localSpeciesSelection == "rodent",
-                        onClick = {
-                            viewModel.selectSpecies("exotic")
-                            viewModel.selectExoticOption("rodent")
-                            petBreed = ""
-                        }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "نوع حیوان اگزوتیک:",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp, end = 4.dp),
+                        textAlign = TextAlign.Right
                     )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // جونده (Rodent)
+                        WhiteSpeciesCircleButton(
+                            speciesKey = "rodent",
+                            label = "جونده",
+                            isSelected = activeExotic == "rodent",
+                            onClick = {
+                                viewModel.selectExoticOption("rodent")
+                                petBreed = ""
+                            }
+                        )
+
+                        // خزنده (Reptile)
+                        val isReptileActive = activeExotic == "amphibian" && isReptileBreed
+                        WhiteSpeciesCircleButton(
+                            speciesKey = "reptile",
+                            label = "خزنده",
+                            isSelected = isReptileActive,
+                            onClick = {
+                                viewModel.selectExoticOption("amphibian")
+                                petBreed = "مار" // Triggers isReptileBreed
+                            }
+                        )
+
+                        // دوزیست (Amphibian)
+                        val isAmphibianActive = activeExotic == "amphibian" && !isReptileBreed
+                        WhiteSpeciesCircleButton(
+                            speciesKey = "amphibian",
+                            label = "دوزیست",
+                            isSelected = isAmphibianActive,
+                            onClick = {
+                                viewModel.selectExoticOption("amphibian")
+                                petBreed = ""
+                            }
+                        )
+
+                        // ماهی (Fish)
+                        WhiteSpeciesCircleButton(
+                            speciesKey = "aquatic",
+                            label = "ماهی",
+                            isSelected = activeExotic == "aquatic",
+                            onClick = {
+                                viewModel.selectExoticOption("aquatic")
+                                petBreed = ""
+                            }
+                        )
+                    }
                 }
-
-                // Reptile (Lizard icon helper) (middle)
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    SharedSpeciesCircleButton(
-                        speciesKey = "reptile",
-                        label = "خزنده",
-                        isSelected = localSpeciesSelection == "reptile",
-                        onClick = {
-                            viewModel.selectSpecies("exotic")
-                            viewModel.selectExoticOption("amphibian")
-                            petBreed = ""
-                        }
-                    )
-                }
-
-                // Amphibian (Turtle image helper) (left)
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    SharedSpeciesCircleButton(
-                        speciesKey = "amphibian",
-                        label = "دوزیست",
-                        isSelected = localSpeciesSelection == "amphibian",
-                        onClick = {
-                            viewModel.selectSpecies("exotic")
-                            viewModel.selectExoticOption("amphibian")
-                            petBreed = ""
-                        }
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Row 3: Fish (Aquatic) on the right column
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Fish (right)
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    SharedSpeciesCircleButton(
-                        speciesKey = "aquatic",
-                        label = "ماهی",
-                        isSelected = localSpeciesSelection == "aquatic",
-                        onClick = {
-                            viewModel.selectSpecies("exotic")
-                            viewModel.selectExoticOption("aquatic")
-                            petBreed = ""
-                        }
-                    )
-                }
-
-                // Spacer columns for perfect RTL grid layout symmetry
-                Spacer(modifier = Modifier.weight(1f))
-                Spacer(modifier = Modifier.weight(1f))
             }
         }
 
@@ -433,452 +453,500 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
         }
 
         // Client Form Card (RTL input layout)
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = if (isSpeciesChosen) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surface.copy(alpha = 0.4f)
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        AnimatedVisibility(
+            visible = isSpeciesChosen,
+            enter = expandVertically() + fadeIn(),
+            exit = shrinkVertically() + fadeOut()
         ) {
-            CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.Start
                     ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "📋 فرم ثبت اطلاعات حیوان مورد معاینه",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary,
+                                textAlign = TextAlign.Right
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // 1. اطلاعات صاحب حیوان خانگی شامل شماره موبایل
                         Text(
-                            text = "📋 فرم ثبت اطلاعات حیوان مورد معاینه",
-                            fontSize = 16.sp,
+                            text = "📞 اطلاعات صاحب حیوان خانگی:",
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (isSpeciesChosen) MaterialTheme.colorScheme.primary else Color.Gray,
-                            textAlign = TextAlign.Right
+                            color = MaterialTheme.colorScheme.primary
                         )
-                    }
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                    Spacer(modifier = Modifier.height(16.dp))
-                    // Record Number
-                    OutlinedTextField(
-                        value = recordNumber,
-                        onValueChange = { recordNumber = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("شماره پرونده (اختیاری - پایه ۱۰۰۰۱)") },
-                        placeholder = { Text("مثال: 10042") },
-                        enabled = isSpeciesChosen,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // Pet Name
-                    OutlinedTextField(
-                        value = petName,
-                        onValueChange = { petName = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("pet_name_input"),
-                        label = { Text("نام پت * (الزامی)") },
-                        placeholder = { Text("مثال: جسیکا") },
-                        enabled = isSpeciesChosen,
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // Pet Weight
-                    OutlinedTextField(
-                        value = petWeight,
-                        onValueChange = { petWeight = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("pet_weight_input"),
-                        label = { Text("وزن به کیلوگرم * (الزامی)") },
-                        placeholder = { Text("مثال: 12.5") },
-                        enabled = isSpeciesChosen,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // Breed selection with quick pill filters and intelligent autocomplete
-                    Box(modifier = Modifier.fillMaxWidth()) {
                         OutlinedTextField(
-                            value = petBreed,
-                            onValueChange = { newValue ->
-                                petBreed = newValue
-                                isBreedDropdownExpanded = isSpeciesChosen && newValue.isNotEmpty()
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .onFocusChanged { focusState ->
-                                    breedTextFieldFocused = focusState.isFocused
-                                    if (focusState.isFocused && isSpeciesChosen && petBreed.isNotEmpty()) {
-                                        isBreedDropdownExpanded = true
-                                    }
-                                },
-                            label = { Text("نژاد پت * (الزامی)") },
-                            placeholder = { Text("مثال: شیتزو") },
+                            value = ownerPhone,
+                            onValueChange = { ownerPhone = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("شماره موبایل صاحب پت") },
+                            placeholder = { Text("مثال: 09121234567") },
+                            enabled = isSpeciesChosen,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        OutlinedTextField(
+                            value = ownerName,
+                            onValueChange = { ownerName = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("نام صاحب پت (اختیاری)") },
+                            placeholder = { Text("مثال: مسعود زارع") },
                             enabled = isSpeciesChosen,
                             singleLine = true,
                             shape = RoundedCornerShape(12.dp)
                         )
 
-                        DropdownMenu(
-                            expanded = isBreedDropdownExpanded && filteredBreeds.isNotEmpty() && filteredBreeds.any { it != petBreed },
-                            onDismissRequest = { isBreedDropdownExpanded = false },
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // 2. شماره پرونده
+                        OutlinedTextField(
+                            value = recordNumber,
+                            onValueChange = { recordNumber = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("شماره پرونده") },
+                            placeholder = { Text("مثال: 10042") },
+                            enabled = isSpeciesChosen,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp),
+                            trailingIcon = {
+                                IconButton(onClick = { showRecordNumberHelp = true }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Info,
+                                        contentDescription = "راهنما",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        )
+
+                        if (showRecordNumberHelp) {
+                            AlertDialog(
+                                onDismissRequest = { showRecordNumberHelp = false },
+                                confirmButton = {
+                                    Button(
+                                        onClick = { showRecordNumberHelp = false }
+                                    ) {
+                                        Text("متوجه شدم")
+                                    }
+                                },
+                                title = {
+                                    Text(
+                                        text = "💡 راهنمای ثبت شماره پرونده",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                },
+                                text = {
+                                    Text(
+                                        text = "همکار گرامی، به منظور ثبت و بایگانی منظم‌تر پرونده مراجعه‌کنندگان خود، می‌توانید شماره پرونده فیزیکی یا ثبت‌شده در سیستم داخلی کلینیک یا بیمارستان خود را در این بخش وارد نمایید. این امر دسترسی سریع‌تر به مشخصات و سابقه درمانی حیوان را در مراجعات بعدی تسهیل می‌نماید.",
+                                        fontSize = 13.sp,
+                                        lineHeight = 20.sp,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                                    )
+                                },
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // 3. نام پت اختیاری
+                        OutlinedTextField(
+                            value = petName,
+                            onValueChange = { petName = it },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .heightIn(max = 240.dp)
-                        ) {
-                            filteredBreeds.forEach { option ->
-                                DropdownMenuItem(
-                                    text = { Text(option, fontSize = 13.sp) },
-                                    onClick = {
-                                        petBreed = option
-                                        isBreedDropdownExpanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
+                                .testTag("pet_name_input"),
+                            label = { Text("نام پت (اختیاری)") },
+                            placeholder = { Text("مثال: جسیکا") },
+                            enabled = isSpeciesChosen,
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
+                        )
 
-                    if (isSpeciesChosen && filteredBreeds.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // 4. وزن پت الزامی
+                        OutlinedTextField(
+                            value = petWeight,
+                            onValueChange = { petWeight = it },
                             modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable { showBreedGuidelines = !showBreedGuidelines }
-                                .padding(vertical = 4.dp, horizontal = 6.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Info,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = if (showBreedGuidelines) "🏷️ پنهان کردن لیست نژادهای پیشنهادی" else "💡 مشاهده نژادهای پیشنهادی این گونه",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
+                                .fillMaxWidth()
+                                .testTag("pet_weight_input"),
+                            label = { Text("وزن به کیلوگرم * (الزامی)") },
+                            placeholder = { Text("مثال: 12.5") },
+                            enabled = isSpeciesChosen,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
+                        )
 
-                        AnimatedVisibility(visible = showBreedGuidelines) {
-                            Card(
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
-                                ),
-                                shape = RoundedCornerShape(12.dp),
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // 5. نژاد پت الزامی
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            OutlinedTextField(
+                                value = petBreed,
+                                onValueChange = { newValue ->
+                                    petBreed = newValue
+                                    isBreedDropdownExpanded = isSpeciesChosen && newValue.isNotEmpty()
+                                },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 4.dp)
+                                    .onFocusChanged { focusState ->
+                                        breedTextFieldFocused = focusState.isFocused
+                                        if (focusState.isFocused && isSpeciesChosen && petBreed.isNotEmpty()) {
+                                            isBreedDropdownExpanded = true
+                                        }
+                                    },
+                                label = { Text("نژاد پت * (الزامی)") },
+                                placeholder = { Text("مثال: شیتزو") },
+                                enabled = isSpeciesChosen,
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+
+                            DropdownMenu(
+                                expanded = isBreedDropdownExpanded && filteredBreeds.isNotEmpty() && filteredBreeds.any { it != petBreed },
+                                onDismissRequest = { isBreedDropdownExpanded = false },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = 240.dp)
                             ) {
-                                Column(
-                                    modifier = Modifier.padding(10.dp)
-                                ) {
-                                    Text(
-                                        text = "پیشنهادهای نژاد برای کمک به ثبت سریع‌تر:",
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                filteredBreeds.forEach { option ->
+                                    DropdownMenuItem(
+                                        text = { Text(option, fontSize = 13.sp) },
+                                        onClick = {
+                                            petBreed = option
+                                            isBreedDropdownExpanded = false
+                                        }
                                     )
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    FlowRow(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                                }
+                            }
+                        }
+
+                        if (isSpeciesChosen && filteredBreeds.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .clickable { showBreedGuidelines = !showBreedGuidelines }
+                                    .padding(vertical = 4.dp, horizontal = 6.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Info,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = if (showBreedGuidelines) "🏷️ پنهان کردن لیست نژادهای پیشنهادی" else "💡 مشاهده نژادهای پیشنهادی این گونه",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+
+                            AnimatedVisibility(visible = showBreedGuidelines) {
+                                Card(
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                                    ),
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp)
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(10.dp)
                                     ) {
-                                        filteredBreeds.take(24).forEach { option ->
-                                            Box(
-                                                modifier = Modifier
-                                                    .clip(RoundedCornerShape(6.dp))
-                                                    .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f))
-                                                    .clickable { 
-                                                        petBreed = option 
-                                                        isBreedDropdownExpanded = false
-                                                    }
-                                                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                                            ) {
-                                                Text(option, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                                        Text(
+                                            text = "پیشنهادهای نژاد برای کمک به ثبت سریع‌تر:",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        FlowRow(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                                        ) {
+                                            filteredBreeds.take(24).forEach { option ->
+                                                Box(
+                                                    modifier = Modifier
+                                                        .clip(RoundedCornerShape(6.dp))
+                                                        .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f))
+                                                        .clickable { 
+                                                            petBreed = option 
+                                                            isBreedDropdownExpanded = false
+                                                        }
+                                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                                                ) {
+                                                    Text(option, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                    // Age & Gender
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        OutlinedTextField(
-                            value = petAge,
-                            onValueChange = { petAge = it },
-                            modifier = Modifier.weight(1f),
-                            label = { Text("سن تقریبی") },
-                            placeholder = { Text("مثال: ۲ سال") },
-                            enabled = isSpeciesChosen,
-                            singleLine = true,
-                            shape = RoundedCornerShape(12.dp)
-                        )
-
-                        Column(
-                            modifier = Modifier.weight(1f)
+                        // 6. سن تقریبی اختیاری & 7. جنسیت اختیاری
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = "جنسیت پت *",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (isSpeciesChosen) MaterialTheme.colorScheme.primary else Color.Gray,
-                                modifier = Modifier.padding(start = 2.dp, bottom = 4.dp)
+                            OutlinedTextField(
+                                value = petAge,
+                                onValueChange = { petAge = it },
+                                modifier = Modifier.weight(1f),
+                                label = { Text("سن تقریبی (اختیاری)") },
+                                placeholder = { Text("مثال: ۲ سال") },
+                                enabled = isSpeciesChosen,
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp)
                             )
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(56.dp)
-                                    .background(
-                                        color = if (isSpeciesChosen) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f),
-                                        shape = RoundedCornerShape(12.dp)
-                                    )
-                                    .border(
-                                        width = 1.dp,
-                                        color = if (isSpeciesChosen) MaterialTheme.colorScheme.outline.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                                        shape = RoundedCornerShape(12.dp)
-                                    )
-                                    .padding(4.dp),
-                                verticalAlignment = Alignment.CenterVertically
+
+                            Column(
+                                modifier = Modifier.weight(1f)
                             ) {
-                                // "نر" option button
-                                Box(
+                                Text(
+                                    text = "جنسیت پت (اختیاری)",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(start = 2.dp, bottom = 4.dp)
+                                )
+                                Row(
                                     modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight()
-                                        .clip(RoundedCornerShape(8.dp))
+                                        .fillMaxWidth()
+                                        .height(56.dp)
                                         .background(
-                                            if (petGender == "نر" && isSpeciesChosen) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-                                            else Color.Transparent
+                                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f),
+                                            shape = RoundedCornerShape(12.dp)
                                         )
                                         .border(
-                                            width = if (petGender == "نر" && isSpeciesChosen) 1.5.dp else 0.dp,
-                                            color = if (petGender == "نر" && isSpeciesChosen) MaterialTheme.colorScheme.primary else Color.Transparent,
-                                            shape = RoundedCornerShape(8.dp)
+                                            width = 1.dp,
+                                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                                            shape = RoundedCornerShape(12.dp)
                                         )
-                                        .clickable(enabled = isSpeciesChosen) { petGender = "نر" },
-                                    contentAlignment = Alignment.Center
+                                        .padding(4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.Center
-                                    ) {
-                                        RadioButton(
-                                            selected = petGender == "نر",
-                                            onClick = null,
-                                            enabled = isSpeciesChosen,
-                                            colors = RadioButtonDefaults.colors(
-                                                selectedColor = MaterialTheme.colorScheme.primary
+                                    // "نر" option button
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxHeight()
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(
+                                                if (petGender == "نر" && isSpeciesChosen) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                                                else Color.Transparent
                                             )
-                                        )
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                        Text(
-                                            text = "نر",
-                                            fontSize = 11.sp,
-                                            fontWeight = if (petGender == "نر") FontWeight.Bold else FontWeight.Normal,
-                                            color = if (isSpeciesChosen) MaterialTheme.colorScheme.onSurface else Color.Gray
-                                        )
+                                            .border(
+                                                width = if (petGender == "نر" && isSpeciesChosen) 1.5.dp else 0.dp,
+                                                color = if (petGender == "نر" && isSpeciesChosen) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                                shape = RoundedCornerShape(8.dp)
+                                            )
+                                            .clickable(enabled = isSpeciesChosen) { petGender = "نر" },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.Center
+                                        ) {
+                                            RadioButton(
+                                                selected = petGender == "نر",
+                                                onClick = null,
+                                                enabled = isSpeciesChosen,
+                                                colors = RadioButtonDefaults.colors(
+                                                    selectedColor = MaterialTheme.colorScheme.primary
+                                                )
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text(
+                                                text = "نر",
+                                                fontSize = 11.sp,
+                                                fontWeight = if (petGender == "نر") FontWeight.Bold else FontWeight.Normal,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                        }
                                     }
-                                }
 
-                                // "ماده" option button
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight()
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(
-                                            if (petGender == "ماده" && isSpeciesChosen) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-                                            else Color.Transparent
-                                        )
-                                        .border(
-                                            width = if (petGender == "ماده" && isSpeciesChosen) 1.5.dp else 0.dp,
-                                            color = if (petGender == "ماده" && isSpeciesChosen) MaterialTheme.colorScheme.primary else Color.Transparent,
-                                            shape = RoundedCornerShape(8.dp)
-                                        )
-                                        .clickable(enabled = isSpeciesChosen) { petGender = "ماده" },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.Center
-                                    ) {
-                                        RadioButton(
-                                            selected = petGender == "ماده",
-                                            onClick = null,
-                                            enabled = isSpeciesChosen,
-                                            colors = RadioButtonDefaults.colors(
-                                                selectedColor = MaterialTheme.colorScheme.primary
+                                    // "ماده" option button
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxHeight()
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(
+                                                if (petGender == "ماده" && isSpeciesChosen) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                                                else Color.Transparent
                                             )
-                                        )
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                        Text(
-                                            text = "ماده",
-                                            fontSize = 11.sp,
-                                            fontWeight = if (petGender == "ماده") FontWeight.Bold else FontWeight.Normal,
-                                            color = if (isSpeciesChosen) MaterialTheme.colorScheme.onSurface else Color.Gray
-                                        )
+                                            .border(
+                                                width = if (petGender == "ماده" && isSpeciesChosen) 1.5.dp else 0.dp,
+                                                color = if (petGender == "ماده" && isSpeciesChosen) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                                shape = RoundedCornerShape(8.dp)
+                                            )
+                                            .clickable(enabled = isSpeciesChosen) { petGender = "ماده" },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.Center
+                                        ) {
+                                            RadioButton(
+                                                selected = petGender == "ماده",
+                                                onClick = null,
+                                                enabled = isSpeciesChosen,
+                                                colors = RadioButtonDefaults.colors(
+                                                    selectedColor = MaterialTheme.colorScheme.primary
+                                                )
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text(
+                                                text = "ماده",
+                                                fontSize = 11.sp,
+                                                fontWeight = if (petGender == "ماده") FontWeight.Bold else FontWeight.Normal,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(14.dp))
 
-                    // Neutered / Spayed status
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .background(
-                                color = if (isSpeciesChosen) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f),
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                            .border(
-                                width = 1.dp,
-                                color = if (isSpeciesChosen) MaterialTheme.colorScheme.outline.copy(alpha = 0.4f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                            .clickable(enabled = isSpeciesChosen) { petIsNeutered = !petIsNeutered }
-                            .padding(horizontal = 14.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = if (petIsNeutered) Icons.Default.Check else Icons.Default.Info,
-                                contentDescription = null,
-                                tint = if (petIsNeutered && isSpeciesChosen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "حیوان عقیم شده است؟",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = if (isSpeciesChosen) MaterialTheme.colorScheme.onSurface else Color.Gray
+                        // 8. حیوان عقیم شده است؟
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .border(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .clickable(enabled = isSpeciesChosen) { petIsNeutered = !petIsNeutered }
+                                .padding(horizontal = 14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = if (petIsNeutered) Icons.Default.Check else Icons.Default.Info,
+                                    contentDescription = null,
+                                    tint = if (petIsNeutered && isSpeciesChosen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "حیوان عقیم شده است؟",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                            Switch(
+                                checked = petIsNeutered,
+                                onCheckedChange = { petIsNeutered = it },
+                                enabled = isSpeciesChosen,
+                                thumbContent = if (petIsNeutered) {
+                                    {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(SwitchDefaults.IconSize),
+                                        )
+                                    }
+                                } else null
                             )
                         }
-                        Switch(
-                            checked = petIsNeutered,
-                            onCheckedChange = { petIsNeutered = it },
+
+                        if (errorMessage.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(errorMessage, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        // 9. ثبت و تایید پرونده بیمار
+                        Button(
+                            onClick = {
+                                if (petBreed.trim().isEmpty() || petWeight.trim().isEmpty()) {
+                                    errorMessage = "وارد کردن نژاد و وزن پت الزامی است."
+                                    return@Button
+                                }
+                                val weightVal = petWeight.toDoubleOrNull()
+                                if (weightVal == null || weightVal <= 0) {
+                                    errorMessage = "لطفاً وزن عددی معتبر وارد کنید."
+                                    return@Button
+                                }
+
+                                errorMessage = ""
+                                viewModel.saveExaminedPet(
+                                    name = petName.trim().ifEmpty { "بدون نام" },
+                                    breed = petBreed,
+                                    weight = weightVal,
+                                    age = petAge,
+                                    gender = petGender,
+                                    isNeutered = petIsNeutered,
+                                    ownerName = ownerName,
+                                    ownerPhone = ownerPhone,
+                                    recordNumber = recordNumber
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp)
+                                .testTag("save_examined_pet"),
                             enabled = isSpeciesChosen,
-                            thumbContent = if (petIsNeutered) {
-                                {
-                                    Icon(
-                                        imageVector = Icons.Default.Check,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(SwitchDefaults.IconSize),
-                                    )
-                                }
-                            } else null
-                        )
-                    }
-
-                    // Owner fields (Always adding owner credentials for high connectivity)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "📞 اطلاعات صاحب حیوان خانگی:",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (isSpeciesChosen) MaterialTheme.colorScheme.primary else Color.Gray
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    OutlinedTextField(
-                        value = ownerName,
-                        onValueChange = { ownerName = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("نام صاحب پت") },
-                        placeholder = { Text("مثال: مسعود زارع") },
-                        enabled = isSpeciesChosen,
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    OutlinedTextField(
-                        value = ownerPhone,
-                        onValueChange = { ownerPhone = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("تلفن صاحب پت") },
-                        placeholder = { Text("مثال: 09121234567") },
-                        enabled = isSpeciesChosen,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-
-                    if (errorMessage.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(errorMessage, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
-                    }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    Button(
-                        onClick = {
-                            if (petName.trim().isEmpty() || petBreed.trim().isEmpty() || petWeight.trim().isEmpty()) {
-                                errorMessage = "وارد کردن نام پت، نژاد و وزن الزامی است."
-                                return@Button
-                            }
-                            val weightVal = petWeight.toDoubleOrNull()
-                            if (weightVal == null || weightVal <= 0) {
-                                errorMessage = "لطفاً وزن عددی معتبر وارد کنید."
-                                return@Button
-                            }
-
-                            errorMessage = ""
-                            viewModel.saveExaminedPet(
-                                name = petName,
-                                breed = petBreed,
-                                weight = weightVal,
-                                age = petAge,
-                                gender = petGender,
-                                isNeutered = petIsNeutered,
-                                ownerName = ownerName,
-                                ownerPhone = ownerPhone,
-                                recordNumber = recordNumber
-                            )
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                            .testTag("save_examined_pet"),
-                        enabled = isSpeciesChosen,
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Icon(Icons.Default.Check, contentDescription = "")
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("ثبت و تایید پرونده بیمار", fontWeight = FontWeight.Bold)
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(Icons.Default.Check, contentDescription = "")
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("ثبت و تایید پرونده بیمار", fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
             }
@@ -992,5 +1060,62 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun WhiteSpeciesCircleButton(
+    speciesKey: String,
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val outlineCol = if (isSelected) Color(0xFF2DD4BF) else Color(0xFFE2E8F0)
+    val outlineWidth = if (isSelected) 3.dp else 1.dp
+    val textCol = if (isSelected) Color(0xFF2DD4BF) else MaterialTheme.colorScheme.onBackground
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .clickable { onClick() }
+            .padding(2.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(62.dp)
+                .clip(CircleShape)
+                .background(Color.White)
+                .border(outlineWidth, outlineCol, CircleShape)
+                .padding(10.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            val iconColor = when (speciesKey) {
+                "dog" -> Color(0xFF38BDF8)
+                "cat" -> Color(0xFF0D9488)
+                "bird" -> Color(0xFF60A5FA)
+                "rodent" -> Color(0xFF34D399)
+                "aquatic" -> Color(0xFF38BDF8)
+                "amphibian" -> Color(0xFF4ADE80)
+                else -> Color(0xFFFBBF24) // reptile / exotic
+            }
+
+            when (speciesKey) {
+                "dog" -> DogVectorIcon(modifier = Modifier.fillMaxSize(), tint = iconColor)
+                "cat" -> CatVectorIcon(modifier = Modifier.fillMaxSize(), tint = iconColor)
+                "bird" -> ExoticVectorIcon(modifier = Modifier.fillMaxSize(), tint = iconColor)
+                "rodent" -> RodentVectorIcon(modifier = Modifier.fillMaxSize(), tint = iconColor)
+                "aquatic" -> AquaticVectorIcon(modifier = Modifier.fillMaxSize(), tint = iconColor)
+                "amphibian" -> AmphibianVectorIcon(modifier = Modifier.fillMaxSize(), tint = iconColor)
+                else -> ReptileVectorIcon(modifier = Modifier.fillMaxSize(), tint = iconColor)
+            }
+        }
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+            color = textCol,
+            textAlign = TextAlign.Center
+        )
     }
 }

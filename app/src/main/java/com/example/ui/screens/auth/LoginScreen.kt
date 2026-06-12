@@ -282,7 +282,7 @@ fun LoginScreen(
                                 enabled = !isCheckingUser,
                                 shape = RoundedCornerShape(14.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFFB55D57),
+                                    containerColor = MaterialTheme.colorScheme.primary,
                                     contentColor = Color.White
                                 )
                             ) {
@@ -557,7 +557,7 @@ fun LoginScreen(
                                     .testTag("submit_button"),
                                 shape = RoundedCornerShape(14.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFFB55D57),
+                                    containerColor = MaterialTheme.colorScheme.primary,
                                     contentColor = Color.White
                                 )
                             ) {

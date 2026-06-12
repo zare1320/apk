@@ -1,5 +1,6 @@
 package com.example
 
+// Force recompilation of MainActivity to align with latest screens
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,6 +18,9 @@ import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.Healing
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.outlined.Dashboard
@@ -142,6 +146,9 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
         topBar = {
             val session by viewModel.activeSession.collectAsState()
             val themeMode by viewModel.themeMode.collectAsState()
+            val isDark = themeMode == "dark"
+            val titleColor = if (isDark) Color(0xFF38BDF8) else Color(0xFF0D9488)
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -150,75 +157,100 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                         shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
                     )
                     .statusBarsPadding()
-                    .padding(horizontal = 16.dp, vertical = 14.dp)
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
                 CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides LayoutDirection.Rtl) {
+                    // 1. App Title "Vetaris" at the very top (centered and clean)
+                    Box(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Vetaris",
+                            color = titleColor,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 1.sp
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // 2. Doctor details and tools row
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Top
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Right side: Doctor circle icon + profile info in front of it (to the left in RTL)
+                        // Right Side in RTL: Avatar circle + "سلام مسعود 👋" (no cards)
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            // Circular doctor icon
                             Box(
                                 modifier = Modifier
-                                    .size(45.dp)
+                                    .size(42.dp)
                                     .background(Color.White, androidx.compose.foundation.shape.CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(if (session?.gender == "خانم") "👩‍⚕️" else "👨‍⚕️", fontSize = 24.sp)
                             }
 
-                            // User Info column
-                            Column(
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.Start
-                            ) {
-                                val userTitle = session?.getFullTitle() ?: "آقای دکتر مسعود زارع"
-                                val workplaceOrUni = session?.workplaceOrUni?.ifEmpty { "بیمارستان تخصصی پارس" } ?: "بیمارستان تخصصی پارس"
+                            val firstName = session?.fullName?.replace("دکتر", "")?.trim()?.split(" ")?.firstOrNull() ?: "مسعود"
+                            Text(
+                                text = "سلام $firstName 👋",
+                                color = Color.White,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
 
-                                Text(
-                                    text = userTitle,
-                                    color = Color.White,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold
+                        // Left Side in RTL: Notification + Theme switcher row with a custom vertical divider
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            // Notification Button
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .background(Color.Black.copy(alpha = 0.25f), androidx.compose.foundation.shape.CircleShape)
+                                    .clickable { /* Notifications action */ },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Notifications,
+                                    contentDescription = "Notifications",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(18.dp)
                                 )
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = workplaceOrUni,
-                                    color = Color.White.copy(alpha = 0.85f),
-                                    fontSize = 10.sp
+                            }
+
+                            // Divider line
+                            Box(
+                                modifier = Modifier
+                                    .width(1.dp)
+                                    .height(20.dp)
+                                    .background(Color.White.copy(alpha = 0.25f))
+                            )
+
+                            // Theme Switcher Button
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .background(Color.Black.copy(alpha = 0.25f), androidx.compose.foundation.shape.CircleShape)
+                                    .clickable { viewModel.toggleTheme() },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = if (isDark) Icons.Default.WbSunny else Icons.Default.DarkMode,
+                                    contentDescription = "Theme Toggle",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(18.dp)
                                 )
                             }
                         }
-
-                        // Left side: Theme switcher icon
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(50.dp))
-                                .clickable { viewModel.toggleTheme() },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(if (themeMode == "dark") "☀️" else "🌙", fontSize = 16.sp)
-                        }
                     }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // Text "Vetaris" brought under application user details
-                    Text(
-                        text = "Vetaris دستیار هوشمند دامپزشکی و مدیریت حیوانات خانگی",
-                        color = Color.White,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Right // Force right alignment for Persian
-                    )
                 }
             }
         },
@@ -229,7 +261,7 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                 listOf(
                     NavItem("داشبورد", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, "داشبورد"),
                     NavItem("دارونامه", Icons.Filled.MedicalServices, Icons.Outlined.MedicalServices, "دارونامه"),
-                    NavItem("تشخیص و درمان", Icons.Filled.Healing, Icons.Outlined.Healing, "تشخیص"),
+                    NavItem("تشخیص و درمان", Icons.Filled.Healing, Icons.Outlined.Healing, "تشخیص هوشمند"),
                     NavItem("ابزار محاسبه‌گر", Icons.Filled.Calculate, Icons.Outlined.Calculate, "محاسبه‌گر"),
                     NavItem("پروفایل", Icons.Filled.Person, Icons.Outlined.Person, "پروفایل")
                 ).forEach { item ->
