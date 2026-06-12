@@ -878,7 +878,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                         verticalArrangement = Arrangement.spacedBy(10.dp)
                                     ) {
                                         // 1.1.1 Farsi Section: Title (Right-to-Left, Right-aligned)
-                                        CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
+                                        CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
                                             Row(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 verticalAlignment = Alignment.CenterVertically,
@@ -928,7 +928,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                         )
 
                                         // 1.1.3 Farsi Section: Contraindications, Side Effects, Pearls (Right-to-Left, Right-aligned)
-                                        CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
+                                        CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
                                             Column(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 horizontalAlignment = Alignment.Start,
