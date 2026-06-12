@@ -717,15 +717,12 @@ fun FluidTherapyCalculator(
                     // Editable Dosage
                     Column(horizontalAlignment = Alignment.End) {
                         Text("Dosage", fontSize = 10.sp, color = textSecondary)
-                        OutlinedTextField(
+                        Spacer(modifier = Modifier.height(2.dp))
+                        CompactDosageField(
                             value = maintenanceDosageCoeff,
                             onValueChange = { maintenanceDosageCoeff = it },
-                            modifier = Modifier
-                                .width(85.dp)
-                                .height(44.dp),
-                            textStyle = LocalTextStyle.current.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                            singleLine = true
+                            isDark = isDark,
+                            textPrimary = textPrimary
                         )
                     }
                 }
@@ -894,15 +891,12 @@ fun FluidTherapyCalculator(
                     // Dosage field
                     Column(horizontalAlignment = Alignment.End) {
                         Text("Dosage", fontSize = 10.sp, color = textSecondary)
-                        OutlinedTextField(
+                        Spacer(modifier = Modifier.height(2.dp))
+                        CompactDosageField(
                             value = resuscitationDosage,
                             onValueChange = { resuscitationDosage = it },
-                            modifier = Modifier
-                                .width(85.dp)
-                                .height(44.dp),
-                            textStyle = LocalTextStyle.current.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                            singleLine = true
+                            isDark = isDark,
+                            textPrimary = textPrimary
                         )
                     }
                 }
@@ -964,15 +958,12 @@ fun FluidTherapyCalculator(
                     // Dosage Customizer
                     Column(horizontalAlignment = Alignment.End) {
                         Text("Dosage", fontSize = 10.sp, color = textSecondary)
-                        OutlinedTextField(
+                        Spacer(modifier = Modifier.height(2.dp))
+                        CompactDosageField(
                             value = surgicalDosage,
                             onValueChange = { surgicalDosage = it },
-                            modifier = Modifier
-                                .width(85.dp)
-                                .height(44.dp),
-                            textStyle = LocalTextStyle.current.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                            singleLine = true
+                            isDark = isDark,
+                            textPrimary = textPrimary
                         )
                     }
                 }
@@ -1020,15 +1011,12 @@ fun FluidTherapyCalculator(
                     // Dosage Customizer
                     Column(horizontalAlignment = Alignment.End) {
                         Text("Dosage", fontSize = 10.sp, color = textSecondary)
-                        OutlinedTextField(
+                        Spacer(modifier = Modifier.height(2.dp))
+                        CompactDosageField(
                             value = hetastarchDosage,
                             onValueChange = { hetastarchDosage = it },
-                            modifier = Modifier
-                                .width(85.dp)
-                                .height(44.dp),
-                            textStyle = LocalTextStyle.current.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                            singleLine = true
+                            isDark = isDark,
+                            textPrimary = textPrimary
                         )
                     }
                 }
@@ -1089,15 +1077,12 @@ fun FluidTherapyCalculator(
                     // Dosage Customizer
                     Column(horizontalAlignment = Alignment.End) {
                         Text("Dosage", fontSize = 10.sp, color = textSecondary)
-                        OutlinedTextField(
+                        Spacer(modifier = Modifier.height(2.dp))
+                        CompactDosageField(
                             value = vetstarchDosage,
                             onValueChange = { vetstarchDosage = it },
-                            modifier = Modifier
-                                .width(85.dp)
-                                .height(44.dp),
-                            textStyle = LocalTextStyle.current.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                            singleLine = true
+                            isDark = isDark,
+                            textPrimary = textPrimary
                         )
                     }
                 }
@@ -1124,4 +1109,41 @@ fun FluidTherapyCalculator(
             }
         }
     }
+}
+
+@Composable
+private fun CompactDosageField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    isDark: Boolean,
+    textPrimary: Color
+) {
+    val borderColor = if (isDark) MaterialTheme.colorScheme.primary.copy(alpha = 0.6f) else MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+    val fieldBg = if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.03f)
+    androidx.compose.foundation.text.BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier
+            .width(85.dp)
+            .height(40.dp)
+            .background(fieldBg, RoundedCornerShape(8.dp))
+            .border(1.2.dp, borderColor, RoundedCornerShape(8.dp)),
+        textStyle = androidx.compose.ui.text.TextStyle(
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            color = textPrimary,
+            textAlign = TextAlign.Center
+        ),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+        singleLine = true,
+        decorationBox = { innerTextField ->
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                innerTextField()
+            }
+        }
+    )
 }
