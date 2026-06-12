@@ -510,20 +510,27 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                             shape = RoundedCornerShape(12.dp)
                         )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        AnimatedVisibility(
+                            visible = ownerPhone.trim().isNotEmpty(),
+                            enter = expandVertically() + fadeIn(),
+                            exit = shrinkVertically() + fadeOut()
+                        ) {
+                            Column {
+                                OutlinedTextField(
+                                    value = ownerName,
+                                    onValueChange = { ownerName = it },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    label = { Text("نام صاحب پت (اختیاری)") },
+                                    placeholder = { Text("مثال: مسعود زارع") },
+                                    enabled = isSpeciesChosen,
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                Spacer(modifier = Modifier.height(12.dp))
+                            }
+                        }
 
-                        OutlinedTextField(
-                            value = ownerName,
-                            onValueChange = { ownerName = it },
-                            modifier = Modifier.fillMaxWidth(),
-                            label = { Text("نام صاحب پت (اختیاری)") },
-                            placeholder = { Text("مثال: مسعود زارع") },
-                            enabled = isSpeciesChosen,
-                            singleLine = true,
-                            shape = RoundedCornerShape(12.dp)
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
 
                         // 2. شماره پرونده
                         OutlinedTextField(
