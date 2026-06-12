@@ -193,13 +193,13 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
     )
     val categoriesList = categoriesWithIcons.map { it.first }
 
-    // Filtered drugs
+    // Filtered drugs, sorted alphabetically by Persian generic name (nameGeneric)
     val filteredDrugs = fullCatalog.filter { drug ->
         val matchesCategory = selectedCategory == "همه داروها" || drug.category == selectedCategory
         val matchesSearch = drug.nameGeneric.contains(searchQuery, ignoreCase = true) ||
                 drug.nameScientific.contains(searchQuery, ignoreCase = true)
         matchesCategory && matchesSearch
-    }
+    }.sortedBy { it.nameGeneric }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
