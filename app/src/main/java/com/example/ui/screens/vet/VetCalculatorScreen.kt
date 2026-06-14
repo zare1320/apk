@@ -22,6 +22,7 @@ import com.example.ui.screens.vet.calculators.*
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun VetCalculatorScreen(viewModel: MainViewModel) {
+    val currentLanguage by viewModel.currentLanguage.collectAsState()
     val activeExaminedPet by viewModel.activeExaminedPet.collectAsState()
     val selectedSpecies by viewModel.selectedSpecies.collectAsState()
 
@@ -38,7 +39,7 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
     }
 
     val calculatorsList = listOf(
-        "مایع‌درمانی", "انتقال خون", "محاسبه کالری غذا", "زمان زایمان", "سن معادل انسان", "تریاژ تروما"
+        "مایع‌درمانی", "انتقال خون", "محاسبه کالی غذا", "زمان زایمان", "سن معادل انسان", "تریاژ تروما"
     )
 
     Column(
@@ -50,14 +51,14 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
     ) {
         // Clinical calculators titles
         Text(
-            text = "🧮 ابزارهای سنجش و محاسبه‌گرهای کلینیکال:",
+            text = if (currentLanguage == "en") "🧮 Clinical Assessment & Calculators:" else "🧮 ابزارهای سنجش و محاسبه‌گرهای کلینیکال:",
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 12.dp),
-            textAlign = TextAlign.Right
+            textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right
         )
 
         // Horizontal selections
@@ -70,6 +71,18 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
                 val isSel = activeCalculator == cal
                 val bgCol = if (isSel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                 val textCol = if (isSel) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                val label = remember(cal, currentLanguage) {
+                    if (currentLanguage != "en") cal
+                    else when (cal) {
+                        "مایع‌درمانی" -> "Fluid Therapy"
+                        "انتقال خون" -> "Blood Transfusion"
+                        "محاسبه کالی غذا" -> "Calorie Needs"
+                        "زمان زایمان" -> "Gestation"
+                        "سن معادل انسان" -> "Human-Age Equiv."
+                        "تریاژ تروما" -> "Trauma Triage"
+                        else -> cal
+                    }
+                }
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
@@ -77,7 +90,7 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
                         .clickable { activeCalculator = cal }
                         .padding(horizontal = 14.dp, vertical = 10.dp)
                 ) {
-                    Text(cal, fontSize = 11.sp, color = textCol, fontWeight = FontWeight.Bold)
+                    Text(label, fontSize = 11.sp, color = textCol, fontWeight = FontWeight.Bold)
                 }
             }
         }

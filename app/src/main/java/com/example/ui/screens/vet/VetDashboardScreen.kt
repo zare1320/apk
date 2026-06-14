@@ -45,6 +45,7 @@ import com.example.ui.theme.GlassBackgroundBox
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun VetDashboardScreen(viewModel: MainViewModel) {
+    val currentLanguage by viewModel.currentLanguage.collectAsState()
     val activeSpecies by viewModel.selectedSpecies.collectAsState()
     val activeExotic by viewModel.selectedExoticOption.collectAsState()
     val activeExaminedPet by viewModel.activeExaminedPet.collectAsState()
@@ -211,14 +212,14 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
     ) {
         // Core Species Select Grid matching user's visual reference
         Text(
-            text = "گونه مورد نظر خود را انتخاب کنید",
+            text = if (currentLanguage == "en") "Select your desired species" else "گونه مورد نظر خود را انتخاب کنید",
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp, top = 8.dp),
-            textAlign = TextAlign.Right
+            textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right
         )
 
         Column(
@@ -236,7 +237,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                 // سگ (Dog)
                 WhiteSpeciesCircleButton(
                     speciesKey = "dog",
-                    label = "سگ",
+                    label = if (currentLanguage == "en") "Dog" else "سگ",
                     isSelected = activeSpecies == "dog",
                     onClick = {
                         viewModel.selectSpecies("dog")
@@ -247,7 +248,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                 // گربه (Cat)
                 WhiteSpeciesCircleButton(
                     speciesKey = "cat",
-                    label = "گربه",
+                    label = if (currentLanguage == "en") "Cat" else "گربه",
                     isSelected = activeSpecies == "cat",
                     onClick = {
                         viewModel.selectSpecies("cat")
@@ -258,7 +259,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                 // پرنده (Bird)
                 WhiteSpeciesCircleButton(
                     speciesKey = "bird",
-                    label = "پرنده",
+                    label = if (currentLanguage == "en") "Bird" else "پرنده",
                     isSelected = activeSpecies == "exotic" && activeExotic == "bird",
                     onClick = {
                         viewModel.selectSpecies("exotic")
@@ -271,7 +272,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                 val isExoticSelected = activeSpecies == "exotic" && activeExotic != "bird"
                 WhiteSpeciesCircleButton(
                     speciesKey = "exotic",
-                    label = "اگزوتیک",
+                    label = if (currentLanguage == "en") "Exotic" else "اگزوتیک",
                     isSelected = isExoticSelected,
                     onClick = {
                         viewModel.selectSpecies("exotic")
@@ -296,14 +297,14 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "نوع حیوان اگزوتیک:",
+                        text = if (currentLanguage == "en") "Exotic species type:" else "نوع حیوان اگزوتیک:",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 8.dp, end = 4.dp),
-                        textAlign = TextAlign.Right
+                        textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right
                     )
 
                     Row(
@@ -314,7 +315,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                         // جونده (Rodent)
                         WhiteSpeciesCircleButton(
                             speciesKey = "rodent",
-                            label = "جونده",
+                            label = if (currentLanguage == "en") "Rodent" else "جونده",
                             isSelected = activeExotic == "rodent",
                             onClick = {
                                 viewModel.selectExoticOption("rodent")
@@ -326,7 +327,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                         val isReptileActive = activeExotic == "amphibian" && isReptileBreed
                         WhiteSpeciesCircleButton(
                             speciesKey = "reptile",
-                            label = "خزنده",
+                            label = if (currentLanguage == "en") "Reptile" else "خزنده",
                             isSelected = isReptileActive,
                             onClick = {
                                 viewModel.selectExoticOption("amphibian")
@@ -338,7 +339,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                         val isAmphibianActive = activeExotic == "amphibian" && !isReptileBreed
                         WhiteSpeciesCircleButton(
                             speciesKey = "amphibian",
-                            label = "دوزیست",
+                            label = if (currentLanguage == "en") "Amphibian" else "دوزیست",
                             isSelected = isAmphibianActive,
                             onClick = {
                                 viewModel.selectExoticOption("amphibian")
@@ -349,7 +350,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                         // ماهی (Fish)
                         WhiteSpeciesCircleButton(
                             speciesKey = "aquatic",
-                            label = "ماهی",
+                            label = if (currentLanguage == "en") "Fish" else "ماهی",
                             isSelected = activeExotic == "aquatic",
                             onClick = {
                                 viewModel.selectExoticOption("aquatic")
@@ -403,12 +404,16 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                         )
                     }
                     Text(
-                        text = "پذیرش بیمار غیرفعال است. جهت شروع معاینه و فعالسازی بخش‌های دارو، تشخیص و درمان ابتدا گونه حیوان (سگ/گربه/اگزوتیک) را در بالا انتخاب کنید.",
+                        text = if (currentLanguage == "en") {
+                            "Patient admission is inactive. To start an examination and activate the drug, diagnosis, and treatment sections, please select a species (Dog/Cat/Exotic) from above."
+                        } else {
+                            "پذیرش بیمار غیرفعال است. جهت شروع معاینه و فعالسازی بخش‌های دارو، تشخیص و درمان ابتدا گونه حیوان (سگ/گربه/اگزوتیک) را در بالا انتخاب کنید."
+                        },
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary, // #1F6F5F - Highly readable and perfectly matches the aesthetic!
                         modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Right,
+                        textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right,
                         lineHeight = 20.sp
                     )
                 }
@@ -431,13 +436,29 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "بیمار فعال در حال معاینه: ${pet.name}",
+                            text = if (currentLanguage == "en") "Active patient under examination: ${pet.name}" else "بیمار فعال در حال معاینه: ${pet.name}",
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
+                        val activeSpeciesDisp = when(pet.species.lowercase()) {
+                            "dog" -> if (currentLanguage == "en") "Dog" else "سگ"
+                            "cat" -> if (currentLanguage == "en") "Cat" else "گربه"
+                            "bird" -> if (currentLanguage == "en") "Bird" else "پرنده"
+                            "exotic" -> if (currentLanguage == "en") "Exotic" else "اگزوتیک"
+                            else -> pet.species
+                        }
+                        val activeGenderDisp = if (pet.gender.isNotEmpty()) {
+                            if (currentLanguage == "en") {
+                                if (pet.gender == "نر") " | Male" else " | Female"
+                            } else " | ${pet.gender}"
+                        } else ""
                         Text(
-                            text = "گونه: ${pet.species} | نژاد: ${pet.breed} | وزن: ${pet.weight} کیلوگرم | پرونده: ${pet.recordNumber}",
+                            text = if (currentLanguage == "en") {
+                                "Species: $activeSpeciesDisp | Breed: ${pet.breed} | Weight: ${pet.weight} kg$activeGenderDisp | Case: ${pet.recordNumber}"
+                            } else {
+                                "گونه: $activeSpeciesDisp | نژاد: ${pet.breed} | وزن: ${pet.weight} کیلوگرم$activeGenderDisp | پرونده: ${pet.recordNumber}"
+                            },
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                         )
@@ -446,7 +467,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                         onClick = { viewModel.clearExaminedPet() },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
-                        Text("خاتمه معاینه", fontSize = 11.sp, color = Color.White)
+                        Text(if (currentLanguage == "en") "End Exam" else "خاتمه معاینه", fontSize = 11.sp, color = Color.White)
                     }
                 }
             }
@@ -479,11 +500,11 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "📋 فرم ثبت اطلاعات حیوان مورد معاینه",
+                                text = if (currentLanguage == "en") "📋 Patient Registration & Case Intake Form" else "📋 فرم ثبت اطلاعات حیوان مورد معاینه",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary,
-                                textAlign = TextAlign.Right
+                                textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right
                             )
                         }
 
@@ -491,7 +512,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
 
                         // 1. اطلاعات صاحب حیوان خانگی شامل شماره موبایل
                         Text(
-                            text = "📞 اطلاعات صاحب حیوان خانگی:",
+                            text = if (currentLanguage == "en") "📞 Owner & Case Information:" else "📞 اطلاعات صاحب حیوان خانگی:",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -502,8 +523,8 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                             value = ownerPhone,
                             onValueChange = { ownerPhone = it },
                             modifier = Modifier.fillMaxWidth(),
-                            label = { Text("شماره موبایل صاحب پت") },
-                            placeholder = { Text("مثال: 09121234567") },
+                            label = { Text(if (currentLanguage == "en") "Owner Mobile Number" else "شماره موبایل صاحب پت") },
+                            placeholder = { Text(if (currentLanguage == "en") "e.g., 09121234567" else "مثال: 09121234567") },
                             enabled = isSpeciesChosen,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                             singleLine = true,
@@ -520,8 +541,8 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                                     value = ownerName,
                                     onValueChange = { ownerName = it },
                                     modifier = Modifier.fillMaxWidth(),
-                                    label = { Text("نام صاحب پت (اختیاری)") },
-                                    placeholder = { Text("مثال: مسعود زارع") },
+                                    label = { Text(if (currentLanguage == "en") "Owner Full Name (Optional)" else "نام صاحب پت (اختیاری)") },
+                                    placeholder = { Text(if (currentLanguage == "en") "e.g., Masoud Zare" else "مثال: مسعود زارع") },
                                     enabled = isSpeciesChosen,
                                     singleLine = true,
                                     shape = RoundedCornerShape(12.dp)
@@ -537,8 +558,8 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                             value = recordNumber,
                             onValueChange = { recordNumber = it },
                             modifier = Modifier.fillMaxWidth(),
-                            label = { Text("شماره پرونده") },
-                            placeholder = { Text("مثال: 10042") },
+                            label = { Text(if (currentLanguage == "en") "Case / Record Number" else "شماره پرونده") },
+                            placeholder = { Text(if (currentLanguage == "en") "e.g., 10042" else "مثال: 10042") },
                             enabled = isSpeciesChosen,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             singleLine = true,
@@ -547,7 +568,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                                 IconButton(onClick = { showRecordNumberHelp = true }) {
                                     Icon(
                                         imageVector = Icons.Default.Info,
-                                        contentDescription = "راهنما",
+                                        contentDescription = if (currentLanguage == "en") "Help" else "راهنما",
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
@@ -561,12 +582,12 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                                     Button(
                                         onClick = { showRecordNumberHelp = false }
                                     ) {
-                                        Text("متوجه شدم")
+                                        Text(if (currentLanguage == "en") "Understood" else "متوجه شدم")
                                     }
                                 },
                                 title = {
                                     Text(
-                                        text = "💡 راهنمای ثبت شماره پرونده",
+                                        text = if (currentLanguage == "en") "💡 Case Record Number Guide" else "💡 راهنمای ثبت شماره پرونده",
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 16.sp,
                                         color = MaterialTheme.colorScheme.primary
@@ -574,7 +595,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                                 },
                                 text = {
                                     Text(
-                                        text = "همکار گرامی، به منظور ثبت و بایگانی منظم‌تر پرونده مراجعه‌کنندگان خود، می‌توانید شماره پرونده فیزیکی یا ثبت‌شده در سیستم داخلی کلینیک یا بیمارستان خود را در این بخش وارد نمایید. این امر دسترسی سریع‌تر به مشخصات و سابقه درمانی حیوان را در مراجعات بعدی تسهیل می‌نماید.",
+                                        text = if (currentLanguage == "en") "Dear colleague, to maintain a systematic case archive, you can input the physical record number or the identifier from your clinic's internal software here. This facilitates rapid access to clinical history in future follow-ups." else "همکار گرامی، به منظور ثبت و بایگانی منظم‌تر پرونده مراجعه‌کنندگان خود، می‌توانید شماره پرونده فیزیکی یا ثبت‌شده در سیستم داخلی کلینیک یا بیمارستان خود را در این بخش وارد نمایید. این امر دسترسی سریع‌تر به مشخصات و سابقه درمانی حیوان را در مراجعات بعدی تسهیل می‌نماید.",
                                         fontSize = 13.sp,
                                         lineHeight = 20.sp,
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
@@ -593,8 +614,8 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .testTag("pet_name_input"),
-                            label = { Text("نام پت (اختیاری)") },
-                            placeholder = { Text("مثال: جسیکا") },
+                            label = { Text(if (currentLanguage == "en") "Pet Name (Optional)" else "نام پت (اختیاری)") },
+                            placeholder = { Text(if (currentLanguage == "en") "e.g., Jessica" else "مثال: جسیکا") },
                             enabled = isSpeciesChosen,
                             singleLine = true,
                             shape = RoundedCornerShape(12.dp)
@@ -609,8 +630,8 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .testTag("pet_weight_input"),
-                            label = { Text("وزن به کیلوگرم * (الزامی)") },
-                            placeholder = { Text("مثال: 12.5") },
+                            label = { Text(if (currentLanguage == "en") "Weight in kg * (Required)" else "وزن به کیلوگرم * (الزامی)") },
+                            placeholder = { Text(if (currentLanguage == "en") "e.g., 12.5" else "مثال: 12.5") },
                             enabled = isSpeciesChosen,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             singleLine = true,
@@ -635,8 +656,8 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                                             isBreedDropdownExpanded = true
                                         }
                                     },
-                                label = { Text("نژاد پت * (الزامی)") },
-                                placeholder = { Text("مثال: شیتزو") },
+                                label = { Text(if (currentLanguage == "en") "Pet Breed * (Required)" else "نژاد پت * (الزامی)") },
+                                placeholder = { Text(if (currentLanguage == "en") "e.g., Shih Tzu" else "مثال: شیتزو") },
                                 enabled = isSpeciesChosen,
                                 singleLine = true,
                                 shape = RoundedCornerShape(12.dp)
@@ -678,7 +699,11 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
-                                    text = if (showBreedGuidelines) "🏷️ پنهان کردن لیست نژادهای پیشنهادی" else "💡 مشاهده نژادهای پیشنهادی این گونه",
+                                    text = if (currentLanguage == "en") {
+                                        if (showBreedGuidelines) "🏷️ Hide Proposed Breed List" else "💡 View Recommended Breeds"
+                                    } else {
+                                        if (showBreedGuidelines) "🏷️ پنهان کردن لیست نژادهای پیشنهادی" else "💡 مشاهده نژادهای پیشنهادی این گونه"
+                                    },
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary
@@ -699,7 +724,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                                         modifier = Modifier.padding(10.dp)
                                     ) {
                                         Text(
-                                            text = "پیشنهادهای نژاد برای کمک به ثبت سریع‌تر:",
+                                            text = if (currentLanguage == "en") "Breed suggestions for rapid entry:" else "پیشنهادهای نژاد برای کمک به ثبت سریع‌تر:",
                                             fontSize = 11.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -742,8 +767,8 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                                 value = petAge,
                                 onValueChange = { petAge = it },
                                 modifier = Modifier.weight(1f),
-                                label = { Text("سن تقریبی (اختیاری)") },
-                                placeholder = { Text("مثال: ۲ سال") },
+                                label = { Text(if (currentLanguage == "en") "Approx. Age (Optional)" else "سن تقریبی (اختیاری)") },
+                                placeholder = { Text(if (currentLanguage == "en") "e.g., 2 years" else "مثال: ۲ سال") },
                                 enabled = isSpeciesChosen,
                                 singleLine = true,
                                 shape = RoundedCornerShape(12.dp)
@@ -753,7 +778,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text(
-                                    text = "جنسیت پت (اختیاری)",
+                                    text = if (currentLanguage == "en") "Pet Gender (Optional)" else "جنسیت پت (اختیاری)",
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary,
@@ -807,7 +832,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                                             )
                                             Spacer(modifier = Modifier.width(4.dp))
                                             Text(
-                                                text = "نر",
+                                                text = if (currentLanguage == "en") "Male" else "نر",
                                                 fontSize = 11.sp,
                                                 fontWeight = if (petGender == "نر") FontWeight.Bold else FontWeight.Normal,
                                                 color = MaterialTheme.colorScheme.onSurface
@@ -847,7 +872,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                                             )
                                             Spacer(modifier = Modifier.width(4.dp))
                                             Text(
-                                                text = "ماده",
+                                                text = if (currentLanguage == "en") "Female" else "ماده",
                                                 fontSize = 11.sp,
                                                 fontWeight = if (petGender == "ماده") FontWeight.Bold else FontWeight.Normal,
                                                 color = MaterialTheme.colorScheme.onSurface
@@ -888,7 +913,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "حیوان عقیم شده است؟",
+                                    text = if (currentLanguage == "en") "Spayed / Neutered?" else "حیوان عقیم شده است؟",
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onSurface
@@ -921,18 +946,18 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                         Button(
                             onClick = {
                                 if (petBreed.trim().isEmpty() || petWeight.trim().isEmpty()) {
-                                    errorMessage = "وارد کردن نژاد و وزن پت الزامی است."
+                                    errorMessage = if (currentLanguage == "en") "Entering pet breed and weight is required." else "وارد کردن نژاد و وزن پت الزامی است."
                                     return@Button
                                 }
                                 val weightVal = petWeight.toDoubleOrNull()
                                 if (weightVal == null || weightVal <= 0) {
-                                    errorMessage = "لطفاً وزن عددی معتبر وارد کنید."
+                                    errorMessage = if (currentLanguage == "en") "Please enter a valid numeric weight." else "لطفاً وزن عددی معتبر وارد کنید."
                                     return@Button
                                 }
 
                                 errorMessage = ""
                                 viewModel.saveExaminedPet(
-                                    name = petName.trim().ifEmpty { "بدون نام" },
+                                    name = petName.trim().ifEmpty { if (currentLanguage == "en") "Unnamed" else "بدون نام" },
                                     breed = petBreed,
                                     weight = weightVal,
                                     age = petAge,
@@ -952,7 +977,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                         ) {
                             Icon(Icons.Default.Check, contentDescription = "")
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("ثبت و تایید پرونده بیمار", fontWeight = FontWeight.Bold)
+                            Text(if (currentLanguage == "en") "Register & Examine Patient" else "ثبت و تایید پرونده بیمار", fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -968,7 +993,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "📚 پرونده‌های اخیر کلینیک",
+                    text = if (currentLanguage == "en") "📚 Recent Clinic Cases" else "📚 پرونده‌های اخیر کلینیک",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -999,13 +1024,29 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                         ) {
-                            Text("انتخاب جهت معاینه", fontSize = 10.sp)
+                            Text(if (currentLanguage == "en") "Select for Exam" else "انتخاب جهت معاینه", fontSize = 10.sp)
                         }
 
                         Column(horizontalAlignment = Alignment.End) {
                             Text(pet.name, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            val speciesDisp = when(pet.species.lowercase()) {
+                                "dog" -> if (currentLanguage == "en") "Dog" else "سگ"
+                                "cat" -> if (currentLanguage == "en") "Cat" else "گربه"
+                                "bird" -> if (currentLanguage == "en") "Bird" else "پرنده"
+                                "exotic" -> if (currentLanguage == "en") "Exotic" else "اگزوتیک"
+                                else -> pet.species
+                            }
+                            val genderDisp = if (pet.gender.isNotEmpty()) {
+                                if (currentLanguage == "en") {
+                                    if (pet.gender == "نر") " | Male" else " | Female"
+                                } else " | ${pet.gender}"
+                            } else ""
                             Text(
-                                text = "گونه: ${pet.species} | نژاد: ${pet.breed} | وزن: ${pet.weight}kg",
+                                text = if (currentLanguage == "en") {
+                                    "Species: $speciesDisp | Breed: ${pet.breed} | Weight: ${pet.weight}kg$genderDisp"
+                                } else {
+                                    "گونه: $speciesDisp | نژاد: ${pet.breed} | وزن: ${pet.weight} کیلوگرم$genderDisp"
+                                },
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -1039,14 +1080,18 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "هیچ پرونده بیماری ثبت نشده است",
+                        text = if (currentLanguage == "en") "No case record registered" else "هیچ پرونده بیماری ثبت نشده است",
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "هم‌اکنون می‌توانید ویژگی‌های بالینی، دارویی و سوابق رکوردهای مراجع جدید را ثبت کنید تا تاریخچه کلینیکی او به صورت یکپارچه ذخیره شود.",
+                        text = if (currentLanguage == "en") {
+                            "You can now record clinical features, medications, and case history of new referrals to be seamlessly saved in their clinical record."
+                        } else {
+                            "هم‌اکنون می‌توانید ویژگی‌های بالینی، دارویی و سوابق رکوردهای مراجع جدید را ثبت کنید تا تاریخچه کلینیکی او به صورت یکپارچه ذخیره شود."
+                        },
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                         textAlign = TextAlign.Center,
@@ -1062,7 +1107,7 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                     ) {
                         Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("ثبت و معاینه یک بیمار جدید", fontSize = 11.sp)
+                        Text(if (currentLanguage == "en") "Register & Examine New Patient" else "ثبت و معاینه یک بیمار جدید", fontSize = 11.sp)
                     }
                 }
             }

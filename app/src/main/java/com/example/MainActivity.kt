@@ -141,6 +141,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun VetLayoutContainer(viewModel: MainViewModel) {
     var activeVetTab by remember { mutableStateOf("Dashboard") }
+    val currentLanguage by viewModel.currentLanguage.collectAsState()
 
     Scaffold(
         topBar = {
@@ -198,7 +199,8 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                                 Text(if (session?.gender == "خانم" || session?.gender == "Female") "👩‍⚕️" else "👨‍⚕️", fontSize = 24.sp)
                             }
 
-                            val firstName = session?.fullName?.replace("دکتر", "")?.replace("Dr.", "")?.trim()?.split(" ")?.firstOrNull() ?: "Masoud"
+                            val rawFirstName = session?.fullName?.replace("دکتر", "")?.replace("Dr.", "")?.trim()?.split(" ")?.firstOrNull() ?: "Masoud"
+                            val firstName = if (currentLanguage == "en" && (rawFirstName == "کاربر" || rawFirstName == "کاربر جدید" || rawFirstName.isEmpty())) "User" else rawFirstName
                             Text(
                                 text = "Hello $firstName 👋",
                                 color = Color.White,
@@ -261,11 +263,11 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                 windowInsets = WindowInsets.navigationBars
             ) {
                 listOf(
-                    NavItem("Dashboard", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, "Dashboard"),
-                    NavItem("Drug Manual", Icons.Filled.MedicalServices, Icons.Outlined.MedicalServices, "Drugs"),
-                    NavItem("Smart Diagnosis", Icons.Filled.Healing, Icons.Outlined.Healing, "Diagnosis"),
-                    NavItem("Calculator", Icons.Filled.Calculate, Icons.Outlined.Calculate, "Calculators"),
-                    NavItem("Profile", Icons.Filled.Person, Icons.Outlined.Person, "Profile")
+                    NavItem("Dashboard", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, if (currentLanguage == "en") "Dashboard" else "داشبورد"),
+                    NavItem("Drug Manual", Icons.Filled.MedicalServices, Icons.Outlined.MedicalServices, if (currentLanguage == "en") "Drugs" else "دارونامه"),
+                    NavItem("Smart Diagnosis", Icons.Filled.Healing, Icons.Outlined.Healing, if (currentLanguage == "en") "Diagnosis" else "تشخیص هوشمند"),
+                    NavItem("Calculator", Icons.Filled.Calculate, Icons.Outlined.Calculate, if (currentLanguage == "en") "Calculators" else "محاسبه‌گر"),
+                    NavItem("Profile", Icons.Filled.Person, Icons.Outlined.Person, if (currentLanguage == "en") "Profile" else "پروفایل")
                 ).forEach { item ->
                     val isSelected = activeVetTab == item.tab
                     NavigationBarItem(
@@ -414,11 +416,11 @@ fun OwnerLayoutContainer(viewModel: MainViewModel) {
                     windowInsets = WindowInsets.navigationBars
                 ) {
                     listOf(
-                        NavItem("Dashboard", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, "Dashboard"),
-                        NavItem("Prescriptions", Icons.Filled.Assignment, Icons.Outlined.Assignment, "Rx"),
-                        NavItem("Calendar", Icons.Filled.CalendarToday, Icons.Outlined.CalendarToday, "Calendar"),
-                        NavItem("Map", Icons.Filled.Map, Icons.Outlined.Map, "Map"),
-                        NavItem("Profile", Icons.Filled.Person, Icons.Outlined.Person, "Profile")
+                        NavItem("Dashboard", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, if (currentLanguage == "en") "Dashboard" else "داشبورد"),
+                        NavItem("Prescriptions", Icons.Filled.Assignment, Icons.Outlined.Assignment, if (currentLanguage == "en") "Rx" else "نسخه‌ها"),
+                        NavItem("Calendar", Icons.Filled.CalendarToday, Icons.Outlined.CalendarToday, if (currentLanguage == "en") "Calendar" else "تقویم"),
+                        NavItem("Map", Icons.Filled.Map, Icons.Outlined.Map, if (currentLanguage == "en") "Map" else "نقشه"),
+                        NavItem("Profile", Icons.Filled.Person, Icons.Outlined.Person, if (currentLanguage == "en") "Profile" else "پروفایل")
                     ).forEach { item ->
                         val isSelected = activeOwnerTab == item.tab
                         NavigationBarItem(

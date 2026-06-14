@@ -125,11 +125,11 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                     }
                     Text(
                         text = when (activeProfileSection) {
-                            "نسخه‌ها" -> "نسخه / پرونده ذخیره شده"
-                            "تنظیمات" -> "تنظیمات برنامه"
-                            "منابع" -> "منابع علمی معتبر"
-                            "لینک‌ها" -> "لینک‌های کاربردی"
-                            else -> "حساب من"
+                            "نسخه‌ها" -> if (currentLang == "en") "Prescriptions & Saved Cases" else "نسخه / پرونده ذخیره شده"
+                            "تنظیمات" -> if (currentLang == "en") "App Settings" else "تنظیمات برنامه"
+                            "منابع" -> if (currentLang == "en") "Scientific Sources" else "منابع علمی معتبر"
+                            "لینک‌ها" -> if (currentLang == "en") "Useful Links" else "لینک‌های کاربردی"
+                            else -> if (currentLang == "en") "My Account" else "حساب من"
                         },
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
@@ -179,8 +179,9 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                                 )
                                             }
                                             Column {
+                                                val displayName = if (currentLang == "en" && (editedName == "کاربر" || editedName == "کاربر جدید" || editedName.isEmpty())) "New User" else editedName
                                                 Text(
-                                                    text = editedName,
+                                                    text = displayName,
                                                     fontSize = 16.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = textColor
@@ -196,9 +197,10 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                                     Spacer(modifier = Modifier.height(4.dp))
                                                     Text(
                                                         text = if (isStudent) {
-                                                            "🎓 دانشجو/رزیدنت: $workplaceOrUni | کد: $identification"
+                                                            if (currentLang == "en") "🎓 Student/Resident: $workplaceOrUni | Code: $identification" else "🎓 دانشجو/رزیدنت: $workplaceOrUni | کد: $identification"
                                                         } else {
-                                                            "🩺 پزشک متخصص: $specialty | پروانه: $identification"
+                                                            val dispSpecialty = if (currentLang == "en" && specialty == "داخلی حیوانات کوچک") "Small Animal Internal Medicine" else specialty
+                                                            if (currentLang == "en") "🩺 Specialist: $dispSpecialty | License: $identification" else "🩺 پزشک متخصص: $specialty | پروانه: $identification"
                                                         },
                                                         fontSize = 11.sp,
                                                         color = Color(0xFF3B82F6),
@@ -226,7 +228,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                             )
                                             Spacer(modifier = Modifier.width(6.dp))
                                             Text(
-                                                text = "ویرایش",
+                                                text = if (currentLang == "en") "Edit" else "ویرایش",
                                                 fontSize = 12.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = Color(0xFF3B82F6),
@@ -267,10 +269,10 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                                 else -> "🏆"
                                             }
                                             val subTitle = when(activeSubscription) {
-                                                "free" -> "اشتراک رایگان"
-                                                "silver" -> "اشتراک نقره‌ای"
-                                                "diamond" -> "اشتراک الماس"
-                                                else -> "اشتراک طلایی"
+                                                "free" -> if (currentLang == "en") "Free Subscription" else "اشتراک رایگان"
+                                                "silver" -> if (currentLang == "en") "Silver Subscription" else "اشتراک نقره‌ای"
+                                                "diamond" -> if (currentLang == "en") "Diamond Subscription" else "اشتراک الماس"
+                                                else -> if (currentLang == "en") "Gold Subscription" else "اشتراک طلایی"
                                             }
                                             val subAccentColor = when(activeSubscription) {
                                                 "free" -> Color(0xFF10B981)
@@ -291,7 +293,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                             }
                                             Spacer(modifier = Modifier.height(14.dp))
                                             Text(
-                                                text = "اشتراک فعال",
+                                                text = if (currentLang == "en") "Active Subscription" else "اشتراک فعال",
                                                 fontSize = 11.sp,
                                                 color = mutedTextColor
                                             )
@@ -308,13 +310,13 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                                 horizontalArrangement = Arrangement.spacedBy(2.dp)
                                             ) {
                                                 Text(
-                                                    text = "مدیریت اشتراک",
+                                                    text = if (currentLang == "en") "Manage" else "مدیریت اشتراک",
                                                     fontSize = 11.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = Color(0xFF3B82F6)
                                                 )
                                                 Text(
-                                                    text = "‹",
+                                                    text = if (currentLang == "en") "›" else "‹",
                                                     fontSize = 12.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = Color(0xFF3B82F6)
@@ -350,13 +352,13 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                             }
                                             Spacer(modifier = Modifier.height(14.dp))
                                             Text(
-                                                text = "امتیاز وت‌کلاب",
+                                                text = if (currentLang == "en") "VetClub Points" else "امتیاز وت‌کلاب",
                                                 fontSize = 11.sp,
                                                 color = mutedTextColor
                                             )
                                             Spacer(modifier = Modifier.height(2.dp))
                                             Text(
-                                                text = "${(activeSession?.coins ?: 100).toPersianDigits()} سکه",
+                                                text = if (currentLang == "en") "${activeSession?.coins ?: 100} Coins" else "${(activeSession?.coins ?: 100).toPersianDigits()} سکه",
                                                 fontSize = 14.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = textColor
@@ -367,13 +369,13 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                                 horizontalArrangement = Arrangement.spacedBy(2.dp)
                                             ) {
                                                 Text(
-                                                    text = "جوایز و تخفیف‌ها",
+                                                    text = if (currentLang == "en") "Rewards & Discounts" else "جوایز و تخفیف‌ها",
                                                     fontSize = 11.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = Color(0xFF3B82F6)
                                                 )
                                                 Text(
-                                                    text = "‹",
+                                                    text = if (currentLang == "en") "›" else "‹",
                                                     fontSize = 12.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = Color(0xFF3B82F6)
@@ -385,8 +387,8 @@ fun VetProfileScreen(viewModel: MainViewModel) {
 
                                 // 3. Account Management Category Grouping
                                 Text(
-                                    text = "مدیریت حساب",
-                                    textAlign = TextAlign.Right,
+                                    text = if (currentLang == "en") "Account Management" else "مدیریت حساب",
+                                    textAlign = if (currentLang == "en") TextAlign.Left else TextAlign.Right,
                                     fontSize = 13.sp,
                                     color = mutedTextColor,
                                     fontWeight = FontWeight.Medium,
@@ -404,19 +406,19 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                 ) {
                                     Column {
                                         ProfileMenuItemRedesigned(
-                                            title = "رمز عبور",
+                                            title = if (currentLang == "en") "Password" else "رمز عبور",
                                             iconEmoji = "🔒",
                                             onClick = { showPasswordDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = "دستگاه‌های متصل",
+                                            title = if (currentLang == "en") "Connected Devices" else "دستگاه‌های متصل",
                                             iconEmoji = "💻",
                                             onClick = { showDevicesDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = "نسخه / پرونده ذخیره شده",
+                                            title = if (currentLang == "en") "Prescriptions & Saved Cases" else "نسخه / پرونده ذخیره شده",
                                             iconEmoji = "💳",
                                             badge = if (allPrescriptions.isNotEmpty()) "${allPrescriptions.size}" else null,
                                             onClick = { activeProfileSection = "نسخه‌ها" }
@@ -426,8 +428,8 @@ fun VetProfileScreen(viewModel: MainViewModel) {
 
                                 // 4. Notifications Grouping
                                 Text(
-                                    text = "اطلاع رسانی",
-                                    textAlign = TextAlign.Right,
+                                    text = if (currentLang == "en") "Notifications" else "اطلاع رسانی",
+                                    textAlign = if (currentLang == "en") TextAlign.Left else TextAlign.Right,
                                     fontSize = 13.sp,
                                     color = mutedTextColor,
                                     fontWeight = FontWeight.Medium,
@@ -444,7 +446,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                         .border(1.dp, borderColor, RoundedCornerShape(16.dp))
                                 ) {
                                     ProfileMenuItemRedesigned(
-                                        title = "دعوت از دوستان",
+                                        title = if (currentLang == "en") "Invite Friends" else "دعوت از دوستان",
                                         iconEmoji = "👥",
                                         onClick = { showInviteDialog = true }
                                     )
@@ -452,8 +454,8 @@ fun VetProfileScreen(viewModel: MainViewModel) {
 
                                 // 5. Support Grouping
                                 Text(
-                                    text = "پشتیبانی",
-                                    textAlign = TextAlign.Right,
+                                    text = if (currentLang == "en") "Support" else "پشتیبانی",
+                                    textAlign = if (currentLang == "en") TextAlign.Left else TextAlign.Right,
                                     fontSize = 13.sp,
                                     color = mutedTextColor,
                                     fontWeight = FontWeight.Medium,
@@ -471,49 +473,49 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                 ) {
                                     Column {
                                         ProfileMenuItemRedesigned(
-                                            title = "راهنما و درباره ما",
+                                            title = if (currentLang == "en") "Help & About Us" else "راهنما و درباره ما",
                                             iconEmoji = "❓",
                                             onClick = { showHelpDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = "شرایط و مقررات استفاده",
+                                            title = if (currentLang == "en") "Terms & Conditions" else "شرایط و مقررات استفاده",
                                             iconEmoji = "📄",
                                             onClick = { showTermsDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = "منابع علمی",
+                                            title = if (currentLang == "en") "Scientific Reference Sources" else "منابع علمی",
                                             iconEmoji = "📖",
                                             onClick = { activeProfileSection = "منابع" }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = "لینک های کاربردی و پورتابل",
+                                            title = if (currentLang == "en") "Useful Links & Portals" else "لینک های کاربردی و پورتابل",
                                             iconEmoji = "🔗",
                                             onClick = { activeProfileSection = "لینک‌ها" }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = "گزارش تخلف کاربر",
+                                            title = if (currentLang == "en") "Report User Violation" else "گزارش تخلف کاربر",
                                             iconEmoji = "⚠️",
                                             onClick = { showReportDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = "پشتیبانی انلاین",
+                                            title = if (currentLang == "en") "Online Support Chat" else "پشتیبانی انلاین",
                                             iconEmoji = "💬",
                                             onClick = { showSupportDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = "بروزرسانی پایگاه داده و برنامه",
+                                            title = if (currentLang == "en") "Update App & Database" else "بروزرسانی پایگاه داده و برنامه",
                                             iconEmoji = "🔄",
                                             onClick = { showUpdateDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = "تنظیمات عمومی",
+                                            title = if (currentLang == "en") "General Settings" else "تنظیمات عمومی",
                                             iconEmoji = "⚙️",
                                             onClick = { activeProfileSection = "تنظیمات" }
                                         )
@@ -545,7 +547,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(
-                                            text = "خروج از حساب کاربری",
+                                            text = if (currentLang == "en") "Logout" else "خروج از حساب کاربری",
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = Color(0xFFE53E3E)
