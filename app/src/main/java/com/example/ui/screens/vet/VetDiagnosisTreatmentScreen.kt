@@ -61,7 +61,6 @@ data class DiagnosticSign(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
-    val currentLanguage by viewModel.currentLanguage.collectAsState()
     val activeExaminedPet by viewModel.activeExaminedPet.collectAsState()
     val activeSpecies by viewModel.selectedSpecies.collectAsState()
 
@@ -208,12 +207,7 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(
-                        text = if (currentLanguage == "en") "Treatment & Guidelines" else "درمان و دستورالعمل‌ها",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (activeSubTab == "درمان") Color.White else primaryText
-                    )
+                    Text("درمان و دستورالعمل‌ها", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = if (activeSubTab == "درمان") Color.White else primaryText)
                 }
 
                 Button(
@@ -224,12 +218,7 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(
-                        text = if (currentLanguage == "en") "Diagnosis & Lab" else "تشخیص و آزمایشگاه",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (activeSubTab == "تشخیص") Color.White else primaryText
-                    )
+                    Text("تشخیص و آزمایشگاه", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = if (activeSubTab == "تشخیص") Color.White else primaryText)
                 }
             }
 
@@ -1293,14 +1282,14 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                                     modifier = Modifier.fillMaxWidth().border(1.dp, strokeColor, RoundedCornerShape(12.dp)).padding(bottom = 16.dp)
                                 ) {
                                     Column(modifier = Modifier.padding(16.dp)) {
-                                        Text(if (currentLanguage == "en") "2. Laboratory CBC & Biochemistry Analysis:" else "۲. تحلیل مقادیر گلبولی و بیوشیمی آزمایشگاه:", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = accentTeal)
+                                        Text("۲. تحلیل مقادیر گلبولی و بیوشیمی آزمایشگاه:", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = accentTeal)
                                         Spacer(modifier = Modifier.height(12.dp))
                                         
                                         OutlinedTextField(
                                             value = labWbcInput,
                                             onValueChange = { labWbcInput = it },
                                             modifier = Modifier.fillMaxWidth(),
-                                            label = { Text(if (currentLanguage == "en") "WBC White Blood Cells (range: 6-17 K/µL)" else "گلبول سفید خون WBC (range: 6-17 K/µL)") },
+                                            label = { Text("گلبول سفید خون WBC (range: 6-17 K/µL)") },
                                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                             shape = RoundedCornerShape(12.dp)
                                         )
@@ -1309,7 +1298,7 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                                             value = labCreatinineInput,
                                             onValueChange = { labCreatinineInput = it },
                                             modifier = Modifier.fillMaxWidth(),
-                                            label = { Text(if (currentLanguage == "en") "Blood Creatinine (range: 0.5-1.8 mg/dL)" else "کراتینین خون (range: 0.5-1.8 mg/dL)") },
+                                            label = { Text("کراتینین خون (range: 0.5-1.8 mg/dL)") },
                                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                             shape = RoundedCornerShape(12.dp)
                                         )
@@ -1319,23 +1308,23 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                                         val cVal = labCreatinineInput.toDoubleOrNull()
                                         if (wVal != null || cVal != null) {
                                             Spacer(modifier = Modifier.height(16.dp))
-                                            Text(if (currentLanguage == "en") "Smart Parameter Interpretation:" else "تفسیر هوشمند پارامترها:", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = primaryText)
+                                            Text("تفسیر هوشمند پارامترها:", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = primaryText)
                                             Spacer(modifier = Modifier.height(6.dp))
                                             wVal?.let { w ->
                                                 val status = when {
-                                                    w < 6.0 -> if (currentLanguage == "en") "Severe Leukopenia ⬇️ (Risk of Panleukopenia / infectious toxicosis)" else "لکوپنی شدید ⬇️ (خطر پنلوکوپنی یا مسمومیت عفونی)"
-                                                    w > 17.0 -> if (currentLanguage == "en") "Leukocytosis ⬆️ (Inflammatory response or bacterial infection)" else "لوکوسیتوز غلیظ ⬆️ (فرآیند التهابی یا عفونت باکتریال)"
-                                                    else -> if (currentLanguage == "en") "Normal ✅ (WBC within reference intervals)" else "طبیعی ✅ (گلبول‌های سفید در مرز هنجار)"
+                                                    w < 6.0 -> "لکوپنی شدید ⬇️ (خطر پنلوکوپنی یا مسمومیت عفونی)"
+                                                    w > 17.0 -> "لوکوسیتوز غلیظ ⬆️ (فرآیند التهابی یا عفونت باکتریال)"
+                                                    else -> "طبیعی ✅ (گلبول‌های سفید در مرز هنجار)"
                                                 }
-                                                Text(if (currentLanguage == "en") "WBC Value $w: $status" else "WBC با مقدار $w: $status", fontSize = 11.sp, color = primaryText)
+                                                Text("WBC با مقدار $w: $status", fontSize = 11.sp, color = primaryText)
                                             }
                                             cVal?.let { c ->
                                                 val status = when {
-                                                    c < 0.5 -> if (currentLanguage == "en") "Decreased Azotemia ⬇️ (Muscle weakness)" else "کاهش آزوتوز ⬇️ (ضعف عضلانی)"
-                                                    c > 1.8 -> if (currentLanguage == "en") "Prerenal/Renal Azotemia ⬆️ (Kidney dysfunction or dehydration)" else "آزوتمی پیش‌کلیوی/کلیوی ⬆️ (نارسایی کلیوی یا دهیدراتاسیون)"
-                                                    else -> if (currentLanguage == "en") "Normal ✅ (Uremia metric within safe margin)" else "طبیعی ✅ (سنجش اورمی در رنج امن)"
+                                                    c < 0.5 -> "کاهش آزوتوز ⬇️ (ضعف عضلانی)"
+                                                    c > 1.8 -> "آزوتمی پیش‌کلیوی/کلیوی ⬆️ (نارسایی کلیوی یا دهیدراتاسیون)"
+                                                    else -> "طبیعی ✅ (سنجش اورمی در رنج امن)"
                                                 }
-                                                Text(if (currentLanguage == "en") "Creatinine Value $c: $status" else "کراتینین با مقدار $c: $status", fontSize = 11.sp, color = primaryText)
+                                                Text("کراتینین با مقدار $c: $status", fontSize = 11.sp, color = primaryText)
                                             }
                                         }
                                     }
@@ -1409,26 +1398,26 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                                 .border(1.dp, strokeColor, RoundedCornerShape(12.dp))
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                val specName = when (activeSpecies) {
-                                    "dog" -> if (currentLanguage == "en") "Canines (Dogs)" else "سگ‌سانان"
-                                    "cat" -> if (currentLanguage == "en") "Felines (Cats)" else "گربه‌سانان"
-                                    else -> if (currentLanguage == "en") "Avian & Exotic Pets" else "پرندگان و اگزوتیک‌پت"
+                                val specFarsi = when (activeSpecies) {
+                                    "dog" -> "سگ‌سانان"
+                                    "cat" -> "گربه‌سانان"
+                                    else -> "پرندگان و اگزوتیک‌پت"
                                 }
                                 Text(
-                                    text = if (currentLanguage == "en") "📋 Comprehensive Clinical Protocols ($specName):" else "📋 پروتکل‌های جامع درمان بیماری‌ها ($specName):",
+                                    text = "📋 پروتکل‌های جامع درمان بیماری‌ها ($specFarsi):",
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = accentTeal,
                                     modifier = Modifier.fillMaxWidth(),
-                                    textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right
+                                    textAlign = TextAlign.Right
                                 )
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
-                                    text = if (currentLanguage == "en") "To study acute pharmacological treatments, review any of the clinical records below:" else "جهت مطالعه درمان‌های دارویی حاد، یک مورد از پرونده‌های زیر را بررسی کنید:",
+                                    text = "جهت مطالعه درمان‌های دارویی حاد، یک مورد از پرونده‌های زیر را بررسی کنید:",
                                     fontSize = 11.sp,
                                     color = secondaryText,
                                     modifier = Modifier.fillMaxWidth(),
-                                    textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right
+                                    textAlign = TextAlign.Right
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -1447,33 +1436,27 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                                     ) {
                                         Column(
                                             modifier = Modifier.padding(12.dp),
-                                            horizontalAlignment = if (currentLanguage == "en") Alignment.Start else Alignment.End
+                                            horizontalAlignment = Alignment.End
                                         ) {
                                             Text(
                                                 text = disease.name,
                                                 fontWeight = FontWeight.Bold,
                                                 fontSize = 12.sp,
                                                 color = accentTeal,
-                                                textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right
+                                                textAlign = TextAlign.Right
                                             )
                                             Spacer(modifier = Modifier.height(2.dp))
-                                            Text(
-                                                text = (if (currentLanguage == "en") "Clinical Signs: " else "علائم بالینی: ") + disease.symptoms,
-                                                fontSize = 11.sp,
-                                                color = primaryText,
-                                                maxLines = if (isExpanded) 10 else 1,
-                                                textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right
-                                            )
+                                            Text("علائم بالینی: " + disease.symptoms, fontSize = 11.sp, color = primaryText, maxLines = if (isExpanded) 10 else 1)
 
                                             if (isExpanded) {
                                                 Spacer(modifier = Modifier.height(8.dp))
-                                                Text(if (currentLanguage == "en") "Differential Diagnosis:" else "تشخیص‌های افتراقی:", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
-                                                Text(disease.diffDiagnosis, fontSize = 11.sp, color = secondaryText, textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right)
+                                                Text("تشخیص‌های افتراقی:", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
+                                                Text(disease.diffDiagnosis, fontSize = 11.sp, color = secondaryText)
                                                 Spacer(modifier = Modifier.height(6.dp))
-                                                Text(if (currentLanguage == "en") "Prescribed Hospital Protocol:" else "پروتکل درمانی تجویزی بیمارستان:", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = accentTeal)
-                                                Text(disease.protocol, fontSize = 11.sp, fontWeight = FontWeight.Medium, color = Color(0xFF15803D), textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right)
+                                                Text("پروتکل درمانی تجویزی بیمارستان:", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = accentTeal)
+                                                Text(disease.protocol, fontSize = 11.sp, fontWeight = FontWeight.Medium, color = Color(0xFF15803D))
                                             } else {
-                                                Text(if (currentLanguage == "en") "Tap to show details..." else "جهت باز کردن جزئیات ضربه بزنید...", fontSize = 9.sp, color = secondaryText, modifier = Modifier.fillMaxWidth(), textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right)
+                                                Text("جهت باز کردن جزئیات ضربه بزنید...", fontSize = 9.sp, color = secondaryText, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Right)
                                             }
                                         }
                                     }

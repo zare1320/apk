@@ -267,9 +267,7 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
         phoneNumber: String,
         identification: String = "",
         workplaceOrUni: String = "",
-        specialty: String = "",
-        userType: String? = null,
-        gender: String? = null
+        specialty: String = ""
     ) {
         viewModelScope.launch {
             val currentSession = repository.getActiveSessionSync()
@@ -279,9 +277,7 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
                     phoneNumber = phoneNumber,
                     identification = identification,
                     workplaceOrUni = workplaceOrUni,
-                    specialty = specialty,
-                    userType = userType ?: currentSession.userType,
-                    gender = gender ?: currentSession.gender
+                    specialty = specialty
                 )
                 if (currentSession.phoneNumber != phoneNumber) {
                     repository.logout()

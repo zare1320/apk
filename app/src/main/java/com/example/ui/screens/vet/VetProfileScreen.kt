@@ -125,11 +125,11 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                     }
                     Text(
                         text = when (activeProfileSection) {
-                            "نسخه‌ها" -> if (currentLang == "en") "Prescriptions & Saved Cases" else "نسخه / پرونده ذخیره شده"
-                            "تنظیمات" -> if (currentLang == "en") "App Settings" else "تنظیمات برنامه"
-                            "منابع" -> if (currentLang == "en") "Scientific Sources" else "منابع علمی معتبر"
-                            "لینک‌ها" -> if (currentLang == "en") "Useful Links" else "لینک‌های کاربردی"
-                            else -> if (currentLang == "en") "My Account" else "حساب من"
+                            "نسخه‌ها" -> "نسخه / پرونده ذخیره شده"
+                            "تنظیمات" -> "تنظیمات برنامه"
+                            "منابع" -> "منابع علمی معتبر"
+                            "لینک‌ها" -> "لینک‌های کاربردی"
+                            else -> "حساب من"
                         },
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
@@ -179,9 +179,8 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                                 )
                                             }
                                             Column {
-                                                val displayName = if (currentLang == "en" && (editedName == "کاربر" || editedName == "کاربر جدید" || editedName.isEmpty())) "New User" else editedName
                                                 Text(
-                                                    text = displayName,
+                                                    text = editedName,
                                                     fontSize = 16.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = textColor
@@ -197,10 +196,9 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                                     Spacer(modifier = Modifier.height(4.dp))
                                                     Text(
                                                         text = if (isStudent) {
-                                                            if (currentLang == "en") "🎓 Student/Resident: $workplaceOrUni | Code: $identification" else "🎓 دانشجو/رزیدنت: $workplaceOrUni | کد: $identification"
+                                                            "🎓 دانشجو/رزیدنت: $workplaceOrUni | کد: $identification"
                                                         } else {
-                                                            val dispSpecialty = if (currentLang == "en" && specialty == "داخلی حیوانات کوچک") "Small Animal Internal Medicine" else specialty
-                                                            if (currentLang == "en") "🩺 Specialist: $dispSpecialty | License: $identification" else "🩺 پزشک متخصص: $specialty | پروانه: $identification"
+                                                            "🩺 پزشک متخصص: $specialty | پروانه: $identification"
                                                         },
                                                         fontSize = 11.sp,
                                                         color = Color(0xFF3B82F6),
@@ -228,7 +226,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                             )
                                             Spacer(modifier = Modifier.width(6.dp))
                                             Text(
-                                                text = if (currentLang == "en") "Edit" else "ویرایش",
+                                                text = "ویرایش",
                                                 fontSize = 12.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = Color(0xFF3B82F6),
@@ -269,10 +267,10 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                                 else -> "🏆"
                                             }
                                             val subTitle = when(activeSubscription) {
-                                                "free" -> if (currentLang == "en") "Free Subscription" else "اشتراک رایگان"
-                                                "silver" -> if (currentLang == "en") "Silver Subscription" else "اشتراک نقره‌ای"
-                                                "diamond" -> if (currentLang == "en") "Diamond Subscription" else "اشتراک الماس"
-                                                else -> if (currentLang == "en") "Gold Subscription" else "اشتراک طلایی"
+                                                "free" -> "اشتراک رایگان"
+                                                "silver" -> "اشتراک نقره‌ای"
+                                                "diamond" -> "اشتراک الماس"
+                                                else -> "اشتراک طلایی"
                                             }
                                             val subAccentColor = when(activeSubscription) {
                                                 "free" -> Color(0xFF10B981)
@@ -293,7 +291,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                             }
                                             Spacer(modifier = Modifier.height(14.dp))
                                             Text(
-                                                text = if (currentLang == "en") "Active Subscription" else "اشتراک فعال",
+                                                text = "اشتراک فعال",
                                                 fontSize = 11.sp,
                                                 color = mutedTextColor
                                             )
@@ -310,13 +308,13 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                                 horizontalArrangement = Arrangement.spacedBy(2.dp)
                                             ) {
                                                 Text(
-                                                    text = if (currentLang == "en") "Manage" else "مدیریت اشتراک",
+                                                    text = "مدیریت اشتراک",
                                                     fontSize = 11.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = Color(0xFF3B82F6)
                                                 )
                                                 Text(
-                                                    text = if (currentLang == "en") "›" else "‹",
+                                                    text = "‹",
                                                     fontSize = 12.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = Color(0xFF3B82F6)
@@ -352,13 +350,13 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                             }
                                             Spacer(modifier = Modifier.height(14.dp))
                                             Text(
-                                                text = if (currentLang == "en") "VetClub Points" else "امتیاز وت‌کلاب",
+                                                text = "امتیاز وت‌کلاب",
                                                 fontSize = 11.sp,
                                                 color = mutedTextColor
                                             )
                                             Spacer(modifier = Modifier.height(2.dp))
                                             Text(
-                                                text = if (currentLang == "en") "${activeSession?.coins ?: 100} Coins" else "${(activeSession?.coins ?: 100).toPersianDigits()} سکه",
+                                                text = "${(activeSession?.coins ?: 100).toPersianDigits()} سکه",
                                                 fontSize = 14.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = textColor
@@ -369,13 +367,13 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                                 horizontalArrangement = Arrangement.spacedBy(2.dp)
                                             ) {
                                                 Text(
-                                                    text = if (currentLang == "en") "Rewards & Discounts" else "جوایز و تخفیف‌ها",
+                                                    text = "جوایز و تخفیف‌ها",
                                                     fontSize = 11.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = Color(0xFF3B82F6)
                                                 )
                                                 Text(
-                                                    text = if (currentLang == "en") "›" else "‹",
+                                                    text = "‹",
                                                     fontSize = 12.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = Color(0xFF3B82F6)
@@ -387,8 +385,8 @@ fun VetProfileScreen(viewModel: MainViewModel) {
 
                                 // 3. Account Management Category Grouping
                                 Text(
-                                    text = if (currentLang == "en") "Account Management" else "مدیریت حساب",
-                                    textAlign = if (currentLang == "en") TextAlign.Left else TextAlign.Right,
+                                    text = "مدیریت حساب",
+                                    textAlign = TextAlign.Right,
                                     fontSize = 13.sp,
                                     color = mutedTextColor,
                                     fontWeight = FontWeight.Medium,
@@ -406,19 +404,19 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                 ) {
                                     Column {
                                         ProfileMenuItemRedesigned(
-                                            title = if (currentLang == "en") "Password" else "رمز عبور",
+                                            title = "رمز عبور",
                                             iconEmoji = "🔒",
                                             onClick = { showPasswordDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = if (currentLang == "en") "Connected Devices" else "دستگاه‌های متصل",
+                                            title = "دستگاه‌های متصل",
                                             iconEmoji = "💻",
                                             onClick = { showDevicesDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = if (currentLang == "en") "Prescriptions & Saved Cases" else "نسخه / پرونده ذخیره شده",
+                                            title = "نسخه / پرونده ذخیره شده",
                                             iconEmoji = "💳",
                                             badge = if (allPrescriptions.isNotEmpty()) "${allPrescriptions.size}" else null,
                                             onClick = { activeProfileSection = "نسخه‌ها" }
@@ -428,8 +426,8 @@ fun VetProfileScreen(viewModel: MainViewModel) {
 
                                 // 4. Notifications Grouping
                                 Text(
-                                    text = if (currentLang == "en") "Notifications" else "اطلاع رسانی",
-                                    textAlign = if (currentLang == "en") TextAlign.Left else TextAlign.Right,
+                                    text = "اطلاع رسانی",
+                                    textAlign = TextAlign.Right,
                                     fontSize = 13.sp,
                                     color = mutedTextColor,
                                     fontWeight = FontWeight.Medium,
@@ -446,7 +444,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                         .border(1.dp, borderColor, RoundedCornerShape(16.dp))
                                 ) {
                                     ProfileMenuItemRedesigned(
-                                        title = if (currentLang == "en") "Invite Friends" else "دعوت از دوستان",
+                                        title = "دعوت از دوستان",
                                         iconEmoji = "👥",
                                         onClick = { showInviteDialog = true }
                                     )
@@ -454,8 +452,8 @@ fun VetProfileScreen(viewModel: MainViewModel) {
 
                                 // 5. Support Grouping
                                 Text(
-                                    text = if (currentLang == "en") "Support" else "پشتیبانی",
-                                    textAlign = if (currentLang == "en") TextAlign.Left else TextAlign.Right,
+                                    text = "پشتیبانی",
+                                    textAlign = TextAlign.Right,
                                     fontSize = 13.sp,
                                     color = mutedTextColor,
                                     fontWeight = FontWeight.Medium,
@@ -473,49 +471,49 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                 ) {
                                     Column {
                                         ProfileMenuItemRedesigned(
-                                            title = if (currentLang == "en") "Help & About Us" else "راهنما و درباره ما",
+                                            title = "راهنما و درباره ما",
                                             iconEmoji = "❓",
                                             onClick = { showHelpDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = if (currentLang == "en") "Terms & Conditions" else "شرایط و مقررات استفاده",
+                                            title = "شرایط و مقررات استفاده",
                                             iconEmoji = "📄",
                                             onClick = { showTermsDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = if (currentLang == "en") "Scientific Reference Sources" else "منابع علمی",
+                                            title = "منابع علمی",
                                             iconEmoji = "📖",
                                             onClick = { activeProfileSection = "منابع" }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = if (currentLang == "en") "Useful Links & Portals" else "لینک های کاربردی و پورتابل",
+                                            title = "لینک های کاربردی و پورتابل",
                                             iconEmoji = "🔗",
                                             onClick = { activeProfileSection = "لینک‌ها" }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = if (currentLang == "en") "Report User Violation" else "گزارش تخلف کاربر",
+                                            title = "گزارش تخلف کاربر",
                                             iconEmoji = "⚠️",
                                             onClick = { showReportDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = if (currentLang == "en") "Online Support Chat" else "پشتیبانی انلاین",
+                                            title = "پشتیبانی انلاین",
                                             iconEmoji = "💬",
                                             onClick = { showSupportDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = if (currentLang == "en") "Update App & Database" else "بروزرسانی پایگاه داده و برنامه",
+                                            title = "بروزرسانی پایگاه داده و برنامه",
                                             iconEmoji = "🔄",
                                             onClick = { showUpdateDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         ProfileMenuItemRedesigned(
-                                            title = if (currentLang == "en") "General Settings" else "تنظیمات عمومی",
+                                            title = "تنظیمات عمومی",
                                             iconEmoji = "⚙️",
                                             onClick = { activeProfileSection = "تنظیمات" }
                                         )
@@ -547,7 +545,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(
-                                            text = if (currentLang == "en") "Logout" else "خروج از حساب کاربری",
+                                            text = "خروج از حساب کاربری",
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = Color(0xFFE53E3E)
@@ -796,15 +794,11 @@ fun VetProfileScreen(viewModel: MainViewModel) {
             // --- PROTOTYPE DIALOGS FOR INTERACTIVE USABILITY ---
 
             if (showEditProfileDialog) {
-
                 var nameInput by remember { mutableStateOf(editedName) }
                 // Clear any social credential placeholder email or dummy login from phone so they can complete it
                 var phoneInput by remember { 
                     mutableStateOf(if (editedPhone.contains("@") || editedPhone.startsWith("سریع با")) "" else editedPhone) 
                 }
-                var selectedGender by remember { mutableStateOf(activeSession?.gender ?: "آقا") }
-                var selectedUserType by remember { mutableStateOf(activeSession?.userType ?: "vet") }
-                
                 var isStudentInput by remember { mutableStateOf(isStudent) }
                 var idInput by remember { 
                     mutableStateOf(if (identification.startsWith("سریع با")) "" else identification) 
@@ -852,188 +846,139 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                 modifier = Modifier.fillMaxWidth()
                             )
 
-                            // Gender Selection
-                            Text("جنسیت:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                            Text(
+                                text = "نوع کاربری صنفی:",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF3B82F6)
+                            )
+
+                            // Student vs Practitioner Toggle Row
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(44.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(if (isDark) Color(0xFF1E293B) else Color(0xFFEDF2F7))
+                                    .padding(2.dp)
                             ) {
-                                listOf("آقا", "خانم").forEach { gender ->
-                                    val isSel = selectedGender == gender
-                                    Box(
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .height(38.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .background(if (isSel) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else Color.Transparent)
-                                            .border(1.dp, if (isSel) MaterialTheme.colorScheme.primary else Color.Gray.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
-                                            .clickable { selectedGender = gender },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(gender, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (isSel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
-                                    }
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight()
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(if (!isStudentInput) Color(0xFF3B82F6) else Color.Transparent)
+                                        .clickable { isStudentInput = false },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        "👨‍⚕️ پزشک کلینیسین",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (!isStudentInput) Color.White else (if (isDark) Color.White else Color.Black)
+                                    )
                                 }
-                            }
-                            
-                            // User Type Selection
-                            Text("نوع کاربری:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                listOf("owner" to "🐾 صاحب حیوان", "vet" to "🩺 دامپزشک").forEach { (typeKey, typeLabel) ->
-                                    val isSel = selectedUserType == typeKey
-                                    Box(
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .height(38.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .background(if (isSel) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else Color.Transparent)
-                                            .border(1.dp, if (isSel) MaterialTheme.colorScheme.primary else Color.Gray.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
-                                            .clickable { selectedUserType = typeKey },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(typeLabel, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (isSel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
-                                    }
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight()
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(if (isStudentInput) Color(0xFF3B82F6) else Color.Transparent)
+                                        .clickable { isStudentInput = true },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        "🎓 دانشجو یا رزیدنت",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isStudentInput) Color.White else (if (isDark) Color.White else Color.Black)
+                                    )
                                 }
                             }
 
-                            if (selectedUserType == "vet") {
-                                Text(
-                                    text = "نوع کاربری صنفی:",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF3B82F6)
-                                )
-
-                                // Student vs Practitioner Toggle Row
-                                Row(
+                            if (isStudentInput) {
+                                // School selection drop-down selector
+                                Text("🎓 دانشگاه محل تحصیل:", fontSize = 11.sp)
+                                Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(44.dp)
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(if (isDark) Color(0xFF1E293B) else Color(0xFFEDF2F7))
-                                        .padding(2.dp)
+                                        .border(1.dp, if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1), RoundedCornerShape(12.dp))
+                                        .background(cardBgColor)
+                                        .clickable { isUniDropdownExpanded = true }
+                                        .padding(12.dp)
                                 ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .fillMaxHeight()
-                                            .clip(RoundedCornerShape(6.dp))
-                                            .background(if (!isStudentInput) Color(0xFF3B82F6) else Color.Transparent)
-                                            .clickable { isStudentInput = false },
-                                        contentAlignment = Alignment.Center
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(
-                                            "👨‍⚕️ پزشک کلینیسین",
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (!isStudentInput) Color.White else (if (isDark) Color.White else Color.Black)
-                                        )
+                                        Text(workplaceInput, fontSize = 13.sp, color = textColor)
+                                        Text("▼", fontSize = 10.sp, color = Color.Gray)
                                     }
-                                    Box(
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .fillMaxHeight()
-                                            .clip(RoundedCornerShape(6.dp))
-                                            .background(if (isStudentInput) Color(0xFF3B82F6) else Color.Transparent)
-                                            .clickable { isStudentInput = true },
-                                        contentAlignment = Alignment.Center
+
+                                    DropdownMenu(
+                                        expanded = isUniDropdownExpanded,
+                                        onDismissRequest = { isUniDropdownExpanded = false }
                                     ) {
-                                        Text(
-                                            "🎓 دانشجو یا رزیدنت",
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (isStudentInput) Color.White else (if (isDark) Color.White else Color.Black)
-                                        )
+                                        universityList.forEach { uni ->
+                                            DropdownMenuItem(
+                                                text = { Text(uni, fontSize = 13.sp) },
+                                                onClick = {
+                                                    workplaceInput = uni
+                                                    isUniDropdownExpanded = false
+                                                }
+                                            )
+                                        }
                                     }
                                 }
 
-                                if (isStudentInput) {
-                                    // School selection drop-down selector
-                                    Text("🎓 دانشگاه محل تحصیل:", fontSize = 11.sp)
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .border(1.dp, if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1), RoundedCornerShape(12.dp))
-                                            .background(cardBgColor)
-                                            .clickable { isUniDropdownExpanded = true }
-                                            .padding(12.dp)
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Text(workplaceInput, fontSize = 13.sp, color = textColor)
-                                            Text("▼", fontSize = 10.sp, color = Color.Gray)
-                                        }
+                                OutlinedTextField(
+                                    value = idInput,
+                                    onValueChange = { idInput = it },
+                                    label = { Text("شماره دانشجویی / کد موقت") },
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            } else {
+                                // Practitioner details
+                                OutlinedTextField(
+                                    value = idInput,
+                                    onValueChange = { idInput = it },
+                                    label = { Text("شماره نظام دامپزشکی") },
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
 
-                                        DropdownMenu(
-                                            expanded = isUniDropdownExpanded,
-                                            onDismissRequest = { isUniDropdownExpanded = false }
-                                        ) {
-                                            universityList.forEach { uni ->
-                                                DropdownMenuItem(
-                                                    text = { Text(uni, fontSize = 13.sp) },
-                                                    onClick = {
-                                                        workplaceInput = uni
-                                                        isUniDropdownExpanded = false
-                                                    }
-                                                )
-                                            }
-                                        }
+                                Text("🩺 تخصص کلینیکال اصلی:", fontSize = 11.sp)
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .border(1.dp, if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1), RoundedCornerShape(12.dp))
+                                        .background(cardBgColor)
+                                        .clickable { isSpecialtyDropdownExpanded = true }
+                                        .padding(12.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(specialtyInput, fontSize = 13.sp, color = textColor)
+                                        Text("▼", fontSize = 10.sp, color = Color.Gray)
                                     }
 
-                                    OutlinedTextField(
-                                        value = idInput,
-                                        onValueChange = { idInput = it },
-                                        label = { Text("شماره دانشجویی / کد موقت") },
-                                        singleLine = true,
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-                                } else {
-                                    // Practitioner details
-                                    OutlinedTextField(
-                                        value = idInput,
-                                        onValueChange = { idInput = it },
-                                        label = { Text("شماره نظام دامپزشکی") },
-                                        singleLine = true,
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text("🩺 تخصص کلینیکال اصلی:", fontSize = 11.sp)
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .border(1.dp, if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1), RoundedCornerShape(12.dp))
-                                            .background(cardBgColor)
-                                            .clickable { isSpecialtyDropdownExpanded = true }
-                                            .padding(12.dp)
+                                    DropdownMenu(
+                                        expanded = isSpecialtyDropdownExpanded,
+                                        onDismissRequest = { isSpecialtyDropdownExpanded = false }
                                     ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Text(specialtyInput, fontSize = 13.sp, color = textColor)
-                                            Text("▼", fontSize = 10.sp, color = Color.Gray)
-                                        }
-
-                                        DropdownMenu(
-                                            expanded = isSpecialtyDropdownExpanded,
-                                            onDismissRequest = { isSpecialtyDropdownExpanded = false }
-                                        ) {
-                                            specialtyList.forEach { spec ->
-                                                DropdownMenuItem(
-                                                    text = { Text(spec, fontSize = 13.sp) },
-                                                    onClick = {
-                                                        specialtyInput = spec
-                                                        isSpecialtyDropdownExpanded = false
-                                                    }
-                                                )
-                                            }
+                                        specialtyList.forEach { spec ->
+                                            DropdownMenuItem(
+                                                text = { Text(spec, fontSize = 13.sp) },
+                                                onClick = {
+                                                    specialtyInput = spec
+                                                    isSpecialtyDropdownExpanded = false
+                                                }
+                                            )
                                         }
                                     }
                                 }
@@ -1055,9 +1000,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                     phoneNumber = phoneInput,
                                     identification = idInput,
                                     workplaceOrUni = if (isStudentInput) workplaceInput else "",
-                                    specialty = if (!isStudentInput) specialtyInput else "",
-                                    userType = selectedUserType,
-                                    gender = selectedGender
+                                    specialty = if (!isStudentInput) specialtyInput else ""
                                 )
 
                                 showEditProfileDialog = false

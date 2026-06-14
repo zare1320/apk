@@ -141,7 +141,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun VetLayoutContainer(viewModel: MainViewModel) {
     var activeVetTab by remember { mutableStateOf("Dashboard") }
-    val currentLanguage by viewModel.currentLanguage.collectAsState()
 
     Scaffold(
         topBar = {
@@ -199,8 +198,7 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                                 Text(if (session?.gender == "خانم" || session?.gender == "Female") "👩‍⚕️" else "👨‍⚕️", fontSize = 24.sp)
                             }
 
-                            val rawFirstName = session?.fullName?.replace("دکتر", "")?.replace("Dr.", "")?.trim()?.split(" ")?.firstOrNull() ?: "Masoud"
-                            val firstName = if (currentLanguage == "en" && (rawFirstName == "کاربر" || rawFirstName == "کاربر جدید" || rawFirstName.isEmpty())) "User" else rawFirstName
+                            val firstName = session?.fullName?.replace("دکتر", "")?.replace("Dr.", "")?.trim()?.split(" ")?.firstOrNull() ?: "Masoud"
                             Text(
                                 text = "Hello $firstName 👋",
                                 color = Color.White,
@@ -259,58 +257,29 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
             }
         },
         bottomBar = {
-            val barLayoutDir = if (currentLanguage == "en") LayoutDirection.Ltr else LayoutDirection.Rtl
-            CompositionLocalProvider(LocalLayoutDirection provides barLayoutDir) {
-                NavigationBar(
-                    windowInsets = WindowInsets.navigationBars
-                ) {
-                    val labelDashboard = when (currentLanguage) {
-                        "en" -> "Dashboard"
-                        "ar" -> "لوحة القيادة"
-                        else -> "داشبورد"
-                    }
-                    val labelDrugs = when (currentLanguage) {
-                        "en" -> "Drugs"
-                        "ar" -> "دليل الأدوية"
-                        else -> "دارونامه"
-                    }
-                    val labelDiagnosis = when (currentLanguage) {
-                        "en" -> "Diagnosis"
-                        "ar" -> "التشخيص الذكي"
-                        else -> "تشخیص هوشمند"
-                    }
-                    val labelCalculators = when (currentLanguage) {
-                        "en" -> "Calculators"
-                        "ar" -> "الحاسبات"
-                        else -> "محاسبه‌گر"
-                    }
-                    val labelProfile = when (currentLanguage) {
-                        "en" -> "Profile"
-                        "ar" -> "الملف الشخصي"
-                        else -> "پروفایل"
-                    }
-
-                    listOf(
-                        NavItem("Dashboard", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, labelDashboard),
-                        NavItem("Drug Manual", Icons.Filled.MedicalServices, Icons.Outlined.MedicalServices, labelDrugs),
-                        NavItem("Smart Diagnosis", Icons.Filled.Healing, Icons.Outlined.Healing, labelDiagnosis),
-                        NavItem("Calculator", Icons.Filled.Calculate, Icons.Outlined.Calculate, labelCalculators),
-                        NavItem("Profile", Icons.Filled.Person, Icons.Outlined.Person, labelProfile)
-                    ).forEach { item ->
-                        val isSelected = activeVetTab == item.tab
-                        NavigationBarItem(
-                            selected = isSelected,
-                            onClick = { activeVetTab = item.tab },
-                            icon = {
-                                Icon(
-                                    imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
-                                    contentDescription = item.label,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            },
-                            label = { Text(item.label, fontSize = 9.sp, fontWeight = FontWeight.Bold) }
-                        )
-                    }
+            NavigationBar(
+                windowInsets = WindowInsets.navigationBars
+            ) {
+                listOf(
+                    NavItem("Dashboard", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, "Dashboard"),
+                    NavItem("Drug Manual", Icons.Filled.MedicalServices, Icons.Outlined.MedicalServices, "Drugs"),
+                    NavItem("Smart Diagnosis", Icons.Filled.Healing, Icons.Outlined.Healing, "Diagnosis"),
+                    NavItem("Calculator", Icons.Filled.Calculate, Icons.Outlined.Calculate, "Calculators"),
+                    NavItem("Profile", Icons.Filled.Person, Icons.Outlined.Person, "Profile")
+                ).forEach { item ->
+                    val isSelected = activeVetTab == item.tab
+                    NavigationBarItem(
+                        selected = isSelected,
+                        onClick = { activeVetTab = item.tab },
+                        icon = {
+                            Icon(
+                                imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                                contentDescription = item.label,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        },
+                        label = { Text(item.label, fontSize = 9.sp, fontWeight = FontWeight.Bold) }
+                    )
                 }
             }
         }
@@ -441,58 +410,29 @@ fun OwnerLayoutContainer(viewModel: MainViewModel) {
                 }
             },
             bottomBar = {
-                val barLayoutDir = if (currentLanguage == "en") LayoutDirection.Ltr else LayoutDirection.Rtl
-                CompositionLocalProvider(LocalLayoutDirection provides barLayoutDir) {
-                    NavigationBar(
-                        windowInsets = WindowInsets.navigationBars
-                    ) {
-                        val labelDashboard = when (currentLanguage) {
-                            "en" -> "Dashboard"
-                            "ar" -> "لوحة القيادة"
-                            else -> "داشبورد"
-                        }
-                        val labelPrescriptions = when (currentLanguage) {
-                            "en" -> "Rx"
-                            "ar" -> "الوصفات"
-                            else -> "نسخه‌ها"
-                        }
-                        val labelCalendar = when (currentLanguage) {
-                            "en" -> "Calendar"
-                            "ar" -> "التقويم"
-                            else -> "تقویم"
-                        }
-                        val labelMap = when (currentLanguage) {
-                            "en" -> "Map"
-                            "ar" -> "الخريطة"
-                            else -> "نقشه"
-                        }
-                        val labelProfile = when (currentLanguage) {
-                            "en" -> "Profile"
-                            "ar" -> "الملف الشخصي"
-                            else -> "پروفایل"
-                        }
-
-                        listOf(
-                            NavItem("Dashboard", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, labelDashboard),
-                            NavItem("Prescriptions", Icons.Filled.Assignment, Icons.Outlined.Assignment, labelPrescriptions),
-                            NavItem("Calendar", Icons.Filled.CalendarToday, Icons.Outlined.CalendarToday, labelCalendar),
-                            NavItem("Map", Icons.Filled.Map, Icons.Outlined.Map, labelMap),
-                            NavItem("Profile", Icons.Filled.Person, Icons.Outlined.Person, labelProfile)
-                        ).forEach { item ->
-                            val isSelected = activeOwnerTab == item.tab
-                            NavigationBarItem(
-                                selected = isSelected,
-                                onClick = { activeOwnerTab = item.tab },
-                                icon = {
-                                    Icon(
-                                        imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
-                                        contentDescription = item.label,
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                },
-                                label = { Text(item.label, fontSize = 9.sp, fontWeight = FontWeight.Bold) }
-                            )
-                        }
+                NavigationBar(
+                    windowInsets = WindowInsets.navigationBars
+                ) {
+                    listOf(
+                        NavItem("Dashboard", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, "Dashboard"),
+                        NavItem("Prescriptions", Icons.Filled.Assignment, Icons.Outlined.Assignment, "Rx"),
+                        NavItem("Calendar", Icons.Filled.CalendarToday, Icons.Outlined.CalendarToday, "Calendar"),
+                        NavItem("Map", Icons.Filled.Map, Icons.Outlined.Map, "Map"),
+                        NavItem("Profile", Icons.Filled.Person, Icons.Outlined.Person, "Profile")
+                    ).forEach { item ->
+                        val isSelected = activeOwnerTab == item.tab
+                        NavigationBarItem(
+                            selected = isSelected,
+                            onClick = { activeOwnerTab = item.tab },
+                            icon = {
+                                Icon(
+                                    imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                                    contentDescription = item.label,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            },
+                            label = { Text(item.label, fontSize = 9.sp, fontWeight = FontWeight.Bold) }
+                        )
                     }
                 }
             }

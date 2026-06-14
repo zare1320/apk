@@ -145,34 +145,11 @@ private fun getDrugDetails(drugId: String): DrugDetails {
     }
 }
 
-fun getCategoryDisp(cat: String, lang: String): String {
-    if (lang == "en") return cat
-    return when(cat) {
-        "All drugs" -> "همه داروها"
-        "Anaesthetic analgesics and NSAIDs" -> "ضددردها، ملوکسیکام و NSAIDها"
-        "Anti-infectives" -> "ضد عفونت و آنتی‌بیوتیک‌ها"
-        "Anti-neoplastic" -> "ضد سرطان و انکولوژی"
-        "Behaviour modifiers" -> "اصلاح‌کننده‌های رفتار"
-        "Blood and immune system" -> "خون و سیستم ایمنی"
-        "Cardiovascular" -> "سیستم قلبی عروقی"
-        "Dermatological" -> "داروهای پوست و مو"
-        "Gastrointestinal and hepatic" -> "گوارش و کبد"
-        "Genito-urinary tract" -> "سیستم تناسلی ادراری"
-        "Metabolic" -> "داروهای متابولیک"
-        "Neuromuscular system" -> "سیستم عصبی عضلانی"
-        "Nutritional/fluids" -> "تغذیه و مایع‌درمانی"
-        "Ophthalmic" -> "داروهای چشم‌پزشکی"
-        "Respiratory system" -> "سیستم تنفسی"
-        else -> cat
-    }
-}
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun VetDrugManualScreen(viewModel: MainViewModel) {
     val activeExaminedPet by viewModel.activeExaminedPet.collectAsState()
     val customCreatedDrugs by viewModel.customDrugs.collectAsState()
-    val currentLanguage by viewModel.currentLanguage.collectAsState()
 
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("All drugs") }
@@ -283,27 +260,23 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(14.dp),
-                        horizontalAlignment = if (currentLanguage == "en") Alignment.Start else Alignment.End
+                        horizontalAlignment = Alignment.Start
                     ) {
                         Text(
-                            text = if (currentLanguage == "en") "⚠️ No Active Patient Selected" else "⚠️ هیچ بیمار فعالی انتخاب نشده است",
+                            text = "⚠️ No Active Patient Selected",
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onErrorContainer,
                             modifier = Modifier.fillMaxWidth(),
-                            textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right
+                            textAlign = TextAlign.Left
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = if (currentLanguage == "en") {
-                                "Dosage calculations are based on a default weight of 1 kg. Please activate a patient record under the dashboard first for precise calculations."
-                            } else {
-                                "محاسبات دوز مصرفی بر مبنای وزن پیش‌فرض ۱ کیلوگرم انجام می‌شود. لطفاً ابتدا از داشبورد یک پرونده بیمار فعال کنید تا محاسبات دقیق انجام شود."
-                            },
+                            text = "Dosage calculations are based on a default weight of 1 kg. Please activate a patient record under the dashboard first for precise calculations.",
                             fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f),
                             modifier = Modifier.fillMaxWidth(),
-                            textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right
+                            textAlign = TextAlign.Left
                         )
                     }
                 }
@@ -315,7 +288,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text(if (currentLanguage == "en") "Search generic name or scientific title..." else "جستجوی نام ژنریک یا نام علمی دارو...") },
+                label = { Text("Search generic name or scientific title...") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "") },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp)
@@ -333,7 +306,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (currentLanguage == "en") "Drug Classifications:" else "دسته‌بندی‌های دارویی:",
+                        text = "Drug Classifications:",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -353,16 +326,12 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                         ) {
                             Icon(
                                 imageVector = if (isCategoriesExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                                contentDescription = if (currentLanguage == "en") "Toggle category view" else "تغییر نمای دسته‌بندی",
+                                contentDescription = "Toggle category view",
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(16.dp)
                             )
                             Text(
-                                text = if (currentLanguage == "en") {
-                                    if (isCategoriesExpanded) "Compact View (Horizontal)" else "Show All Categories (15)"
-                                } else {
-                                    if (isCategoriesExpanded) "نمای فشرده (افقی)" else "مشاهده تمام دسته‌ها (۱۵)"
-                                },
+                                text = if (isCategoriesExpanded) "Compact View (Horizontal)" else "Show All Categories (15)",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
@@ -411,7 +380,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                         ) {
                                             Text(emoji, fontSize = 14.sp)
                                             Text(
-                                                text = getCategoryDisp(catName, currentLanguage),
+                                                text = catName,
                                                 fontSize = 11.sp,
                                                 color = textCol,
                                                 fontWeight = if (isChosen) FontWeight.Bold else FontWeight.Medium
@@ -438,7 +407,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                 ) {
                                     Text("➕", fontSize = 11.sp)
                                     Text(
-                                        text = if (currentLanguage == "en") "New Drug" else "جدید",
+                                        text = "New Drug",
                                         fontSize = 11.sp,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                                         fontWeight = FontWeight.Bold
@@ -463,7 +432,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Text(
-                                text = if (currentLanguage == "en") "Select sterile class or category group:" else "یک گروه دارویی را جهت محدودسازی دوزها فیلتر کنید:",
+                                text = "Select a group to filter and prevent errors:",
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                                 fontWeight = FontWeight.Bold,
@@ -512,7 +481,7 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                                 }
 
                                                 Text(
-                                                    text = getCategoryDisp(catName, currentLanguage),
+                                                    text = catName,
                                                     fontSize = 11.sp,
                                                     color = textCol,
                                                     fontWeight = if (isChosen) FontWeight.ExtraBold else FontWeight.Medium,

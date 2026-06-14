@@ -40,8 +40,6 @@ import com.example.ui.theme.StaggeredFadeInItem
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun OwnerDashboardScreen(viewModel: MainViewModel) {
-    val currentThemeMode by viewModel.themeMode.collectAsState()
-    val isDark = currentThemeMode == "dark"
     val activeSession by viewModel.activeSession.collectAsState()
     val allPets by viewModel.allPets.collectAsState()
 
@@ -143,7 +141,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .glassmorphic(isDark = isDark, accentGlow = true, cornerRadius = 16.dp)
+                    .glassmorphic(accentGlow = true, cornerRadius = 16.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -191,7 +189,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 12.dp)
-                    .glassmorphic(isDark = isDark, cornerRadius = 16.dp)
+                    .glassmorphic(cornerRadius = 16.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -438,7 +436,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp)
-                    .glassmorphic(isDark = isDark, cornerRadius = 24.dp)
+                    .glassmorphic(cornerRadius = 24.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -488,7 +486,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 6.dp)
-                            .glassmorphic(isDark = isDark, cornerRadius = 16.dp),
+                            .glassmorphic(cornerRadius = 16.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                         shape = RoundedCornerShape(16.dp)
                     ) {

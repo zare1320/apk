@@ -560,22 +560,11 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                 var phoneInput by remember { 
                     mutableStateOf(if (editedPhone.contains("@") || editedPhone.startsWith("سریع با")) "" else editedPhone) 
                 }
-                var selectedGender by remember { mutableStateOf(activeSession?.gender ?: "آقا") }
-                var selectedUserType by remember { mutableStateOf(activeSession?.userType ?: "owner") }
-                
-                // Vet-specific extra fields
-                var identificationInput by remember { mutableStateOf(activeSession?.identification ?: "") }
-                var workplaceInput by remember { mutableStateOf(activeSession?.workplaceOrUni ?: "") }
-                var specialtyInput by remember { mutableStateOf(activeSession?.specialty ?: "") }
-
                 AlertDialog(
                     onDismissRequest = { showEditProfileDialog = false },
                     title = { Text("ویرایش اطلاعات حساب کاربری", fontWeight = FontWeight.Bold, fontSize = 16.sp) },
                     text = {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(10.dp),
-                            modifier = Modifier.verticalScroll(rememberScrollState())
-                        ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             OutlinedTextField(
                                 value = nameInput,
                                 onValueChange = { nameInput = it },
@@ -590,80 +579,6 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth()
                             )
-                            
-                            // Gender Selection
-                            Text("جنسیت:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                listOf("آقا", "خانم").forEach { gender ->
-                                    val isSel = selectedGender == gender
-                                    Box(
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .height(38.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .background(if (isSel) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else Color.Transparent)
-                                            .border(1.dp, if (isSel) MaterialTheme.colorScheme.primary else Color.Gray.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
-                                            .clickable { selectedGender = gender },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(gender, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (isSel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
-                                    }
-                                }
-                            }
-                            
-                            // User Type Selection
-                            Text("نوع کاربری:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                listOf("owner" to "🐾 صاحب حیوان", "vet" to "🩺 دامپزشک").forEach { (typeKey, typeLabel) ->
-                                    val isSel = selectedUserType == typeKey
-                                    Box(
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .height(38.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .background(if (isSel) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else Color.Transparent)
-                                            .border(1.dp, if (isSel) MaterialTheme.colorScheme.primary else Color.Gray.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
-                                            .clickable { selectedUserType = typeKey },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(typeLabel, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (isSel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
-                                    }
-                                }
-                            }
-
-                            // Vet extra fields
-                            if (selectedUserType == "vet") {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text("اطلاعات نظام دامپزشکی / دانشگاهی:", fontSize = 11.sp, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
-                                
-                                OutlinedTextField(
-                                    value = identificationInput,
-                                    onValueChange = { identificationInput = it },
-                                    label = { Text("شماره نظام / دانشجویی") },
-                                    singleLine = true,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                                OutlinedTextField(
-                                    value = workplaceInput,
-                                    onValueChange = { workplaceInput = it },
-                                    label = { Text("دانشگاه / محل فعالیت") },
-                                    singleLine = true,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                                OutlinedTextField(
-                                    value = specialtyInput,
-                                    onValueChange = { specialtyInput = it },
-                                    label = { Text("تخصص / حوزه تخصصی") },
-                                    singleLine = true,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
                         }
                     },
                     confirmButton = {
@@ -673,12 +588,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                 editedPhone = phoneInput
                                 viewModel.updateSession(
                                     fullName = nameInput,
-                                    phoneNumber = phoneInput,
-                                    identification = identificationInput,
-                                    workplaceOrUni = workplaceInput,
-                                    specialty = specialtyInput,
-                                    userType = selectedUserType,
-                                    gender = selectedGender
+                                    phoneNumber = phoneInput
                                 )
                                 showEditProfileDialog = false
                             },

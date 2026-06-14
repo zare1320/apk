@@ -40,8 +40,8 @@ fun getGlassmorphicBrush(isDark: Boolean = isSystemInDarkTheme()): Brush {
     } else {
         Brush.linearGradient(
             colors = listOf(
-                Color(0xFFF4F5F8).copy(alpha = 0.78f), // Soft light-slate translucent top
-                Color(0xFFF4F5F8).copy(alpha = 0.78f)  // Soft light-slate translucent bottom
+                Color(0xFFFFFFFF).copy(alpha = 0.65f), // Crystal translucent white top
+                Color(0xFFF3F4F6).copy(alpha = 0.78f)  // Soft light grey bottom
             ),
             start = Offset(0f, 0f),
             end = Offset(0f, Float.POSITIVE_INFINITY)
