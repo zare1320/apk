@@ -796,11 +796,15 @@ fun VetProfileScreen(viewModel: MainViewModel) {
             // --- PROTOTYPE DIALOGS FOR INTERACTIVE USABILITY ---
 
             if (showEditProfileDialog) {
+
                 var nameInput by remember { mutableStateOf(editedName) }
                 // Clear any social credential placeholder email or dummy login from phone so they can complete it
                 var phoneInput by remember { 
                     mutableStateOf(if (editedPhone.contains("@") || editedPhone.startsWith("سریع با")) "" else editedPhone) 
                 }
+                var selectedGender by remember { mutableStateOf(activeSession?.gender ?: "آقا") }
+                var selectedUserType by remember { mutableStateOf(activeSession?.userType ?: "vet") }
+                
                 var isStudentInput by remember { mutableStateOf(isStudent) }
                 var idInput by remember { 
                     mutableStateOf(if (identification.startsWith("سریع با")) "" else identification) 
@@ -848,139 +852,188 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                 modifier = Modifier.fillMaxWidth()
                             )
 
-                            Text(
-                                text = "نوع کاربری صنفی:",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF3B82F6)
-                            )
-
-                            // Student vs Practitioner Toggle Row
+                            // Gender Selection
+                            Text("جنسیت:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                             Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(44.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(if (isDark) Color(0xFF1E293B) else Color(0xFFEDF2F7))
-                                    .padding(2.dp)
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight()
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .background(if (!isStudentInput) Color(0xFF3B82F6) else Color.Transparent)
-                                        .clickable { isStudentInput = false },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        "👨‍⚕️ پزشک کلینیسین",
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = if (!isStudentInput) Color.White else (if (isDark) Color.White else Color.Black)
-                                    )
+                                listOf("آقا", "خانم").forEach { gender ->
+                                    val isSel = selectedGender == gender
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .height(38.dp)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(if (isSel) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else Color.Transparent)
+                                            .border(1.dp, if (isSel) MaterialTheme.colorScheme.primary else Color.Gray.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+                                            .clickable { selectedGender = gender },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(gender, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (isSel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
+                                    }
                                 }
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight()
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .background(if (isStudentInput) Color(0xFF3B82F6) else Color.Transparent)
-                                        .clickable { isStudentInput = true },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        "🎓 دانشجو یا رزیدنت",
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = if (isStudentInput) Color.White else (if (isDark) Color.White else Color.Black)
-                                    )
+                            }
+                            
+                            // User Type Selection
+                            Text("نوع کاربری:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                listOf("owner" to "🐾 صاحب حیوان", "vet" to "🩺 دامپزشک").forEach { (typeKey, typeLabel) ->
+                                    val isSel = selectedUserType == typeKey
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .height(38.dp)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(if (isSel) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else Color.Transparent)
+                                            .border(1.dp, if (isSel) MaterialTheme.colorScheme.primary else Color.Gray.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+                                            .clickable { selectedUserType = typeKey },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(typeLabel, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (isSel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
+                                    }
                                 }
                             }
 
-                            if (isStudentInput) {
-                                // School selection drop-down selector
-                                Text("🎓 دانشگاه محل تحصیل:", fontSize = 11.sp)
-                                Box(
+                            if (selectedUserType == "vet") {
+                                Text(
+                                    text = "نوع کاربری صنفی:",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF3B82F6)
+                                )
+
+                                // Student vs Practitioner Toggle Row
+                                Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .border(1.dp, if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1), RoundedCornerShape(12.dp))
-                                        .background(cardBgColor)
-                                        .clickable { isUniDropdownExpanded = true }
-                                        .padding(12.dp)
+                                        .height(44.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(if (isDark) Color(0xFF1E293B) else Color(0xFFEDF2F7))
+                                        .padding(2.dp)
                                 ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxHeight()
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(if (!isStudentInput) Color(0xFF3B82F6) else Color.Transparent)
+                                            .clickable { isStudentInput = false },
+                                        contentAlignment = Alignment.Center
                                     ) {
-                                        Text(workplaceInput, fontSize = 13.sp, color = textColor)
-                                        Text("▼", fontSize = 10.sp, color = Color.Gray)
+                                        Text(
+                                            "👨‍⚕️ پزشک کلینیسین",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (!isStudentInput) Color.White else (if (isDark) Color.White else Color.Black)
+                                        )
                                     }
-
-                                    DropdownMenu(
-                                        expanded = isUniDropdownExpanded,
-                                        onDismissRequest = { isUniDropdownExpanded = false }
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxHeight()
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(if (isStudentInput) Color(0xFF3B82F6) else Color.Transparent)
+                                            .clickable { isStudentInput = true },
+                                        contentAlignment = Alignment.Center
                                     ) {
-                                        universityList.forEach { uni ->
-                                            DropdownMenuItem(
-                                                text = { Text(uni, fontSize = 13.sp) },
-                                                onClick = {
-                                                    workplaceInput = uni
-                                                    isUniDropdownExpanded = false
-                                                }
-                                            )
-                                        }
+                                        Text(
+                                            "🎓 دانشجو یا رزیدنت",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (isStudentInput) Color.White else (if (isDark) Color.White else Color.Black)
+                                        )
                                     }
                                 }
 
-                                OutlinedTextField(
-                                    value = idInput,
-                                    onValueChange = { idInput = it },
-                                    label = { Text("شماره دانشجویی / کد موقت") },
-                                    singleLine = true,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            } else {
-                                // Practitioner details
-                                OutlinedTextField(
-                                    value = idInput,
-                                    onValueChange = { idInput = it },
-                                    label = { Text("شماره نظام دامپزشکی") },
-                                    singleLine = true,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-
-                                Text("🩺 تخصص کلینیکال اصلی:", fontSize = 11.sp)
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .border(1.dp, if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1), RoundedCornerShape(12.dp))
-                                        .background(cardBgColor)
-                                        .clickable { isSpecialtyDropdownExpanded = true }
-                                        .padding(12.dp)
-                                ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
+                                if (isStudentInput) {
+                                    // School selection drop-down selector
+                                    Text("🎓 دانشگاه محل تحصیل:", fontSize = 11.sp)
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .border(1.dp, if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1), RoundedCornerShape(12.dp))
+                                            .background(cardBgColor)
+                                            .clickable { isUniDropdownExpanded = true }
+                                            .padding(12.dp)
                                     ) {
-                                        Text(specialtyInput, fontSize = 13.sp, color = textColor)
-                                        Text("▼", fontSize = 10.sp, color = Color.Gray)
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(workplaceInput, fontSize = 13.sp, color = textColor)
+                                            Text("▼", fontSize = 10.sp, color = Color.Gray)
+                                        }
+
+                                        DropdownMenu(
+                                            expanded = isUniDropdownExpanded,
+                                            onDismissRequest = { isUniDropdownExpanded = false }
+                                        ) {
+                                            universityList.forEach { uni ->
+                                                DropdownMenuItem(
+                                                    text = { Text(uni, fontSize = 13.sp) },
+                                                    onClick = {
+                                                        workplaceInput = uni
+                                                        isUniDropdownExpanded = false
+                                                    }
+                                                )
+                                            }
+                                        }
                                     }
 
-                                    DropdownMenu(
-                                        expanded = isSpecialtyDropdownExpanded,
-                                        onDismissRequest = { isSpecialtyDropdownExpanded = false }
+                                    OutlinedTextField(
+                                        value = idInput,
+                                        onValueChange = { idInput = it },
+                                        label = { Text("شماره دانشجویی / کد موقت") },
+                                        singleLine = true,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                } else {
+                                    // Practitioner details
+                                    OutlinedTextField(
+                                        value = idInput,
+                                        onValueChange = { idInput = it },
+                                        label = { Text("شماره نظام دامپزشکی") },
+                                        singleLine = true,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text("🩺 تخصص کلینیکال اصلی:", fontSize = 11.sp)
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .border(1.dp, if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1), RoundedCornerShape(12.dp))
+                                            .background(cardBgColor)
+                                            .clickable { isSpecialtyDropdownExpanded = true }
+                                            .padding(12.dp)
                                     ) {
-                                        specialtyList.forEach { spec ->
-                                            DropdownMenuItem(
-                                                text = { Text(spec, fontSize = 13.sp) },
-                                                onClick = {
-                                                    specialtyInput = spec
-                                                    isSpecialtyDropdownExpanded = false
-                                                }
-                                            )
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(specialtyInput, fontSize = 13.sp, color = textColor)
+                                            Text("▼", fontSize = 10.sp, color = Color.Gray)
+                                        }
+
+                                        DropdownMenu(
+                                            expanded = isSpecialtyDropdownExpanded,
+                                            onDismissRequest = { isSpecialtyDropdownExpanded = false }
+                                        ) {
+                                            specialtyList.forEach { spec ->
+                                                DropdownMenuItem(
+                                                    text = { Text(spec, fontSize = 13.sp) },
+                                                    onClick = {
+                                                        specialtyInput = spec
+                                                        isSpecialtyDropdownExpanded = false
+                                                    }
+                                                )
+                                            }
                                         }
                                     }
                                 }
@@ -1002,7 +1055,9 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                     phoneNumber = phoneInput,
                                     identification = idInput,
                                     workplaceOrUni = if (isStudentInput) workplaceInput else "",
-                                    specialty = if (!isStudentInput) specialtyInput else ""
+                                    specialty = if (!isStudentInput) specialtyInput else "",
+                                    userType = selectedUserType,
+                                    gender = selectedGender
                                 )
 
                                 showEditProfileDialog = false

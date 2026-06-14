@@ -9,7 +9,9 @@ import androidx.compose.ui.unit.sp
 // In Persian and Arabic, letters connect cursively.
 // Standard English letter-spacing divides cursive letters and causes disjointed gaps.
 // We force a clean 0.sp letter-spacing and generous line-heights (1.35x - 1.5x) for maximum scientific clarity.
-val PersianFont = FontFamily.SansSerif
+val VazirFontFamily = FontFamily.SansSerif
+val InterFontFamily = FontFamily.Default
+val PersianFont = VazirFontFamily
 
 val Typography = Typography(
     displayLarge = TextStyle(

@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,6 +41,8 @@ import com.example.R
 import com.example.viewmodel.MainViewModel
 import com.example.ui.theme.glassmorphic
 import com.example.ui.theme.GlassBackgroundBox
+import com.example.ui.theme.VazirFontFamily
+import com.example.ui.theme.InterFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,6 +50,9 @@ fun LoginScreen(
     viewModel: MainViewModel,
     onNavigateToRegister: () -> Unit
 ) {
+    val currentThemeMode by viewModel.themeMode.collectAsState()
+    val isDark = currentThemeMode == "dark"
+
     var step by remember { mutableStateOf(1) } // 1: ورود / ثبت نام, 2: کد تایید (OTP + Register if new)
     var inputUsername by remember { mutableStateOf("") }
     
@@ -63,7 +69,6 @@ fun LoginScreen(
     
     var showError by remember { mutableStateOf(false) }
     var socialAuthChoice by remember { mutableStateOf<String?>(null) }
-    val isDark = isSystemInDarkTheme()
 
     // Timer countdown effect when step 2 active
     LaunchedEffect(key1 = step) {
@@ -82,128 +87,246 @@ fun LoginScreen(
         String.format("%02d:%02d", mins, secs)
     }
 
-    GlassBackgroundBox {
-        Column(
+    val currentLanguage by viewModel.currentLanguage.collectAsState()
+
+    val appDescription = when (currentLanguage) {
+        "en" -> "Intelligent veterinary reference & your trusted companion for pet health management"
+        "ar" -> "مرجع الطب البيطري الذكي ورفيقك الموثوق لإدارة صحة الحيوانات الأليفة"
+        else -> "مرجع هوشمند دامپزشکی و همراه قابل اعتماد شما برای مدیریت سلامت حیوانات"
+    }
+    val titleLoginRegister = when (currentLanguage) {
+        "en" -> "Login / Register"
+        "ar" -> "تسجيل الدخول / التسجيل"
+        else -> "ورود / ثبت نام"
+    }
+    val subtitleHello = when (currentLanguage) {
+        "en" -> "Hello!\nPlease enter your credentials"
+        "ar" -> "مرحباً!\nيرجى إدخال بيانات الاعتماد الخاصة بك"
+        else -> "سلام!\nلطفا اطلاعات کاربری خود را وارد کنید"
+    }
+
+    GlassBackgroundBox(isDark = isDark) {
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp)
+                .statusBarsPadding()
                 .navigationBarsPadding()
-                .statusBarsPadding(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(20.dp)
         ) {
-            
-            // Header elements (App Info) can fade/slide
-            AnimatedVisibility(
-                visible = step == 1,
-                enter = fadeIn() + slideInVertically(),
-                exit = fadeOut()
+            // Modern Settings Header Bar (Floating at Top)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopCenter),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    // App Emblem
-                    Box(
-                        modifier = Modifier
-                            .size(90.dp)
-                            .clip(RoundedCornerShape(22.dp))
-                            .background(Color(0xFF312E81).copy(alpha = 0.45f))
-                            .border(1.5.dp, Color(0xFF6366F1).copy(alpha = 0.35f), RoundedCornerShape(22.dp))
-                            .padding(4.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.img_app_logo),
-                            contentDescription = "Vetaris Logo",
-                            modifier = Modifier.fillMaxSize()
+                // Theme Toggle Icon
+                IconButton(
+                    onClick = { viewModel.toggleTheme() },
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            shape = CircleShape
                         )
+                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f), CircleShape)
+                        .testTag("login_theme_toggle")
+                ) {
+                    Text(
+                        text = if (currentThemeMode == "dark") "☀️" else "🌙",
+                        fontSize = 18.sp
+                    )
+                }
+
+                // Language Selection pill
+                Row(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
+                        .padding(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    listOf(
+                        "en" to "🇬🇧 EN",
+                        "fa" to "🇮🇷 FA",
+                        "ar" to "🇸🇦 AR"
+                    ).forEach { (code, label) ->
+                        val isSelected = currentLanguage == code
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(
+                                    if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+                                )
+                                .clickable { viewModel.setLanguage(code) }
+                                .padding(horizontal = 12.dp, vertical = 6.dp)
+                                .testTag("login_lang_$code"),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = label,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            )
+                        }
                     }
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    Text(
-                        text = "Vetaris",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    Text(
-                        text = "مرجع هوشمند دامپزشکی و همراه قابل اعتماد شما برای مدیریت سلامت حیوانات",
-                        fontSize = 12.sp,
-                        lineHeight = 18.sp,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 24.dp)
-                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Main Glassmorphic Card Container
-            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                Card(
+            // Main centered login content
+            val loginLayoutDirection = if (currentLanguage == "en") LayoutDirection.Ltr else LayoutDirection.Rtl
+            CompositionLocalProvider(LocalLayoutDirection provides loginLayoutDirection) {
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .glassmorphic(cornerRadius = 24.dp, accentGlow = step == 2)
-                        .padding(2.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                        .fillMaxSize()
+                        .padding(top = 48.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Column(
+                    
+                    // Header elements (App Info) can fade/slide
+                    AnimatedVisibility(
+                        visible = step == 1,
+                        enter = fadeIn() + slideInVertically(),
+                        exit = fadeOut()
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            // App Emblem
+                            Box(
+                                modifier = Modifier
+                                    .size(90.dp)
+                                    .clip(RoundedCornerShape(22.dp))
+                                    .background(Color(0xFF312E81).copy(alpha = 0.45f))
+                                    .border(1.5.dp, Color(0xFF6366F1).copy(alpha = 0.35f), RoundedCornerShape(22.dp))
+                                    .padding(4.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.img_app_logo),
+                                    contentDescription = "Vetaris Logo",
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            Text(
+                                text = "Vetaris",
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary,
+                                textAlign = TextAlign.Center
+                            )
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            Text(
+                                text = appDescription,
+                                fontSize = 12.sp,
+                                lineHeight = 18.sp,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = 24.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Main Glassmorphic Card Container
+                    Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .glassmorphic(isDark = isDark, cornerRadius = 24.dp, accentGlow = step == 2)
+                            .padding(2.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
                     ) {
-                        
-                        // Back Icon overlay for Step 2
-                        if (step == 2) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Start
-                            ) {
-                                IconButton(
-                                    onClick = { step = 1 },
-                                    modifier = Modifier.size(36.dp)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            
+                            // Back Icon overlay for Step 2
+                            if (step == 2) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Start
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.ArrowBack,
-                                        contentDescription = "بازگشت",
-                                        tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
-                                    )
+                                    IconButton(
+                                        onClick = { step = 1 },
+                                        modifier = Modifier.size(36.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.ArrowBack,
+                                            contentDescription = if (currentLanguage == "en") "Back" else "بازگشت",
+                                            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+                                        )
+                                    }
                                 }
                             }
-                        }
 
-                        // --- STEP 1: LOGIN / REGISTER INITIAL ---
-                        if (step == 1) {
-                            Text(
-                                text = "ورود / ثبت نام",
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onBackground,
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Right
-                            )
+                            // --- STEP 1: LOGIN / REGISTER INITIAL ---
+                            if (step == 1) {
+                                Text(
+                                    text = titleLoginRegister,
+                                    fontFamily = VazirFontFamily,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right
+                                )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
 
-                            Text(
-                                text = "سلام!\nلطفا اطلاعات کاربری خود را وارد کنید",
-                                fontSize = 14.sp,
-                                lineHeight = 22.sp,
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.65f),
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Right
-                            )
+                                Text(
+                                    text = subtitleHello,
+                                    fontFamily = VazirFontFamily,
+                                    fontSize = 13.sp,
+                                    lineHeight = 20.sp,
+                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.65f),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right
+                                )
 
                             Spacer(modifier = Modifier.height(24.dp))
 
                             // Custom Textfield look matching screenshot 2
                             val containerCol = if (isDark) Color.White.copy(alpha = 0.08f) else Color(0xFFF1F4F9)
                             val borderCol = if (isDark) Color.White.copy(alpha = 0.12f) else Color(0xFFE2E8F0)
+
+                            val placeholderPhoneInput = when (currentLanguage) {
+                                "en" -> "Phone number, email or username"
+                                "ar" -> "رقم الهاتف أو البريد الإلكتروني أو اسم المستخدم"
+                                else -> "شماره موبایل یا ایمیل یا نام کاربری"
+                            }
+                            val errorInvalidInput = when (currentLanguage) {
+                                "en" -> "Please enter a valid value."
+                                "ar" -> "يرجى إدخال قيمة صالحة."
+                                else -> "لطفاً مقداری معتبر وارد کنید."
+                            }
+                            val buttonLoginText = when (currentLanguage) {
+                                "en" -> "Login"
+                                "ar" -> "تسجيل الدخول"
+                                else -> "ورود"
+                            }
+                            val textNoAccount = when (currentLanguage) {
+                                "en" -> "Don't have an account yet? "
+                                "ar" -> "ليس لديك حساب بعد؟ "
+                                else -> "هنوز ثبت‌نام نکرده‌اید؟ "
+                            }
+                            val textCreateAccount = when (currentLanguage) {
+                                "en" -> "Create new account"
+                                "ar" -> "إنشاء حساب جديد"
+                                else -> "ایجاد حساب کاربری جدید"
+                            }
 
                             OutlinedTextField(
                                 value = inputUsername,
@@ -214,9 +337,14 @@ fun LoginScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .testTag("phone_input"),
+                                textStyle = TextStyle(
+                                    fontFamily = InterFontFamily,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Medium
+                                ),
                                 placeholder = {
                                     Text(
-                                        "شماره موبایل یا ایمیل یا نام کاربری",
+                                        placeholderPhoneInput,
                                         fontSize = 13.sp,
                                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                                     )
@@ -236,11 +364,11 @@ fun LoginScreen(
                             if (showError) {
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
-                                    text = "لطفاً مقداری معتبر وارد کنید.",
+                                    text = errorInvalidInput,
                                     color = MaterialTheme.colorScheme.error,
                                     fontSize = 12.sp,
                                     modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Right
+                                    textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right
                                 )
                             }
 
@@ -294,7 +422,7 @@ fun LoginScreen(
                                     )
                                 } else {
                                     Text(
-                                        text = "ورود",
+                                        text = buttonLoginText,
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -309,12 +437,12 @@ fun LoginScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "هنوز ثبت‌نام نکرده‌اید؟ ",
+                                    text = textNoAccount,
                                     fontSize = 13.sp,
                                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                                 )
                                 Text(
-                                    text = "ایجاد حساب کاربری جدید",
+                                    text = textCreateAccount,
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary,
@@ -327,13 +455,50 @@ fun LoginScreen(
 
                         // --- STEP 2: VERIFICATION & REGISTRATION ---
                         if (step == 2) {
+                            val headerTitle = when (currentLanguage) {
+                                "en" -> "Verification Code"
+                                "ar" -> "رمز التحقق"
+                                else -> "کد تایید"
+                            }
+                            val firstNameLabel = when (currentLanguage) {
+                                "en" -> "First Name"
+                                "ar" -> "الاسم الأول"
+                                else -> "نام"
+                            }
+                            val lastNameLabel = when (currentLanguage) {
+                                "en" -> "Last Name"
+                                "ar" -> "الاسم الأخير"
+                                else -> "نام خانوادگی"
+                            }
+                            val otpPlaceholder = when (currentLanguage) {
+                                "en" -> "Verification Code"
+                                "ar" -> "رمز التحقق"
+                                else -> "کد تایید"
+                            }
+                            val vetRoleLabel = when (currentLanguage) {
+                                "en" -> "🩺 Veterinarian"
+                                "ar" -> "🩺 طبيب بيطري"
+                                else -> "🩺 دامپزشک"
+                            }
+                            val ownerRoleLabel = when (currentLanguage) {
+                                "en" -> "🐾 Pet Owner"
+                                "ar" -> "🐾 صاحب الحيوان"
+                                else -> "🐾 صاحب حیوان"
+                            }
+                            val confirmButtonLabel = when (currentLanguage) {
+                                "en" -> "Confirm"
+                                "ar" -> "تأكيد"
+                                else -> "تایید"
+                            }
+
                             Text(
-                                text = "کد تایید",
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
+                                text = headerTitle,
+                                fontFamily = VazirFontFamily,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.ExtraBold,
                                 color = MaterialTheme.colorScheme.onBackground,
                                 modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Right
+                                textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right
                             )
 
                             Spacer(modifier = Modifier.height(14.dp))
@@ -360,19 +525,28 @@ fun LoginScreen(
                             ) {
                                 Text(
                                     text = if (existingSession != null) {
-                                        "خوش‌آمدید! حساب کاربری شما با عنوان «${existingSession?.fullName}» یافت شد. برای ورود به سامانه، لطفاً کد تایید پیامک‌شده را وارد کنید (می‌توانید کدهای دلخواه یا ۱۲۳۴۵۶ را تایپ کنید)."
+                                        when (currentLanguage) {
+                                            "en" -> "Welcome! Your account under \"${existingSession?.fullName}\" was found. Please enter the SMS verification code to enter (you can type any code or 123456)."
+                                            "ar" -> "مرحباً! تم العثور على حسابك باسم \"${existingSession?.fullName}\". يرجى إدخال رمز التحقق الوارد في الرسالة للدخول (يمكنك كتابة أي رمز أو 123456)."
+                                            else -> "خوش‌آمدید! حساب کاربری شما با عنوان «${existingSession?.fullName}» یافت شد. برای ورود به سامانه، لطفاً کد تایید پیامک‌شده را وارد کنید (می‌توانید کدهای دلخواه یا ۱۲۳۴۵۶ را تایپ کنید)."
+                                        }
                                     } else {
-                                        "حساب کاربری با شماره موبایل $inputUsername وجود ندارد. برای ساخت حساب جدید، کد تایید برای این شماره ارسال گردید (می‌توانید کدهای دلخواه یا ۱۲۳۴۵۶ را وارد کنید)."
+                                        when (currentLanguage) {
+                                            "en" -> "An account with number $inputUsername does not exist. A verification code has been sent to create a new account (you can enter any code or 123456)."
+                                            "ar" -> "لا يوجد حساب برقم الهاتف $inputUsername. تم إرسال رمز التحقق لإنشاء حساب جديد لكم (يمكنكم إدخال أي رمز أو 123456)."
+                                            else -> "حساب کاربری با شماره موبایل $inputUsername وجود ندارد. برای ساخت حساب جدید، کد تایید برای این شماره ارسال گردید (می‌توانید کدهای دلخواه یا ۱۲۳۴۵۶ را وارد کنید)."
+                                        }
                                     },
+                                    fontFamily = VazirFontFamily,
                                     fontSize = 13.sp,
-                                    lineHeight = 22.sp,
+                                    lineHeight = 20.sp,
                                     color = if (existingSession != null) {
                                         if (isDark) Color(0xFF81C784) else Color(0xFF1E4620)
                                     } else {
                                         if (isDark) Color(0xFFF4B3B0) else Color(0xFF9B2C2C)
                                     },
                                     modifier = Modifier.padding(14.dp),
-                                    textAlign = TextAlign.Right
+                                    textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right
                                 )
                             }
 
@@ -393,7 +567,7 @@ fun LoginScreen(
                                         modifier = Modifier.weight(1f),
                                         placeholder = {
                                             Text(
-                                                "نام",
+                                                firstNameLabel,
                                                 fontSize = 13.sp,
                                                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                                             )
@@ -416,7 +590,7 @@ fun LoginScreen(
                                         modifier = Modifier.weight(1f),
                                         placeholder = {
                                             Text(
-                                                "نام خانوادگی",
+                                                lastNameLabel,
                                                 fontSize = 13.sp,
                                                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                                             )
@@ -445,9 +619,15 @@ fun LoginScreen(
                                 value = otpCode,
                                 onValueChange = { otpCode = it },
                                 modifier = Modifier.fillMaxWidth(),
+                                textStyle = TextStyle(
+                                    fontFamily = InterFontFamily,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                ),
                                 placeholder = {
                                     Text(
-                                        "کد تایید",
+                                        otpPlaceholder,
+                                        fontFamily = VazirFontFamily,
                                         fontSize = 13.sp,
                                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                                     )
@@ -472,8 +652,23 @@ fun LoginScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Center
                             ) {
+                                val timerMessage = if (secondsLeft > 0) {
+                                    when (currentLanguage) {
+                                        "en" -> "$timerText until resend"
+                                        "ar" -> "إعادة الإرسال خلال $timerText"
+                                        else -> "$timerText تا دریافت مجدد کد"
+                                    }
+                                } else {
+                                    when (currentLanguage) {
+                                        "en" -> "Resend code"
+                                        "ar" -> "إعادة إرسال الرمز"
+                                        else -> "ارسال مجدد کد تایید"
+                                    }
+                                }
+
                                 Text(
-                                    text = if (secondsLeft > 0) "$timerText تا دریافت مجدد کد" else "ارسال مجدد کد تایید",
+                                    text = timerMessage,
+                                    fontFamily = InterFontFamily,
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Medium,
                                     color = if (secondsLeft > 0) MaterialTheme.colorScheme.onBackground.copy(alpha = 0.65f) else MaterialTheme.colorScheme.primary,
@@ -490,7 +685,7 @@ fun LoginScreen(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(44.dp)
+                                        .height(54.dp)
                                         .clip(RoundedCornerShape(12.dp))
                                         .background(if (isDark) Color.White.copy(alpha = 0.05f) else Color(0xFFE2E8F0))
                                         .padding(2.dp),
@@ -506,8 +701,9 @@ fun LoginScreen(
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
-                                            text = "🩺 دامپزشک",
-                                            fontSize = 12.sp,
+                                            text = vetRoleLabel,
+                                            fontFamily = VazirFontFamily,
+                                            fontSize = 13.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = if (isVetMode) Color.White else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                                         )
@@ -522,8 +718,9 @@ fun LoginScreen(
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
-                                            text = "🐾 صاحب حیوان",
-                                            fontSize = 12.sp,
+                                            text = ownerRoleLabel,
+                                            fontFamily = VazirFontFamily,
+                                            fontSize = 13.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = if (!isVetMode) Color.White else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                                         )
@@ -539,15 +736,15 @@ fun LoginScreen(
                                     if (existingSession != null) {
                                         viewModel.simulateLogin(inputUsername)
                                     } else {
-                                        val finalFN = firstName.ifEmpty { "کاربر" }
-                                        val finalLN = lastName.ifEmpty { "جدید" }
+                                        val finalFN = firstName.ifEmpty { "User" }
+                                        val finalLN = lastName.ifEmpty { "" }
                                         viewModel.simulateRegistration(
                                             fullName = "$finalFN $finalLN",
                                             phoneNumber = inputUsername,
                                             userType = if (isVetMode) "vet" else "owner",
                                             licenseNum = if (isVetMode) "95843" else "",
-                                            specOrUni = if (isVetMode) "داخلی حیوانات کوچک" else "",
-                                            gender = "آقا"
+                                            specOrUni = if (isVetMode) "General Practice" else "",
+                                            gender = "Male"
                                         )
                                     }
                                 },
@@ -562,7 +759,7 @@ fun LoginScreen(
                                 )
                             ) {
                                 Text(
-                                    text = "تایید",
+                                    text = confirmButtonLabel,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -572,10 +769,9 @@ fun LoginScreen(
                     }
                 }
             }
-
-
         }
     }
+}
 
     if (socialAuthChoice != null) {
         val provider = socialAuthChoice ?: "Google"
@@ -627,7 +823,7 @@ fun LoginScreen(
                                     colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .glassmorphic(accentGlow = true, cornerRadius = 12.dp)
+                                        .glassmorphic(isDark = isDark, accentGlow = true, cornerRadius = 12.dp)
                                         .clickable {
                                             viewModel.simulateSocialAuth(email, name, detectedRole, "Google", detectedGender)
                                             socialAuthChoice = null
@@ -650,7 +846,7 @@ fun LoginScreen(
                                         }
 
                                         Column {
-                                            Text(name, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                            Text(name, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface)
                                             Text(email, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                                         }
                                     }
@@ -670,7 +866,7 @@ fun LoginScreen(
                                     colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .glassmorphic(accentGlow = true, cornerRadius = 12.dp)
+                                        .glassmorphic(isDark = isDark, accentGlow = true, cornerRadius = 12.dp)
                                         .clickable {
                                             viewModel.simulateSocialAuth(email, name, detectedRole, "Apple", detectedGender)
                                             socialAuthChoice = null
@@ -693,7 +889,7 @@ fun LoginScreen(
                                         }
 
                                         Column {
-                                            Text(name, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                            Text(name, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface)
                                             Text(email, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                                         }
                                     }
@@ -717,7 +913,7 @@ fun LoginScreen(
             confirmButton = {},
             dismissButton = {
                 TextButton(onClick = { socialAuthChoice = null }) {
-                    Text("انصراف")
+                    Text(text = "انصراف", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                 }
             }
         )

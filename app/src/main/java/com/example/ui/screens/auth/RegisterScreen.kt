@@ -150,13 +150,14 @@ fun RegisterScreen(
         "رادیولوژی و تصویربرداری", "مامایی و بیماری‌های تولیدمثل"
     )
 
-    val isDark = isSystemInDarkTheme()
+    val currentThemeMode by viewModel.themeMode.collectAsState()
+    val isDark = currentThemeMode == "dark"
     val textfieldBg = if (isDark) Color.White.copy(alpha = 0.08f) else Color(0xFFF1F4F9)
     val textfieldBorder = if (isDark) Color.White.copy(alpha = 0.12f) else Color(0xFFE2E8F0)
     val customAccentColor = Color(0xFFB55D57) // reddish rust premium color
     val activeThemeColor = if (isVetMode) customAccentColor else MaterialTheme.colorScheme.secondary
 
-    GlassBackgroundBox {
+    GlassBackgroundBox(isDark = isDark) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -212,7 +213,7 @@ fun RegisterScreen(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .glassmorphic(cornerRadius = 24.dp, accentGlow = true)
+                                .glassmorphic(isDark = isDark, cornerRadius = 24.dp, accentGlow = true)
                                 .padding(2.dp),
                             colors = CardDefaults.cardColors(containerColor = Color.Transparent)
                         ) {
