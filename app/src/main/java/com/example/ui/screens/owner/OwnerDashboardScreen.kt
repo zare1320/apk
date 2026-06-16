@@ -42,6 +42,7 @@ import com.example.ui.theme.StaggeredFadeInItem
 fun OwnerDashboardScreen(viewModel: MainViewModel) {
     val activeSession by viewModel.activeSession.collectAsState()
     val allPets by viewModel.allPets.collectAsState()
+    val currentLang by viewModel.currentLanguage.collectAsState()
 
     // Filter pets belonging to this logged-in owner
     val ownerPhoneNum = activeSession?.phoneNumber ?: "empty"
@@ -54,7 +55,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
     var newPetBreed by remember { mutableStateOf("") }
     var newPetWeight by remember { mutableStateOf("") }
     var newPetAge by remember { mutableStateOf("") }
-    var newPetGender by remember { mutableStateOf("نر") }
+    var newPetGender by remember { mutableStateOf(if (currentLang == "en") "Male" else "نر") }
     var newPetSpecies by remember { mutableStateOf("dog") } // "dog", "cat", "exotic"
 
     // Populate standard lists of breed based on species in Persian and English for Owner registration
@@ -104,7 +105,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
             "مرغ عشق (Budgerigar)",
             "کاسکو (Grey Parrot)",
             "همستر روسی (Russian Hamster)",
-            "خوکچه هندی (Guinea Pig)",
+            "خکچه هندی (Guinea Pig)",
             "خرگوش لوپ (Lop Rabbit)",
             "ماهی قرمز (Goldfish)",
             "گوپی (Guppy)",
@@ -127,56 +128,67 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Welcoming card
-        StaggeredFadeInItem(index = 0) {
-            Card(
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .glassmorphic(accentGlow = true, cornerRadius = 16.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.Start
+    val layoutDirection = if (currentLang == "en") androidx.compose.ui.unit.LayoutDirection.Ltr else androidx.compose.ui.unit.LayoutDirection.Rtl
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Welcoming card
+            StaggeredFadeInItem(index = 0) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .glassmorphic(accentGlow = true, cornerRadius = 16.dp)
                 ) {
-                    Text(
-                        text = "سلام، ${activeSession?.getFullTitle() ?: "صاحب عزیز پت"} 👋",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = "به پورتال مدیریت پرونده‌های سلامت حیوانات خانگی خوش آمدید. اطلاعات کلینیکی همگام‌سازی شده با دامپزشک فورا در تب نسخه قابل بازرسی است.",
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
-                        textAlign = TextAlign.Right,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Text(
+                            text = if (currentLang == "en") "Hello, ${activeSession?.fullName ?: "Dear Pet Owner"} 👋" else "سلام، ${activeSession?.getFullTitle() ?: "صاحب عزیز پت"} 👋",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = if (currentLang == "en") "Welcome to your Pet Health Record Portal. Treatment files and prescriptions synced by your veterinarian are instantly reviewable the historical entries." else "به پورتال مدیریت پرونده‌های سلامت حیوانات خانگی خوش آمدید. اطلاعات کلینیکی همگام‌سازی شده با دامپزشک فورا در تب نسخه قابل بازرسی است.",
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+                            textAlign = if (currentLang == "en") TextAlign.Left else TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // Actions Bar
-        StaggeredFadeInItem(index = 1) {
-            Button(
-                onClick = { showAddPetForm = !showAddPetForm },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("➕", fontSize = 14.sp)
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(if (showAddPetForm) "بستن فرم ورود" else "ثبت و افزودن حیوان خانگی جدید", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            // Actions Bar
+            StaggeredFadeInItem(index = 1) {
+                Button(
+                    onClick = { showAddPetForm = !showAddPetForm },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("➕", fontSize = 14.sp)
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = if (showAddPetForm) {
+                                if (currentLang == "en") "Close registration Form" else "بستن فرم ورود"
+                            } else {
+                                if (currentLang == "en") "Register & Add New Pet" else "ثبت و افزودن حیوان خانگی جدید"
+                            },
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }
@@ -195,7 +207,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                     modifier = Modifier.padding(16.dp),
                     horizontalAlignment = Alignment.Start
                 ) {
-                    Text("🐾 مشخصات حیوان دلبند شما:", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    Text(if (currentLang == "en") "🐾 Your Beloved Pet's Specifications:" else "🐾 مشخصات حیوان دلبند شما:", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     Spacer(modifier = Modifier.height(12.dp))
 
                     CompositionLocalProvider(LocalLayoutDirection provides LocalLayoutDirection.current) {
@@ -203,14 +215,14 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                             value = newPetName,
                             onValueChange = { newPetName = it },
                             modifier = Modifier.fillMaxWidth(),
-                            label = { Text("نام پت (فارسی)") },
+                            label = { Text(if (currentLang == "en") "Pet Name" else "نام پت") },
                             singleLine = true,
                             shape = RoundedCornerShape(12.dp)
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        Text("نوع حیوان (گونه زیستی):", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(if (currentLang == "en") "Animal Type (Species):" else "نوع حیوان (گونه زیستی):", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -218,9 +230,9 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             listOf(
-                                Triple("dog", "سگ", Color(0xFFC084FC)),
-                                Triple("cat", "گربه", Color(0xFF60A5FA)),
-                                Triple("exotic", "پرنده/اگزوتیک", Color(0xFF34D399))
+                                Triple("dog", if (currentLang == "en") "Dog" else "سگ", Color(0xFFC084FC)),
+                                Triple("cat", if (currentLang == "en") "Cat" else "گربه", Color(0xFF60A5FA)),
+                                Triple("exotic", if (currentLang == "en") "Exotic" else "پرنده/اگزوتیک", Color(0xFF34D399))
                             ).forEach { (code, label, color) ->
                                 val isSel = newPetSpecies == code
                                 val bg = if (isSel) color else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
@@ -267,7 +279,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                                 value = newPetWeight,
                                 onValueChange = { newPetWeight = it },
                                 modifier = Modifier.weight(1f),
-                                label = { Text("وزن (کیلوگرم)") },
+                                label = { Text(if (currentLang == "en") "Weight (kg)" else "وزن (کیلوگرم)") },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 singleLine = true,
                                 shape = RoundedCornerShape(12.dp)
@@ -276,7 +288,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                                 value = newPetAge,
                                 onValueChange = { newPetAge = it },
                                 modifier = Modifier.weight(1f),
-                                label = { Text("سن تخمینی (سال)") },
+                                label = { Text(if (currentLang == "en") "Est. Age (Years)" else "سن تخمینی (سال)") },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 singleLine = true,
                                 shape = RoundedCornerShape(12.dp)
@@ -301,8 +313,8 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                                             isBreedDropdownExpanded = true
                                         }
                                     },
-                                label = { Text("نژاد حیوان") },
-                                placeholder = { Text("پرشین / هاسکی") },
+                                label = { Text(if (currentLang == "en") "Animal Breed" else "نژاد حیوان") },
+                                placeholder = { Text(if (currentLang == "en") "Persian / Husky" else "پرشین / هاسکی") },
                                 singleLine = true,
                                 shape = RoundedCornerShape(12.dp)
                             )
@@ -328,7 +340,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
 
                         if (filteredBreeds.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(6.dp))
-                            Text("پیشنهادهای نژاد بر اساس گونه:", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(if (currentLang == "en") "Breed recommendations by species:" else "پیشنهادهای نژاد بر اساس گونه:", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             @OptIn(ExperimentalLayoutApi::class)
                             FlowRow(
                                 modifier = Modifier
@@ -356,11 +368,14 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                         Spacer(modifier = Modifier.height(8.dp))
 
                         // Gender Switch
-                        Text("جنسیت حیوان:", fontSize = 11.sp)
+                        Text(if (currentLang == "en") "Animal Gender:" else "جنسیت حیوان:", fontSize = 11.sp)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(vertical = 4.dp)) {
                             listOf("نر", "ماده").forEach { gen ->
                                 val isSel = newPetGender == gen
-                                val bg = if (isSel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                                val bg = if (isSel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                                val label = if (currentLang == "en") {
+                                    if (gen == "نر") "Male" else "Female"
+                                } else gen
                                 Box(
                                     modifier = Modifier
                                         .weight(1f)
@@ -371,7 +386,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                                         .padding(horizontal = 4.dp, vertical = 8.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text(gen, fontSize = 11.sp, color = if (isSel) Color.White else Color.Black, fontWeight = FontWeight.Bold)
+                                    Text(label, fontSize = 11.sp, color = if (isSel) Color.White else MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
@@ -387,7 +402,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                                 val newlyCreatedPet = Pet(
                                     name = newPetName,
                                     species = newPetSpecies,
-                                    breed = newPetBreed.ifEmpty { "ناپیدا" },
+                                    breed = newPetBreed.ifEmpty { if (currentLang == "en") "Unknown" else "ناپیدا" },
                                     weight = dblWeight,
                                     age = newPetAge,
                                     gender = newPetGender,
@@ -408,7 +423,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("درج نهایی پرونده پت")
+                            Text(if (currentLang == "en") "Submit Pet Record" else "درج نهایی پرونده پت")
                         }
                     }
                 }
@@ -419,14 +434,14 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
 
         // History list of pets
         Text(
-            text = "🐾 حیوانات ثبت‌شده شما:",
+            text = if (currentLang == "en") "🐾 Your Registered Pets:" else "🐾 حیوانات ثبت‌شده شما:",
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp),
-            textAlign = TextAlign.Right
+            textAlign = if (currentLang == "en") TextAlign.Left else TextAlign.Right
         )
 
         if (ownerPetsList.isEmpty()) {
@@ -454,14 +469,14 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "هنوز هیچ حیوان خانگی ثبت نشده است",
+                        text = if (currentLang == "en") "No registered pets found" else "هنوز هیچ حیوان خانگی ثبت نشده است",
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "برای ثبت پرونده سلامت، نوبت‌های درمان دوره‌ای و دسترسی به اطلاعات کلینیکی، ابتدا مشخصات حیوان خانگی خود را وارد کنید.",
+                        text = if (currentLang == "en") "To record health files, periodic treatments, and clinical reports, please add your pet details first." else "برای ثبت پرونده سلامت، نوبت‌های درمان دوره‌ای و دسترسی به اطلاعات کلینیکی، ابتدا مشخصات حیوان خانگی خود را وارد کنید.",
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                         textAlign = TextAlign.Center,
@@ -475,7 +490,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                     ) {
                         Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("ثبت و افزودن اولین پت", fontSize = 11.sp)
+                        Text(if (currentLang == "en") "Register First Pet" else "ثبت و افزودن اولین پت", fontSize = 11.sp)
                     }
                 }
             }
@@ -502,7 +517,15 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                                 Text("🐾", fontSize = 24.sp)
                                 Column(horizontalAlignment = Alignment.Start) {
                                     Text(pet.name, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                                    Text("گونه: " + if (pet.species == "dog") "سگ‌سان" else if (pet.species == "cat") "گربه‌سان" else "پرنده/اگزوتیک زیستی", fontSize = 11.sp, color = Color.Gray)
+                                    Text(
+                                        text = if (currentLang == "en") {
+                                            "Species: " + if (pet.species == "dog") "Dog" else if (pet.species == "cat") "Cat" else "Exotic"
+                                        } else {
+                                            "گونه: " + if (pet.species == "dog") "سگ‌سان" else if (pet.species == "cat") "گربه‌سان" else "پرنده/اگزوتیک زیستی"
+                                        },
+                                        fontSize = 11.sp,
+                                        color = Color.Gray
+                                    )
                                 }
                             }
 
@@ -514,16 +537,21 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Column(horizontalAlignment = Alignment.Start) {
-                                        Text("نژاد حیوان:", fontSize = 10.sp, color = Color.Gray)
+                                        Text(if (currentLang == "en") "Breed:" else "نژاد حیوان:", fontSize = 10.sp, color = Color.Gray)
                                         Text(pet.breed, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                     }
                                     Column(horizontalAlignment = Alignment.Start) {
-                                        Text("جنسیت و سن:", fontSize = 10.sp, color = Color.Gray)
-                                        Text("${pet.gender} | ${pet.age} ساله", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                        Text(if (currentLang == "en") "Gender & Age:" else "جنسیت و سن:", fontSize = 10.sp, color = Color.Gray)
+                                        val displayGender = if (currentLang == "en") {
+                                            if (pet.gender == "نر") "Male" else "Female"
+                                        } else pet.gender
+                                        val displayAge = if (currentLang == "en") "${pet.age} Years" else "${pet.age} ساله"
+                                        Text("$displayGender | $displayAge", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                     }
                                     Column(horizontalAlignment = Alignment.Start) {
-                                        Text("وزن بالینی:", fontSize = 10.sp, color = Color.Gray)
-                                        Text("${pet.weight} کیلوگرم", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                        Text(if (currentLang == "en") "Clinical Weight:" else "وزن بالینی:", fontSize = 10.sp, color = Color.Gray)
+                                        val displayWeight = if (currentLang == "en") "${pet.weight} kg" else "${pet.weight} کیلوگرم"
+                                        Text(displayWeight, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
 
@@ -542,7 +570,7 @@ fun OwnerDashboardScreen(viewModel: MainViewModel) {
                                             modifier = Modifier.size(16.dp)
                                         )
                                         Spacer(modifier = Modifier.width(4.dp))
-                                        Text("شناسه پرونده: ${pet.recordNumber}", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                        Text(if (currentLang == "en") "Record ID: ${pet.recordNumber}" else "شناسه پرونده: ${pet.recordNumber}", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
                             }

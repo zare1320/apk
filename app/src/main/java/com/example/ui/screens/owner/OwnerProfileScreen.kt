@@ -111,10 +111,10 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                     }
                     Text(
                         text = when (activeOwnerSection) {
-                            "تنظیمات" -> "تنظیمات برنامه"
-                            "لینک‌ها" -> "لینک های کاربردی و پورتابل"
-                            "منابع" -> "منابع علمی"
-                            else -> "حساب من"
+                            "تنظیمات" -> if (currentLang == "en") "App Settings" else "تنظیمات برنامه"
+                            "لینک‌ها" -> if (currentLang == "en") "Useful & Portable Links" else "لینک های کاربردی و پورتابل"
+                            "منابع" -> if (currentLang == "en") "Scientific Resources" else "منابع علمی"
+                            else -> if (currentLang == "en") "My Account" else "حساب من"
                         },
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
@@ -165,14 +165,14 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                             }
                                             Column {
                                                 Text(
-                                                    text = editedName,
+                                                    text = if (editedName == "صاحب پت گرامی") { if (currentLang == "en") "Dear Pet Owner" else "صاحب پت گرامی" } else editedName,
                                                     fontSize = 16.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = textColor
                                                 )
                                                 Spacer(modifier = Modifier.height(2.dp))
                                                 Text(
-                                                    text = editedPhone,
+                                                    text = if (editedPhone == "۰۹۱۲۳۴۵۶۷۸۹") { if (currentLang == "en") "09123456789" else "۰۹۱۲۳۴۵۶۷۸۹" } else editedPhone,
                                                     fontSize = 12.sp,
                                                     color = mutedTextColor,
                                                     fontWeight = FontWeight.Medium
@@ -198,7 +198,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                              )
                                              Spacer(modifier = Modifier.width(6.dp))
                                              Text(
-                                                text = "ویرایش",
+                                                text = if (currentLang == "en") "Edit" else "ویرایش",
                                                 fontSize = 12.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = Color(0xFF3B82F6),
@@ -213,8 +213,8 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
 
                                 // 2. Account Management Category Grouping
                                 Text(
-                                    text = "مدیریت حساب",
-                                    textAlign = TextAlign.Right,
+                                    text = if (currentLang == "en") "Account Management" else "مدیریت حساب",
+                                    textAlign = if (currentLang == "en") TextAlign.Left else TextAlign.Right,
                                     fontSize = 13.sp,
                                     color = mutedTextColor,
                                     fontWeight = FontWeight.Medium,
@@ -232,13 +232,13 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                 ) {
                                     Column {
                                         OwnerProfileMenuItemRedesigned(
-                                            title = "رمز عبور",
+                                            title = if (currentLang == "en") "Password Management" else "رمز عبور",
                                             iconEmoji = "🔒",
                                             onClick = { showPasswordDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         OwnerProfileMenuItemRedesigned(
-                                            title = "دستگاه‌های متصل",
+                                            title = if (currentLang == "en") "Connected Devices" else "دستگاه‌های متصل",
                                             iconEmoji = "💻",
                                             onClick = { showDevicesDialog = true }
                                         )
@@ -250,13 +250,13 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                             else -> "🏆"
                                         }
                                         val subTitle = when(activeSubscription) {
-                                            "free" -> "رایگان"
-                                            "silver" -> "نقره‌ای (۳ ماهه)"
-                                            "diamond" -> "الماس (یکساله)"
-                                            else -> "طلایی (۶ ماهه)"
+                                            "free" -> if (currentLang == "en") "Free" else "رایگان"
+                                            "silver" -> if (currentLang == "en") "Silver (3-Month)" else "نقره‌ای (۳ ماهه)"
+                                            "diamond" -> if (currentLang == "en") "Diamond (1-Year)" else "الماس (یکساله)"
+                                            else -> if (currentLang == "en") "Gold (6-Month)" else "طلایی (۶ ماهه)"
                                         }
                                         OwnerProfileMenuItemRedesigned(
-                                            title = "مدیریت اشتراک: $subTitle $subEmoji",
+                                            title = if (currentLang == "en") "Subscription: $subTitle $subEmoji" else "مدیریت اشتراک: $subTitle $subEmoji",
                                             iconEmoji = "🛡️",
                                             onClick = { showSubscriptionDialog = true }
                                         )
@@ -265,7 +265,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
 
                                 // 3. Support & Utils Grouping
                                 Text(
-                                    text = "پشتیبانی و امکانات",
+                                    text = if (currentLang == "en") "Support & Options" else "پشتیبانی و امکانات",
                                     textAlign = TextAlign.Right,
                                     fontSize = 13.sp,
                                     color = mutedTextColor,
@@ -284,49 +284,49 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                 ) {
                                     Column {
                                         OwnerProfileMenuItemRedesigned(
-                                            title = "راهنما و درباره ما",
+                                            title = if (currentLang == "en") "Help & About Us" else "راهنما و درباره ما",
                                             iconEmoji = "❓",
                                             onClick = { showHelpDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         OwnerProfileMenuItemRedesigned(
-                                            title = "شرایط و مقررات استفاده",
+                                            title = if (currentLang == "en") "Terms & Conditions" else "شرایط و مقررات استفاده",
                                             iconEmoji = "📄",
                                             onClick = { showTermsDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         OwnerProfileMenuItemRedesigned(
-                                            title = "منابع علمی",
+                                            title = if (currentLang == "en") "Scientific Resources" else "منابع علمی",
                                             iconEmoji = "📖",
                                             onClick = { activeOwnerSection = "منابع" }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         OwnerProfileMenuItemRedesigned(
-                                            title = "لینک های کاربردی و پورتابل",
+                                            title = if (currentLang == "en") "Useful & Portable Links" else "لینک های کاربردی و پورتابل",
                                             iconEmoji = "🔗",
                                             onClick = { activeOwnerSection = "لینک‌ها" }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         OwnerProfileMenuItemRedesigned(
-                                            title = "گزارش تخلف کاربر",
+                                            title = if (currentLang == "en") "Report User Violation" else "گزارش تخلف کاربر",
                                             iconEmoji = "⚠️",
                                             onClick = { showReportDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         OwnerProfileMenuItemRedesigned(
-                                            title = "پشتیبانی انلاین",
+                                            title = if (currentLang == "en") "Online Support" else "پشتیبانی انلاین",
                                             iconEmoji = "💬",
                                             onClick = { showSupportDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         OwnerProfileMenuItemRedesigned(
-                                            title = "بروزرسانی پایگاه داده و برنامه",
+                                            title = if (currentLang == "en") "Database & App Update" else "بروزرسانی پایگاه داده و برنامه",
                                             iconEmoji = "🔄",
                                             onClick = { showUpdateDialog = true }
                                         )
                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
                                         OwnerProfileMenuItemRedesigned(
-                                            title = "تنظیمات عمومی",
+                                            title = if (currentLang == "en") "General Settings" else "تنظیمات عمومی",
                                             iconEmoji = "⚙️",
                                             onClick = { activeOwnerSection = "تنظیمات" }
                                         )
@@ -358,7 +358,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(
-                                            text = "خروج از حساب کاربری",
+                                            text = if (currentLang == "en") "Logout" else "خروج از حساب کاربری",
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = Color(0xFFE53E3E)
@@ -562,20 +562,20 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                 }
                 AlertDialog(
                     onDismissRequest = { showEditProfileDialog = false },
-                    title = { Text("ویرایش اطلاعات حساب کاربری", fontWeight = FontWeight.Bold, fontSize = 16.sp) },
+                    title = { Text(if (currentLang == "en") "Edit Profile Information" else "ویرایش اطلاعات حساب کاربری", fontWeight = FontWeight.Bold, fontSize = 16.sp) },
                     text = {
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             OutlinedTextField(
                                 value = nameInput,
                                 onValueChange = { nameInput = it },
-                                label = { Text("نام و نام خانوادگی") },
+                                label = { Text(if (currentLang == "en") "Full Name" else "نام و نام خانوادگی") },
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth()
                             )
                             OutlinedTextField(
                                 value = phoneInput,
                                 onValueChange = { phoneInput = it },
-                                label = { Text("شماره همراه") },
+                                label = { Text(if (currentLang == "en") "Mobile Number" else "شماره همراه") },
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth()
                             )
@@ -594,12 +594,12 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
                         ) {
-                            Text("ذخیره تغییرات")
+                            Text(if (currentLang == "en") "Save Changes" else "ذخیره تغییرات")
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { showEditProfileDialog = false }) {
-                            Text("انصراف")
+                            Text(if (currentLang == "en") "Cancel" else "انصراف")
                         }
                     }
                 )
@@ -610,20 +610,20 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                 var newPass by remember { mutableStateOf("") }
                 AlertDialog(
                     onDismissRequest = { showPasswordDialog = false },
-                    title = { Text("تغییر رمز عبور", fontWeight = FontWeight.Bold) },
+                    title = { Text(if (currentLang == "en") "Change Password" else "تغییر رمز عبور", fontWeight = FontWeight.Bold) },
                     text = {
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             OutlinedTextField(
                                 value = oldPass,
                                 onValueChange = { oldPass = it },
-                                label = { Text("رمز عبور فعلی") },
+                                label = { Text(if (currentLang == "en") "Current Password" else "رمز عبور فعلی") },
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth()
                             )
                             OutlinedTextField(
                                 value = newPass,
                                 onValueChange = { newPass = it },
-                                label = { Text("رمز عبور جدید") },
+                                label = { Text(if (currentLang == "en") "New Password" else "رمز عبور جدید") },
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth()
                             )
@@ -634,12 +634,12 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                             onClick = { showPasswordDialog = false },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
                         ) {
-                            Text("بروزرسانی رمز عبور")
+                            Text(if (currentLang == "en") "Update Password" else "بروزرسانی رمز عبور")
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { showPasswordDialog = false }) {
-                            Text("بازگشت")
+                            Text(if (currentLang == "en") "Back" else "بازگشت")
                         }
                     }
                 )
@@ -648,7 +648,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
             if (showDevicesDialog) {
                 AlertDialog(
                     onDismissRequest = { showDevicesDialog = false },
-                    title = { Text("دستگاه‌های متصل به حساب", fontWeight = FontWeight.Bold) },
+                    title = { Text(if (currentLang == "en") "Devices Connected to Account" else "دستگاه‌های متصل به حساب", fontWeight = FontWeight.Bold) },
                     text = {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             Card(
@@ -660,10 +660,10 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text("فعال (این دستگاه)", color = Color(0xFF48BB78), fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                                    Text(if (currentLang == "en") "Active (This Device)" else "فعال (این دستگاه)", color = Color(0xFF48BB78), fontWeight = FontWeight.Bold, fontSize = 11.sp)
                                     Column(horizontalAlignment = Alignment.Start) {
                                         Text("Xiaomi Redmi 12", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textColor)
-                                        Text("آخرین فعالیت: هم‌اکنون", fontSize = 11.sp, color = mutedTextColor)
+                                        Text(if (currentLang == "en") "Last Activity: Now" else "آخرین فعالیت: هم‌اکنون", fontSize = 11.sp, color = mutedTextColor)
                                     }
                                 }
                             }
@@ -674,7 +674,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                             onClick = { showDevicesDialog = false },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
                         ) {
-                            Text("تایید")
+                            Text(if (currentLang == "en") "OK" else "تایید")
                         }
                     }
                 )
@@ -827,19 +827,19 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                 var reportMsg by remember { mutableStateOf("") }
                 AlertDialog(
                     onDismissRequest = { showReportDialog = false },
-                    title = { Text("گزارش تخلف کاربر", fontWeight = FontWeight.Bold) },
+                    title = { Text(if (currentLang == "en") "Report User Violation" else "گزارش تخلف کاربر", fontWeight = FontWeight.Bold) },
                     text = {
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             OutlinedTextField(
                                 value = shopName,
                                 onValueChange = { shopName = it },
-                                label = { Text("نام یا شناسه کاربر") },
+                                label = { Text(if (currentLang == "en") "User Name/ID" else "نام یا شناسه کاربر") },
                                 modifier = Modifier.fillMaxWidth()
                             )
                             OutlinedTextField(
                                 value = reportMsg,
                                 onValueChange = { reportMsg = it },
-                                label = { Text("شرح جزئیات تخلف") },
+                                label = { Text(if (currentLang == "en") "Violation Details" else "شرح جزئیات تخلف") },
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
@@ -849,12 +849,12 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                             onClick = { showReportDialog = false },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
                         ) {
-                            Text("ارسال گزارش")
+                            Text(if (currentLang == "en") "Send Report" else "ارسال گزارش")
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { showReportDialog = false }) {
-                            Text("انصراف")
+                            Text(if (currentLang == "en") "Cancel" else "انصراف")
                         }
                     }
                 )
@@ -1239,7 +1239,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                 ) {
                                     Icon(imageVector = Icons.Default.Star, contentDescription = null, modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
-                                    Text("ثبت در گوگل پلی و خروج", fontWeight = FontWeight.Bold)
+                                    Text(if (currentLang == "en") "Rate on Google Play & Logout" else "ثبت در گوگل پلی و خروج", fontWeight = FontWeight.Bold)
                                 }
                             }
                             
@@ -1255,14 +1255,14 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                     },
                                     modifier = Modifier.weight(1f)
                                 ) {
-                                    Text("خروج بدون ثبت نظر", color = Color(0xFFEF4444), fontSize = 12.sp)
+                                    Text(if (currentLang == "en") "Logout without rating" else "خروج بدون ثبت نظر", color = Color(0xFFEF4444), fontSize = 12.sp)
                                 }
                                 
                                 TextButton(
                                     onClick = { showLogoutDialog = false },
                                     modifier = Modifier.weight(1f)
                                 ) {
-                                    Text("انصراف", color = textColor.copy(alpha = 0.6f), fontSize = 12.sp)
+                                    Text(if (currentLang == "en") "Cancel" else "انصراف", color = textColor.copy(alpha = 0.6f), fontSize = 12.sp)
                                 }
                             }
                         }
@@ -1368,12 +1368,12 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
                         ) {
-                            Text("تایید و فعال‌سازی", fontWeight = FontWeight.Bold)
+                            Text(if (currentLang == "en") "Confirm & Activate" else "تایید و فعال‌سازی", fontWeight = FontWeight.Bold)
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { showSubscriptionDialog = false }) {
-                            Text("انصراف")
+                            Text(if (currentLang == "en") "Cancel" else "انصراف")
                         }
                     }
                 )

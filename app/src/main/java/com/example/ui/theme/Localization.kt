@@ -1,0 +1,351 @@
+package com.example.ui.theme
+
+object Localization {
+    private val fa = mapOf(
+        // General / Auth
+        "app_name" to "وتاریس",
+        "app_tagline" to "مرجع هوشمند دامپزشکی و همراه قابل اعتماد شما برای مدیریت سلامت حیوانات",
+        "login_register" to "ورود / ثبت نام",
+        "hello_enter_details" to "سلام!\nلطفا اطلاعات کاربری خود را وارد کنید",
+        "mobile_placeholder" to "شماره موبایل یا ایمیل یا نام کاربری",
+        "verification_code" to "کد تایید",
+        "login" to "ورود",
+        "verify" to "تایید",
+        "not_registered_yet" to "هنوز ثبت‌نام نکرده‌اید؟ ",
+        "create_account" to "ایجاد حساب کاربری جدید",
+        "vet_student" to "🩺 دامپزشک / دانش‌آموز",
+        "pet_owner" to "🐾 صاحب حیوان",
+        "resend_code" to "ارسال مجدد کد تایید",
+        "seconds_until_resend" to "%s ثانیه تا دریافت مجدد کد",
+        "welcome_back_with_name" to "خوش‌آمدید! حساب کاربری شما با عنوان «%s» یافت شد. برای ورود به سامانه، لطفاً کد تایید پیامک‌شده را وارد کنید (می‌توانید کدهای دلخواه یا ۱۲۳۴۵۶ را تایپ کنید).",
+        "no_account_found" to "حساب کاربری با شماره موبایل %s وجود ندارد. برای ساخت حساب جدید، کد تایید برای این شماره ارسال گردید (می‌توانید کدهای دلخواه یا ۱۲۳۴۵۶ را وارد کنید).",
+        "first_name_placeholder" to "نام",
+        "last_name_placeholder" to "نام خانوادگی",
+        "submit" to "ثبت و تایید",
+        "cancel" to "انصراف",
+
+        // Register Screen
+        "register_new_account" to "ثبت نام حساب کاربری جدید",
+        "full_name" to "نام و نام خانوادگی",
+        "gender" to "جنسیت",
+        "gender_male" to "آقا",
+        "gender_female" to "خانم",
+        "phone_number" to "شماره تلفن همراه",
+        "send_otp" to "ارسال کد تایید",
+        "otp_sent_to" to "کد تایید به شماره %s ارسال شد",
+        "otp_verified" to "کد تایید با موفقیت تایید شد",
+        "academic_info" to "اطلاعات تحصیلی و شغلی",
+        "student_mode" to "حساب دانشجویی",
+        "clinician_mode" to "حساب کلینیسین / دامپزشک",
+        "university" to "دانشگاه محل تحصیل",
+        "student_id" to "شماره دانشجویی / نظام",
+        "license_number" to "شماره نظام دامپزشکی",
+        "specialty" to "تخصص فعال",
+        "pet_info" to "اطلاعات پت شما",
+        "pet_name" to "نام پت",
+        "pet_species" to "گونه حیوان",
+        "pet_breed" to "نژاد پت",
+        "pet_age" to "سن پت (سال)",
+        "pet_weight" to "وزن پت (کیلوگرم)",
+        "dog" to "سگ",
+        "cat" to "گربه",
+        "exotic" to "خزندگان، پرندگان و اگزوتیک",
+        "select_breed" to "انتخاب نژاد",
+        "register_btn" to "تکمیل ثبت نام",
+        "back_to_login" to "بازگشت به ورود",
+
+        // Vet Layout / Topbar / Navigation
+        "welcome_vet" to "خوش آمدید، دکتر %s",
+        "welcome_owner" to "خوش آمدید، %s",
+        "guest" to "مهمان گرامی",
+        "notifications" to "اعلام‌ها",
+        "theme_toggle" to "تغییر تم",
+        "language_toggle" to "تغییر زبان",
+        "tab_dashboard" to "پیشخوان",
+        "tab_drugs" to "دارونامه",
+        "tab_diagnosis" to "کمک‌تشخیص",
+        "tab_calculators" to "ماشین‌حساب‌ها",
+        "tab_profile" to "پروفایل",
+        "tab_calendar" to "تقویم",
+        "tab_map" to "مراکز درمانی",
+        "tab_prescriptions" to "نسخه‌ها",
+
+        // Vet Dashboard Screen
+        "vet_dashboard_title" to "پیشخوان پزشک",
+        "vet_dashboard_sub" to "آمار و اطلاعات کلینیک شما در یک نگاه",
+        "subscription_status" to "وضعیت اشتراک: %s",
+        "active_subscription" to "طلایی",
+        "visits_today" to "ویزیت‌های امروز",
+        "pending" to "در انتظار",
+        "completed" to "تکمیل شده",
+        "total_patients" to "کل بیماران",
+        "register_patient" to "ثبت پرونده بیمار جدید",
+        "todays_appointment" to "نوبت‌های امروز",
+        "no_appointments" to "نوبتی برای امروز ثبت نشده است.",
+        "patient_name" to "نام بیمار",
+        "owner_name" to "نام صاحب بیمار",
+        "time" to "زمان",
+        "action" to "عملیات",
+
+        // Vet Drug Manual Screen
+        "drug_manual_title" to "راهنمای دارویی دامپزشکی",
+        "drug_manual_sub" to "مرجع اطلاعات داروها، دوز مصرفی و موارد منع مصرف",
+        "search_drug" to "جستجوی داروی مورد نظر...",
+        "indications" to "موارد مصرف",
+        "dosage" to "دوز و نحوه مصرف",
+        "contraindications" to "موارد منع مصرف",
+        "no_drug_found" to "دارویی با این نام یافت نشد.",
+
+        // Vet Diagnosis Screen
+        "smart_diagnosis_title" to "سامانه کمک‌تشخیص هوشمند",
+        "smart_diagnosis_sub" to "پیشنهاد تشخیص و درمان بر اساس علائم بالینی",
+        "select_species" to "انتخاب گونه بیمار",
+        "enter_symptoms" to "علائم بالینی مشاهده شده را بنویسید (مثال: استفراغ، بی‌اشتهایی)",
+        "diagnose" to "شروع فرآیند کمک‌تشخیص",
+        "diagnosis_result" to "نتایج تشخیص هوشمند مجهز به هوش مصنوعی",
+        "possible_diagnoses" to "تشخیص‌های احتمالی",
+        "recommended_treatment" to "درمان پیشنهادی",
+        "confidence_level" to "میزان اطمینان",
+
+        // Vet Calculator Screen
+        "vet_calculators_title" to "ماشین‌حساب‌های تخصصی دامپزشکی",
+        "vet_calculators_sub" to "محاسبه دقیق مایع‌درمانی، دوزها و سن حیوانات",
+        "fluid_calc" to "محاسبه مایع‌درمانی",
+        "calorie_calc" to "محاسبه کالری روزانه",
+        "transfusion_calc" to "محاسبه انتقال خون",
+        "gestation_calc" to "بارداری و زایمان",
+        "human_age_calc" to "محاسبه سن به انسانی",
+        "trauma_calc" to "امتیازدهی تروما",
+
+        // Vet Profile Screen
+        "vet_profile_title" to "پروفایل کلینیک و پزشک",
+        "vet_profile_sub" to "آخرین مشخصات نظام دامپزشکی و تنظیمات کاربری شما",
+        "license_no_label" to "شماره نظام دامپزشکی: %s",
+        "specialty_label" to "تخصص: %s",
+        "clinic_address" to "آدرس کلینیک",
+        "save_changes" to "ذخیره تغییرات",
+        "logout" to "خروج از حساب کاربری",
+
+        // Owner Dashboard Screen
+        "owner_dashboard_title" to "پیشخوان صاحب حیوان",
+        "owner_dashboard_sub" to "برنامه‌ریزی و مراقبت‌های هوشمند برای دوست کوچک شما",
+        "your_pets_list" to "لیست پت‌های شما",
+        "age_years" to "%s سال",
+        "weight_kg" to "%s کیلوگرم",
+        "breed_capital" to "نژاد: %s",
+        "upcoming_events" to "رویدادهای پیش‌رو",
+        "no_events" to "هیچ یادآوری یا رویدادی ثبت نشده است.",
+        "add_care_reminder" to "افزودن یادآوری مراقبت",
+
+        // Owner Prescriptions Screen
+        "prescriptions_title" to "نسخه‌های دیجیتال پت شما",
+        "prescriptions_sub" to "آرشیو کامل داروها، کلینیک‌ها و پرونده‌های درمانی صادرشده",
+        "clinic" to "کلینیک",
+        "prescribing_vet" to "دامپزشک: دکتر %s",
+        "prescribed_date" to "تاریخ نسخه",
+        "medications" to "داروهای تجویز شده",
+        "dosage_instructions" to "دستور مصرف: %s",
+
+        // Owner Calendar Screen
+        "calendar_title" to "تقویم یادآوری و مراقبت",
+        "calendar_sub" to "زمان‌بندی واکسیناسیون، دارو، درمان ضد‌انگل و چکاپ‌ها",
+        "create_new_event" to "ثبت رویداد جدید",
+        "event_title" to "عنوان یادآوری (مثال: قرص ضد‌انگل)",
+        "event`type" to "نوع یادآوری",
+        "vaccination" to "واکسیناسیون",
+        "parasite_treatment" to "درمان ضد‌انگل",
+        "general_checkup" to "چکاپ عمومی",
+        "date" to "تاریخ یادآوری",
+        "add_event" to "افزودن به تقویم",
+
+        // Owner Map Screen
+        "map_title" to "مسیریاب مراکز درمانی",
+        "map_sub" to "یافتن کلینیک‌ها، بیمارستان‌های دامپزشکی و داروخانه‌های شبانه‌روزی",
+        "search_vet_clinics" to "جستجوی نزدیک‌ترین کلینیک دامپزشکی...",
+        "distance" to "فاصله: %s",
+        "phone" to "تلفن تماس: %s",
+        "navigation" to "مسیریابی",
+
+        // Owner Profile Screen
+        "owner_profile_title" to "پروفایل صاحب پت",
+        "owner_profile_sub" to "تنظیمات حساب کاربری و اطلاعات تماس شما"
+    )
+
+    private val en = mapOf(
+        // General / Auth
+        "app_name" to "Vetaris",
+        "app_tagline" to "Smart veterinary reference and your trusted companion for pet health management",
+        "login_register" to "Login / Sign Up",
+        "hello_enter_details" to "Hello!\nPlease enter your credentials to login",
+        "mobile_placeholder" to "Mobile number, email, or username",
+        "verification_code" to "Verification Code",
+        "login" to "Login",
+        "verify" to "Verify",
+        "not_registered_yet" to "Don't have an account yet? ",
+        "create_account" to "Create new account",
+        "vet_student" to "🩺 Vet / Student",
+        "pet_owner" to "🐾 Pet Owner",
+        "resend_code" to "Resend verification code",
+        "seconds_until_resend" to "%s seconds to resend",
+        "welcome_back_with_name" to "Welcome back! Your account under \"%s\" was found. Please enter the verification code sent to your phone (you can type any code or 123456).",
+        "no_account_found" to "No account associated with mobile %s exists. A verification code has been sent to register a new account (you can type any code or 123456).",
+        "first_name_placeholder" to "First Name",
+        "last_name_placeholder" to "Last Name",
+        "submit" to "Submit & Verify",
+        "cancel" to "Cancel",
+
+        // Register Screen
+        "register_new_account" to "Register New Account",
+        "full_name" to "Full Name",
+        "gender" to "Gender",
+        "gender_male" to "Male",
+        "gender_female" to "Female",
+        "phone_number" to "Phone Number",
+        "send_otp" to "Send Verification Code",
+        "otp_sent_to" to "Verification code sent to %s",
+        "otp_verified" to "Verification code successfully verified",
+        "academic_info" to "Academic & Professional Info",
+        "student_mode" to "Student Account",
+        "clinician_mode" to "Clinician / Veterinarian Account",
+        "university" to "University / School",
+        "student_id" to "Student / License ID",
+        "license_number" to "Veterinary License Number",
+        "specialty" to "Active Specialty",
+        "pet_info" to "Your Pet's Info",
+        "pet_name" to "Pet Name",
+        "pet_species" to "Pet Species",
+        "pet_breed" to "Pet Breed",
+        "pet_age" to "Pet Age (Years)",
+        "pet_weight" to "Pet Weight (Kilograms)",
+        "dog" to "Dog",
+        "cat" to "Cat",
+        "exotic" to "Reptile, Bird & Exotic",
+        "select_breed" to "Select Breed",
+        "register_btn" to "Complete Registration",
+        "back_to_login" to "Back to Login",
+
+        // Vet Layout / Topbar / Navigation
+        "welcome_vet" to "Welcome, Dr. %s",
+        "welcome_owner" to "Welcome, %s",
+        "guest" to "Valued Guest",
+        "notifications" to "Notifications",
+        "theme_toggle" to "Theme Toggle",
+        "language_toggle" to "Language Toggle",
+        "tab_dashboard" to "Dashboard",
+        "tab_drugs" to "Drug Manual",
+        "tab_diagnosis" to "Diagnosis",
+        "tab_calculators" to "Calculators",
+        "tab_profile" to "Profile",
+        "tab_calendar" to "Calendar",
+        "tab_map" to "Clinics",
+        "tab_prescriptions" to "Prescriptions",
+
+        // Vet Dashboard Screen
+        "vet_dashboard_title" to "Doctor's Dashboard",
+        "vet_dashboard_sub" to "Your clinic summary and stats at a glance",
+        "subscription_status" to "Subscription Status: %s",
+        "active_subscription" to "Gold",
+        "visits_today" to "Visits Today",
+        "pending" to "Pending",
+        "completed" to "Completed",
+        "total_patients" to "Total Patients",
+        "register_patient" to "Register New Patient Record",
+        "todays_appointment" to "Today's Appointments",
+        "no_appointments" to "No appointments scheduled for today.",
+        "patient_name" to "Patient Name",
+        "owner_name" to "Owner Name",
+        "time" to "Time",
+        "action" to "Action",
+
+        // Vet Drug Manual Screen
+        "drug_manual_title" to "Veterinary Drug Manual",
+        "drug_manual_sub" to "Reference for indications, dosages, and contraindications",
+        "search_drug" to "Search for drugs...",
+        "indications" to "Indications",
+        "dosage" to "Dosage & Usage",
+        "contraindications" to "Contraindications",
+        "no_drug_found" to "No drug found matching this name.",
+
+        // Vet Diagnosis Screen
+        "smart_diagnosis_title" to "Smart Diagnosis System",
+        "smart_diagnosis_sub" to "AI-powered diagnosis and treatment recommendations based on clinical signs",
+        "select_species" to "Select Patient Species",
+        "enter_symptoms" to "Describe observed clinical symptoms (e.g., vomiting, loss of appetite)",
+        "diagnose" to "Start AI Smart Diagnosis",
+        "diagnosis_result" to "Smart Diagnosis Results (AI-Powered)",
+        "possible_diagnoses" to "Probable Diagnoses",
+        "recommended_treatment" to "Recommended Treatment",
+        "confidence_level" to "Confidence Level",
+
+        // Vet Calculator Screen
+        "vet_calculators_title" to "Specialized Vet Calculators",
+        "vet_calculators_sub" to "Calculate fluid therapy, daily calories, dosage and conversions",
+        "fluid_calc" to "Fluid Therapy",
+        "calorie_calc" to "Daily Calories",
+        "transfusion_calc" to "Blood Transfusion",
+        "gestation_calc" to "Gestation & Birth",
+        "human_age_calc" to "Human Age Converter",
+        "trauma_calc" to "Trauma Score Assessment",
+
+        // Vet Profile Screen
+        "vet_profile_title" to "Vet & Clinic Profile",
+        "vet_profile_sub" to "Review veterinary license credentials and change settings",
+        "license_no_label" to "Veterinary License: %s",
+        "specialty_label" to "Specialty: %s",
+        "clinic_address" to "Clinic Address",
+        "save_changes" to "Save Changes",
+        "logout" to "Log Out",
+
+        // Owner Dashboard Screen
+        "owner_dashboard_title" to "Pet Owner Dashboard",
+        "owner_dashboard_sub" to "Smart scheduling and custom care reminders for your little friends",
+        "your_pets_list" to "My Pets",
+        "age_years" to "%s Years Old",
+        "weight_kg" to "%s kg",
+        "breed_capital" to "Breed: %s",
+        "upcoming_events" to "Upcoming Events & Care Reminders",
+        "no_events" to "No reminders or events scheduled.",
+        "add_care_reminder" to "Add Care Reminder",
+
+        // Owner Prescriptions Screen
+        "prescriptions_title" to "Pet Digital Prescriptions",
+        "prescriptions_sub" to "Access prescribed drugs, treatment manuals and historical clinic visits",
+        "clinic" to "Clinic",
+        "prescribing_vet" to "Vet: Dr. %s",
+        "prescribed_date" to "Rx Date",
+        "medications" to "Medications Prescribed",
+        "dosage_instructions" to "Directions: %s",
+
+        // Owner Calendar Screen
+        "calendar_title" to "Care Calendar & Reminders",
+        "calendar_sub" to "Schedule vaccinations, parasite treatments, and general vet checkups",
+        "create_new_event" to "Register New Event",
+        "event_title" to "Symptom/Reminder Title (e.g. anti-parasite check)",
+        "event_type" to "Reminder Type",
+        "vaccination" to "Vaccination",
+        "parasite_treatment" to "Anti-parasite treatment",
+        "general_checkup" to "General Checkup",
+        "date" to "Date Scheduled",
+        "add_event" to "Add to Calendar",
+
+        // Owner Map Screen
+        "map_title" to "Clinic Finder Guide",
+        "map_sub" to "Find clinical facilities, veterinary hospitals, and 24/7 dispensaries",
+        "search_vet_clinics" to "Search for veterinary clinics nearby...",
+        "distance" to "Distance: %s",
+        "phone" to "Phone: %s",
+        "navigation" to "Navigate",
+
+        // Owner Profile Screen
+        "owner_profile_title" to "Pet Owner Profile",
+        "owner_profile_sub" to "User account details, personal preferences and contact info"
+    )
+
+    fun get(key: String, lang: String): String {
+        return if (lang == "en") {
+            en[key] ?: fa[key] ?: key
+        } else {
+            fa[key] ?: en[key] ?: key
+        }
+    }
+}

@@ -59,6 +59,7 @@ import com.example.ui.screens.vet.VetProfileScreen
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.platform.LocalLayoutDirection
 import com.example.ui.theme.MyApplicationTheme
+import com.example.ui.theme.Localization
 import com.example.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
@@ -200,19 +201,36 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                             }
 
                             val firstName = session?.fullName?.replace("دکتر", "")?.replace("Dr.", "")?.trim()?.split(" ")?.firstOrNull() ?: "Masoud"
+                            val greeting = if (currentLanguage == "en") "Hello $firstName 👋" else "سلام همکار گرامی، دکتر $firstName 👋"
                             Text(
-                                text = "Hello $firstName 👋",
+                                text = greeting,
                                 color = Color.White,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         }
-
+ 
                         // Left Side in LTR: Notification + Theme switcher row with a custom vertical divider
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
+                            // Language Switcher Button (Allows toggle directly from top header)
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .background(Color.Black.copy(alpha = 0.25f), androidx.compose.foundation.shape.CircleShape)
+                                    .clickable { viewModel.setLanguage(if (currentLanguage == "en") "fa" else "en") },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = if (currentLanguage == "en") "FA" else "EN",
+                                    color = Color.White,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+
                             // Notification Button
                             Box(
                                 modifier = Modifier
@@ -223,12 +241,12 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Notifications,
-                                    contentDescription = "Notifications",
+                                    contentDescription = Localization.get("notifications", currentLanguage),
                                     tint = Color.White,
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
-
+ 
                             // Divider line
                             Box(
                                 modifier = Modifier
@@ -236,7 +254,7 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                                     .height(20.dp)
                                     .background(Color.White.copy(alpha = 0.25f))
                             )
-
+ 
                             // Theme Switcher Button
                             Box(
                                 modifier = Modifier
@@ -247,7 +265,7 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                             ) {
                                 Icon(
                                     imageVector = if (isDark) Icons.Default.WbSunny else Icons.Default.DarkMode,
-                                    contentDescription = "Theme Toggle",
+                                    contentDescription = Localization.get("theme_toggle", currentLanguage),
                                     tint = Color.White,
                                     modifier = Modifier.size(18.dp)
                                 )
@@ -258,15 +276,16 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
             }
         },
         bottomBar = {
+            val currentLanguage by viewModel.currentLanguage.collectAsState()
             NavigationBar(
                 windowInsets = WindowInsets.navigationBars
             ) {
                 listOf(
-                    NavItem("Dashboard", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, "Dashboard"),
-                    NavItem("Drug Manual", Icons.Filled.MedicalServices, Icons.Outlined.MedicalServices, "Drugs"),
-                    NavItem("Smart Diagnosis", Icons.Filled.Healing, Icons.Outlined.Healing, "Diagnosis"),
-                    NavItem("Calculator", Icons.Filled.Calculate, Icons.Outlined.Calculate, "Calculators"),
-                    NavItem("Profile", Icons.Filled.Person, Icons.Outlined.Person, "Profile")
+                    NavItem("Dashboard", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, Localization.get("tab_dashboard", currentLanguage)),
+                    NavItem("Drug Manual", Icons.Filled.MedicalServices, Icons.Outlined.MedicalServices, Localization.get("tab_drugs", currentLanguage)),
+                    NavItem("Smart Diagnosis", Icons.Filled.Healing, Icons.Outlined.Healing, Localization.get("tab_diagnosis", currentLanguage)),
+                    NavItem("Calculator", Icons.Filled.Calculate, Icons.Outlined.Calculate, Localization.get("tab_calculators", currentLanguage)),
+                    NavItem("Profile", Icons.Filled.Person, Icons.Outlined.Person, Localization.get("tab_profile", currentLanguage))
                 ).forEach { item ->
                     val isSelected = activeVetTab == item.tab
                     NavigationBarItem(
@@ -353,21 +372,43 @@ fun OwnerLayoutContainer(viewModel: MainViewModel) {
                                 Text("🐕", fontSize = 18.sp)
                             }
                             Text(
-                                text = "Pet Owner Companion",
+                                text = if (currentLanguage == "en") "Pet Owner Companion" else "همراهِ صاحبِ حیوان",
                                 color = Color.White,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         }
 
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(50.dp))
-                                .clickable { viewModel.toggleTheme() },
-                            contentAlignment = Alignment.Center
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text(if (themeMode == "dark") "☀️" else "🌙", fontSize = 16.sp)
+                            // Language switcher
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(50.dp))
+                                    .clickable { viewModel.setLanguage(if (currentLanguage == "en") "fa" else "en") },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = if (currentLanguage == "en") "FA" else "EN",
+                                    color = Color.White,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+
+                            // Theme switcher
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(50.dp))
+                                    .clickable { viewModel.toggleTheme() },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(if (themeMode == "dark") "☀️" else "🌙", fontSize = 16.sp)
+                            }
                         }
                     }
 
@@ -382,17 +423,17 @@ fun OwnerLayoutContainer(viewModel: MainViewModel) {
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Smart Care & Scheduling Companion",
+                                text = if (currentLanguage == "en") "Smart Care & Scheduling Companion" else "برنامه‌ریزی و مراقبت‌های هوشمند برای پتِ شما",
                                 color = Color.White.copy(alpha = 0.85f),
                                 fontSize = 10.sp
                             )
                             val title = if (session?.fullName?.startsWith("دکتر") == true) {
-                                "Dr. " + session?.fullName?.replace("دکتر", "")?.trim()
+                                if (currentLanguage == "en") "Dr. " + session?.fullName?.replace("دکتر", "")?.trim() else session?.fullName ?: ""
                             } else {
-                                session?.fullName ?: "Dear Pet Owner"
+                                session?.fullName ?: (if (currentLanguage == "en") "Dear Owner" else "صاحب عزیزِ پت")
                             }
                             Text(
-                                text = "Welcome, $title",
+                                text = if (currentLanguage == "en") "Welcome, $title" else "خوش آمدید، $title",
                                 color = Color.White,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold
@@ -415,11 +456,11 @@ fun OwnerLayoutContainer(viewModel: MainViewModel) {
                     windowInsets = WindowInsets.navigationBars
                 ) {
                     listOf(
-                        NavItem("Dashboard", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, "Dashboard"),
-                        NavItem("Prescriptions", Icons.Filled.Assignment, Icons.Outlined.Assignment, "Rx"),
-                        NavItem("Calendar", Icons.Filled.CalendarToday, Icons.Outlined.CalendarToday, "Calendar"),
-                        NavItem("Map", Icons.Filled.Map, Icons.Outlined.Map, "Map"),
-                        NavItem("Profile", Icons.Filled.Person, Icons.Outlined.Person, "Profile")
+                        NavItem("Dashboard", Icons.Filled.Dashboard, Icons.Outlined.Dashboard, Localization.get("tab_dashboard", currentLanguage)),
+                        NavItem("Prescriptions", Icons.Filled.Assignment, Icons.Outlined.Assignment, Localization.get("tab_prescriptions", currentLanguage)),
+                        NavItem("Calendar", Icons.Filled.CalendarToday, Icons.Outlined.CalendarToday, Localization.get("tab_calendar", currentLanguage)),
+                        NavItem("Map", Icons.Filled.Map, Icons.Outlined.Map, Localization.get("tab_map", currentLanguage)),
+                        NavItem("Profile", Icons.Filled.Person, Icons.Outlined.Person, Localization.get("tab_profile", currentLanguage))
                     ).forEach { item ->
                         val isSelected = activeOwnerTab == item.tab
                         NavigationBarItem(
