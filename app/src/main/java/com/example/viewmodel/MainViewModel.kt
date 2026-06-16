@@ -1,5 +1,6 @@
 package com.example.viewmodel
 
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.database.*
@@ -7,17 +8,20 @@ import com.example.data.repository.VetRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class MainViewModel(private val repository: VetRepository) : ViewModel() {
+class MainViewModel(
+    private val repository: VetRepository,
+    private val sharedPrefs: SharedPreferences
+) : ViewModel() {
 
     // --- Authentication ---
     val activeSession: StateFlow<UserSession?> = repository.activeSession
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    // --- UI/Language/Theme Settings (Room state-driven or in-memory) ---
-    private val _themeMode = MutableStateFlow("dark") // "light" or "dark" (default dark to feel premium)
+    // --- UI/Language/Theme Settings (SharedPreferences-backed) ---
+    private val _themeMode = MutableStateFlow(sharedPrefs.getString("theme_mode", "dark") ?: "dark")
     val themeMode: StateFlow<String> = _themeMode.asStateFlow()
 
-    private val _currentLanguage = MutableStateFlow("en") // "fa", "en", "ar"
+    private val _currentLanguage = MutableStateFlow(sharedPrefs.getString("current_language", "fa") ?: "fa") // Default "fa" as seen on the login page
     val currentLanguage: StateFlow<String> = _currentLanguage.asStateFlow()
 
     private val _activeSubscription = MutableStateFlow("gold") // "free", "silver", "gold", "diamond"
@@ -67,11 +71,14 @@ class MainViewModel(private val repository: VetRepository) : ViewModel() {
 
     // --- Functions ---
     fun toggleTheme() {
-        _themeMode.value = if (_themeMode.value == "light") "dark" else "light"
+        val newTheme = if (_themeMode.value == "light") "dark" else "light"
+        _themeMode.value = newTheme
+        sharedPrefs.edit().putString("theme_mode", newTheme).apply()
     }
 
     fun setLanguage(lang: String) {
         _currentLanguage.value = lang
+        sharedPrefs.edit().putString("current_language", lang).apply()
     }
 
     fun setSubscription(sub: String) {

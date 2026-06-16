@@ -69,13 +69,14 @@ class MainActivity : ComponentActivity() {
         // Room DB & Repo Initialization
         val database = AppDatabase.getDatabase(applicationContext)
         val repository = VetRepository(database)
+        val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
 
         // ViewModel factory
         val viewModelFactory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
                     @Suppress("UNCHECKED_CAST")
-                    return MainViewModel(repository) as T
+                    return MainViewModel(repository, sharedPrefs) as T
                 }
                 throw IllegalArgumentException("Unknown ViewModel class")
             }
