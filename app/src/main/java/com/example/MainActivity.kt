@@ -204,18 +204,23 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                             val isProfileIncomplete = s == null || s.fullName.isBlank() || s.fullName.contains("کاربر") || s.fullName.contains("User")
                             val isFemale = s?.gender == "خانم" || s?.gender == "Female"
                             val cleanDoctorName = s?.fullName?.replace("دکتر", "")?.replace("Dr.", "")?.replace("Dr", "")?.trim() ?: ""
+                            val familyName = if (cleanDoctorName.contains(" ")) {
+                                cleanDoctorName.split(" ").lastOrNull()?.trim() ?: cleanDoctorName
+                            } else {
+                                cleanDoctorName
+                            }
 
                             val greeting = if (currentLanguage == "en") {
                                 if (isProfileIncomplete) {
                                     "Hello dear colleague."
                                 } else {
-                                    "Hello ${if (isFemale) "Ms." else "Mr."} Dr. $cleanDoctorName."
+                                    "Hello Dr. $familyName."
                                 }
                             } else {
                                 if (isProfileIncomplete) {
                                     "سلام همکار گرامی."
                                 } else {
-                                    "سلام ${if (isFemale) "سرکار خانم" else "جناب آقای"} دکتر $cleanDoctorName"
+                                    "سلام ${if (isFemale) "خانم" else "آقای"} دکتر $familyName"
                                 }
                             }
                             Text(
