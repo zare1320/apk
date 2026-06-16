@@ -200,8 +200,24 @@ fun VetLayoutContainer(viewModel: MainViewModel) {
                                 Text(if (session?.gender == "خانم" || session?.gender == "Female") "👩‍⚕️" else "👨‍⚕️", fontSize = 24.sp)
                             }
 
-                            val firstName = session?.fullName?.replace("دکتر", "")?.replace("Dr.", "")?.trim()?.split(" ")?.firstOrNull() ?: "Masoud"
-                            val greeting = if (currentLanguage == "en") "Hello $firstName 👋" else "سلام همکار گرامی، دکتر $firstName 👋"
+                            val s = session
+                            val isProfileIncomplete = s == null || s.fullName.isBlank() || s.fullName.contains("کاربر") || s.fullName.contains("User")
+                            val isFemale = s?.gender == "خانم" || s?.gender == "Female"
+                            val cleanDoctorName = s?.fullName?.replace("دکتر", "")?.replace("Dr.", "")?.replace("Dr", "")?.trim() ?: ""
+
+                            val greeting = if (currentLanguage == "en") {
+                                if (isProfileIncomplete) {
+                                    "Hello dear colleague."
+                                } else {
+                                    "Hello ${if (isFemale) "Ms." else "Mr."} Dr. $cleanDoctorName."
+                                }
+                            } else {
+                                if (isProfileIncomplete) {
+                                    "سلام همکار گرامی."
+                                } else {
+                                    "سلام ${if (isFemale) "سرکار خانم" else "جناب آقای"} دکتر $cleanDoctorName"
+                                }
+                            }
                             Text(
                                 text = greeting,
                                 color = Color.White,
