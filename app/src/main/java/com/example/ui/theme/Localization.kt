@@ -151,7 +151,7 @@ object Localization {
         "calendar_sub" to "زمان‌بندی واکسیناسیون، دارو، درمان ضد‌انگل و چکاپ‌ها",
         "create_new_event" to "ثبت رویداد جدید",
         "event_title" to "عنوان یادآوری (مثال: قرص ضد‌انگل)",
-        "event`type" to "نوع یادآوری",
+        "event_type" to "نوع یادآوری",
         "vaccination" to "واکسیناسیون",
         "parasite_treatment" to "درمان ضد‌انگل",
         "general_checkup" to "چکاپ عمومی",
