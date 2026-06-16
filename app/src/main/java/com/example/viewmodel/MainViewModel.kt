@@ -27,6 +27,9 @@ class MainViewModel(
     private val _activeSubscription = MutableStateFlow("gold") // "free", "silver", "gold", "diamond"
     val activeSubscription: StateFlow<String> = _activeSubscription.asStateFlow()
 
+    private val _notificationsEnabled = MutableStateFlow(sharedPrefs.getBoolean("notifications_enabled", true))
+    val notificationsEnabled: StateFlow<Boolean> = _notificationsEnabled.asStateFlow()
+
     // --- Vet Mode: Examined Pet State (Dashboard) ---
     private val _selectedSpecies = MutableStateFlow<String?>(null) // "dog", "cat", "exotic"
     val selectedSpecies: StateFlow<String?> = _selectedSpecies.asStateFlow()
@@ -83,6 +86,11 @@ class MainViewModel(
 
     fun setSubscription(sub: String) {
         _activeSubscription.value = sub
+    }
+
+    fun setNotificationsEnabled(enabled: Boolean) {
+        _notificationsEnabled.value = enabled
+        sharedPrefs.edit().putBoolean("notifications_enabled", enabled).apply()
     }
 
     fun selectSpecies(species: String?) {

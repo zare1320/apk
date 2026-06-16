@@ -37,6 +37,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
     val currentTheme by viewModel.themeMode.collectAsState()
     val currentLang by viewModel.currentLanguage.collectAsState()
     val activeSubscription by viewModel.activeSubscription.collectAsState()
+    val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()
 
     var activeOwnerSection by remember { mutableStateOf("اصلی") } // "اصلی", "تنظیمات", "لینک‌ها"
 
@@ -398,6 +399,73 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                         Switch(
                                             checked = currentTheme == "dark",
                                             onCheckedChange = { viewModel.toggleTheme() }
+                                        )
+                                    }
+
+                                    HorizontalDivider(color = dividerColor)
+
+                                    // Notifications Switch toggle
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 12.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        val context = androidx.compose.ui.platform.LocalContext.current
+                                        val launcher = androidx.activity.compose.rememberLauncherForActivityResult(
+                                            contract = androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
+                                        ) { isGranted ->
+                                            if (isGranted) {
+                                                viewModel.setNotificationsEnabled(true)
+                                                com.example.util.NotificationHelper.sendNotification(
+                                                    context,
+                                                    if (currentLang == "en") "Notifications Activated" else "اعلام‌ها فعال شد",
+                                                    if (currentLang == "en") "You will receive real-time vaccine checks and clinical alerts!" else "از این پس پیام‌ها و هشدارهای واکسیناسیون و دستیار پزشکی ارسال خواهند شد!"
+                                                )
+                                            } else {
+                                                viewModel.setNotificationsEnabled(false)
+                                            }
+                                        }
+                                         
+                                        Text(
+                                            text = if (currentLang == "en") "Enable Push Notifications" else "دریافت نوتیفیکیشن‌ها:",
+                                            fontSize = 13.sp,
+                                            color = textColor
+                                        )
+                                         
+                                        Switch(
+                                            checked = notificationsEnabled,
+                                            onCheckedChange = { isChecked ->
+                                                if (isChecked) {
+                                                     if (android.os.Build.VERSION.SDK_INT >= 33) {
+                                                         val isPermissionGranted = androidx.core.content.ContextCompat.checkSelfPermission(
+                                                             context,
+                                                             "android.permission.POST_NOTIFICATIONS"
+                                                         ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+                                                         if (isPermissionGranted) {
+                                                             viewModel.setNotificationsEnabled(true)
+                                                             com.example.util.NotificationHelper.sendNotification(
+                                                                 context,
+                                                                 if (currentLang == "en") "Notifications Active 🔔" else "فعال‌سازی اطلاع‌رسانی 🔔",
+                                                                 if (currentLang == "en") "You have verified notification services successfully." else "پیکربندی سیستم اطلاع‌رسانی با موفقیت تایید شد."
+                                                             )
+                                                         } else {
+                                                             launcher.launch("android.permission.POST_NOTIFICATIONS")
+                                                         }
+                                                     } else {
+                                                         viewModel.setNotificationsEnabled(true)
+                                                         com.example.util.NotificationHelper.sendNotification(
+                                                             context,
+                                                             if (currentLang == "en") "Notifications Active 🔔" else "فعال‌سازی اطلاع‌رسانی 🔔",
+                                                             if (currentLang == "en") "You have verified notification services successfully." else "پیکربندی سیستم اطلاع‌رسانی با موفقیت تایید شد."
+                                                         )
+                                                     }
+                                                } else {
+                                                    viewModel.setNotificationsEnabled(false)
+                                                }
+                                            }
                                         )
                                     }
 

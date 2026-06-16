@@ -39,6 +39,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
     val currentTheme by viewModel.themeMode.collectAsState()
     val currentLang by viewModel.currentLanguage.collectAsState()
     val activeSubscription by viewModel.activeSubscription.collectAsState()
+    val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()
 
     var activeProfileSection by remember { mutableStateOf("اصلی") } // "اصلی", "نسخه‌ها", "تنظیمات", "لینک‌ها", "منابع"
 
@@ -443,12 +444,111 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                         .padding(bottom = 16.dp)
                                         .border(1.dp, borderColor, RoundedCornerShape(16.dp))
                                 ) {
-                                    ProfileMenuItemRedesigned(
-                                        title = if (currentLang == "en") "Invite Friends" else "دعوت از دوستان",
-                                        iconEmoji = "👥",
-                                        onClick = { showInviteDialog = true }
-                                    )
-                                }
+                                    Column {
+                                        // Inline notification toggle item
+                                        val context = androidx.compose.ui.platform.LocalContext.current
+                                        val launcher = androidx.activity.compose.rememberLauncherForActivityResult(
+                                            contract = androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
+                                        ) { isGranted ->
+                                            if (isGranted) {
+                                                viewModel.setNotificationsEnabled(true)
+                                                com.example.util.NotificationHelper.sendNotification(
+                                                    context,
+                                                    if (currentLang == "en") "System Notifications Active 🔔" else "فعال‌سازی سیستم پدیده 🔔",
+                                                    if (currentLang == "en") "You will receive real-time vaccine checks and clinical alerts!" else "از این پس پیام‌ها و هشدارهای واکسیناسیون و دستیار پزشکی ارسال خواهند شد!"
+                                                )
+                                            } else {
+                                                viewModel.setNotificationsEnabled(false)
+                                            }
+                                        }
+
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 16.dp, vertical = 10.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                             Row(
+                                                 verticalAlignment = Alignment.CenterVertically,
+                                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                             ) {
+                                                 val circleBgColor = if (isSystemInDarkTheme() || MaterialTheme.colorScheme.background.red < 0.2f) Color(0xFF334155) else Color(0xFFEDF2F7)
+                                                 val circleBorderColor = if (isSystemInDarkTheme() || MaterialTheme.colorScheme.background.red < 0.2f) Color(0xFF475569) else Color(0xFFE2E8F0)
+                                                 Box(
+                                                     modifier = Modifier
+                                                         .size(36.dp)
+                                                         .background(circleBgColor, CircleShape)
+                                                         .border(1.dp, circleBorderColor, CircleShape),
+                                                     contentAlignment = Alignment.Center
+                                                 ) {
+                                                     Text("🔔", fontSize = 16.sp)
+                                                 }
+
+                                                 Column {
+                                                     Text(
+                                                         text = if (currentLang == "en") "Push Notifications" else "دریافت نوتیفیکیشن‌ها",
+                                                         fontSize = 14.sp,
+                                                         fontWeight = FontWeight.Bold,
+                                                         color = textColor
+                                                     )
+                                                     val statusDesc = if (notificationsEnabled) {
+                                                         if (currentLang == "en") "Enabled" else "فعال"
+                                                     } else {
+                                                         if (currentLang == "en") "Disabled" else "غیرفعال"
+                                                     }
+                                                     Text(
+                                                         text = statusDesc,
+                                                         fontSize = 11.sp,
+                                                         color = mutedTextColor
+                                                     )
+                                                 }
+                                             }
+
+                                             Switch(
+                                                 checked = notificationsEnabled,
+                                                 onCheckedChange = { isChecked ->
+                                                     if (isChecked) {
+                                                         if (android.os.Build.VERSION.SDK_INT >= 33) {
+                                                             val isPermissionGranted = androidx.core.content.ContextCompat.checkSelfPermission(
+                                                                 context,
+                                                                 "android.permission.POST_NOTIFICATIONS"
+                                                             ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+                                                             if (isPermissionGranted) {
+                                                                 viewModel.setNotificationsEnabled(true)
+                                                                 com.example.util.NotificationHelper.sendNotification(
+                                                                     context,
+                                                                     if (currentLang == "en") "Vetaris Reminders Live" else "هشدارهای پزشکی فعال شد",
+                                                                     if (currentLang == "en") "Notification system successfully verified!" else "دستیار صوتی و سیستم هشدارهای پزشکی شما فعال است!"
+                                                                 )
+                                                             } else {
+                                                                 launcher.launch("android.permission.POST_NOTIFICATIONS")
+                                                             }
+                                                         } else {
+                                                             viewModel.setNotificationsEnabled(true)
+                                                             com.example.util.NotificationHelper.sendNotification(
+                                                                 context,
+                                                                 if (currentLang == "en") "Vetaris Reminders Live" else "هشدارهای پزشکی فعال شد",
+                                                                 if (currentLang == "en") "Notification system successfully verified!" else "دستیار صوتی و سیستم هشدارهای پزشکی شما فعال است!"
+                                                             )
+                                                         }
+                                                     } else {
+                                                         viewModel.setNotificationsEnabled(false)
+                                                     }
+                                                 }
+                                             )
+                                         }
+
+                                         HorizontalDivider(color = dividerColor, thickness = 1.dp)
+
+                                         ProfileMenuItemRedesigned(
+                                             title = if (currentLang == "en") "Invite Friends" else "دعوت از دوستان",
+                                             iconEmoji = "👥",
+                                             onClick = { showInviteDialog = true }
+                                         )
+                                     }
+                                 }
 
                                 // 5. Support Grouping
                                 Text(
@@ -637,6 +737,73 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                         Switch(
                                             checked = currentTheme == "dark",
                                             onCheckedChange = { viewModel.toggleTheme() }
+                                        )
+                                    }
+
+                                    HorizontalDivider(color = dividerColor)
+
+                                    // Notifications Switch toggle
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 12.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        val context = androidx.compose.ui.platform.LocalContext.current
+                                        val launcher = androidx.activity.compose.rememberLauncherForActivityResult(
+                                            contract = androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
+                                        ) { isGranted ->
+                                            if (isGranted) {
+                                                viewModel.setNotificationsEnabled(true)
+                                                com.example.util.NotificationHelper.sendNotification(
+                                                    context,
+                                                    if (currentLang == "en") "Notifications Enabled" else "اعلام‌ها فعال شد",
+                                                    if (currentLang == "en") "You will receive system reminders and updates!" else "اطلاع‌رسانی یادآورها و خدمات واکسیناسیون شما فعال شد."
+                                                )
+                                            } else {
+                                                viewModel.setNotificationsEnabled(false)
+                                            }
+                                        }
+                                         
+                                        Text(
+                                            text = if (currentLang == "en") "Enable Push Notifications" else "دریافت نوتیفیکیشن‌ها:",
+                                            fontSize = 13.sp,
+                                            color = textColor
+                                        )
+                                         
+                                        Switch(
+                                            checked = notificationsEnabled,
+                                            onCheckedChange = { isChecked ->
+                                                if (isChecked) {
+                                                    if (android.os.Build.VERSION.SDK_INT >= 33) {
+                                                        val isPermissionGranted = androidx.core.content.ContextCompat.checkSelfPermission(
+                                                            context,
+                                                            "android.permission.POST_NOTIFICATIONS"
+                                                        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+                                                        if (isPermissionGranted) {
+                                                            viewModel.setNotificationsEnabled(true)
+                                                            com.example.util.NotificationHelper.sendNotification(
+                                                                context,
+                                                                if (currentLang == "en") "Notifications Active 🔔" else "فعال‌سازی اطلاع‌رسانی 🔔",
+                                                                if (currentLang == "en") "You have verified notification services successfully." else "پیکربندی سیستم اطلاع‌رسانی با موفقیت تایید شد."
+                                                            )
+                                                        } else {
+                                                            launcher.launch("android.permission.POST_NOTIFICATIONS")
+                                                        }
+                                                    } else {
+                                                        viewModel.setNotificationsEnabled(true)
+                                                        com.example.util.NotificationHelper.sendNotification(
+                                                            context,
+                                                            if (currentLang == "en") "Notifications Active 🔔" else "فعال‌سازی اطلاع‌رسانی 🔔",
+                                                            if (currentLang == "en") "You have verified notification services successfully." else "پیکربندی سیستم اطلاع‌رسانی با موفقیت تایید شد."
+                                                        )
+                                                    }
+                                                } else {
+                                                    viewModel.setNotificationsEnabled(false)
+                                                }
+                                            }
                                         )
                                     }
 
