@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Edit
@@ -32,7 +33,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.viewmodel.DrugItem
+import com.example.data.database.DrugItem
 import com.example.viewmodel.MainViewModel
 import com.example.viewmodel.staticDrugCatalog
 import kotlinx.coroutines.launch
@@ -282,8 +283,8 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Combine static catalog and custom created drugs
-    val fullCatalog = staticDrugCatalog + customCreatedDrugs
+    // Combine static catalog and custom created drugs (all managed robustly via Room Database)
+    val fullCatalog = customCreatedDrugs.ifEmpty { staticDrugCatalog }
 
     // Premium categories with custom medical icons and emojis
     val categoriesWithIcons = listOf(
@@ -969,6 +970,23 @@ fun VetDrugManualScreen(viewModel: MainViewModel) {
                                 )
                                 
                                 Spacer(modifier = Modifier.width(8.dp))
+                                
+                                if (drug.id.startsWith("custom_")) {
+                                    IconButton(
+                                        onClick = {
+                                            viewModel.deleteDrug(drug)
+                                        },
+                                        modifier = Modifier.size(28.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = "Delete Drug Formula",
+                                            tint = Color(0xFFEF4444),
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                }
                                 
                                 Icon(
                                     imageVector = Icons.Default.KeyboardArrowDown,

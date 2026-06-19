@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.*
 
 @Database(
-    entities = [UserSession::class, Pet::class, Prescription::class, CalendarEvent::class],
-    version = 3,
+    entities = [UserSession::class, Pet::class, Prescription::class, CalendarEvent::class, DrugItem::class, TreatmentGuideline::class],
+    version = 5,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -13,6 +13,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun petDao(): PetDao
     abstract fun prescriptionDao(): PrescriptionDao
     abstract fun calendarEventDao(): CalendarEventDao
+    abstract fun drugDao(): DrugDao
+    abstract fun treatmentGuidelineDao(): TreatmentGuidelineDao
 
     companion object {
         @Volatile

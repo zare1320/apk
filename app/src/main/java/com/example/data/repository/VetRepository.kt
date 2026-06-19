@@ -9,6 +9,8 @@ class VetRepository(private val db: AppDatabase) {
     private val petDao = db.petDao()
     private val prescriptionDao = db.prescriptionDao()
     private val calendarEventDao = db.calendarEventDao()
+    private val drugDao = db.drugDao()
+    private val treatmentGuidelineDao = db.treatmentGuidelineDao()
 
     // --- Authentication / User Session ---
     val activeSession: Flow<UserSession?> = userSessionDao.getActiveSession()
@@ -80,5 +82,51 @@ class VetRepository(private val db: AppDatabase) {
 
     suspend fun deleteEvent(event: CalendarEvent) {
         calendarEventDao.deleteEvent(event)
+    }
+
+    // --- Drugs Database ---
+    val allDrugs: Flow<List<DrugItem>> = drugDao.getAllDrugs()
+
+    suspend fun insertDrug(drug: DrugItem) {
+        drugDao.insertDrug(drug)
+    }
+
+    suspend fun deleteDrug(drug: DrugItem) {
+        drugDao.deleteDrug(drug)
+    }
+
+    suspend fun getDrugCount(): Int = drugDao.getCount()
+
+    suspend fun deleteCustomDrugs() {
+        drugDao.deleteCustomDrugs()
+    }
+
+    suspend fun seedDrugs(drugs: List<DrugItem>) {
+        if (drugDao.getCount() == 0) {
+            drugs.forEach { drugDao.insertDrug(it) }
+        }
+    }
+
+    // --- Treatment Guidelines and Instructions ---
+    val allGuidelines: Flow<List<TreatmentGuideline>> = treatmentGuidelineDao.getAllGuidelines()
+
+    fun getGuidelinesBySpecies(species: String): Flow<List<TreatmentGuideline>> {
+        return treatmentGuidelineDao.getGuidelinesBySpecies(species)
+    }
+
+    suspend fun insertGuideline(guideline: TreatmentGuideline) {
+        treatmentGuidelineDao.insertGuideline(guideline)
+    }
+
+    suspend fun deleteGuideline(guideline: TreatmentGuideline) {
+        treatmentGuidelineDao.deleteGuideline(guideline)
+    }
+
+    suspend fun getGuidelineCount(): Int = treatmentGuidelineDao.getCount()
+
+    suspend fun seedGuidelines(guidelines: List<TreatmentGuideline>) {
+        if (treatmentGuidelineDao.getCount() == 0) {
+            guidelines.forEach { treatmentGuidelineDao.insertGuideline(it) }
+        }
     }
 }

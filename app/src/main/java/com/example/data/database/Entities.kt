@@ -79,3 +79,31 @@ data class CalendarEvent(
     val notes: String = "",
     val isCompleted: Boolean = false
 )
+
+@Entity(tableName = "drugs")
+data class DrugItem(
+    @PrimaryKey
+    val id: String,
+    val nameGeneric: String,
+    val nameScientific: String,
+    val category: String, // e.g. Antibiotics, Anesthetics etc.
+    val concentrationVal: Double, // in mg/ml
+    val concentrationText: String, // available packaging
+    val rangeAndRoute: String, // e.g. "10-20 mg/kg SC"
+    val rangeMin: Double,
+    val rangeMax: Double,
+    val route: String,
+    val defaultDosage: Double // Default drug dosage in mg/kg
+)
+
+@Entity(tableName = "treatment_guidelines")
+data class TreatmentGuideline(
+    @PrimaryKey
+    val id: String,
+    val species: String, // "dog", "cat", "exotic"
+    val name: String,
+    val symptoms: String,
+    val diffDiagnosis: String,
+    val protocol: String
+)
+

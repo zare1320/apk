@@ -58,11 +58,25 @@ class MainViewModel(
     val physicalSigns = MutableStateFlow(mapOf<String, String>())
     val labResults = MutableStateFlow(mapOf<String, String>())
 
-    // --- Drug Catalog & Custom Added Drug Store ---
-    private val _customDrugs = MutableStateFlow<List<DrugItem>>(emptyList())
-    val customDrugs: StateFlow<List<DrugItem>> = _customDrugs.asStateFlow()
+    // --- Drug Catalog & Custom Added Drug Store (Room database-backed) ---
+    val customDrugs: StateFlow<List<DrugItem>> = repository.allDrugs
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    // --- Treatment Guidelines Store (Room database-backed) ---
+    val allGuidelines: StateFlow<List<TreatmentGuideline>> = repository.allGuidelines
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     init {
+        // Seed database with default drug catalog if empty
+        viewModelScope.launch {
+            repository.seedDrugs(staticDrugCatalog)
+        }
+
+        // Seed database with default treatment guidelines if empty
+        viewModelScope.launch {
+            repository.seedGuidelines(staticGuidelinesCatalog)
+        }
+
         // Pre-create a default vet session so the user starts with something if they haven't registered
         viewModelScope.launch {
             val session = repository.getActiveSessionSync()
@@ -359,7 +373,36 @@ class MainViewModel(
             route = route,
             defaultDosage = defaultDosage
         )
-        _customDrugs.value = _customDrugs.value + newDrug
+        viewModelScope.launch {
+            repository.insertDrug(newDrug)
+        }
+    }
+
+    fun deleteDrug(drug: DrugItem) {
+        viewModelScope.launch {
+            repository.deleteDrug(drug)
+        }
+    }
+
+    fun insertGuideline(species: String, name: String, symptoms: String, diffDiagnosis: String, protocol: String) {
+        val guidId = "custom_g_" + System.currentTimeMillis()
+        val newGuideline = TreatmentGuideline(
+            id = guidId,
+            species = species,
+            name = name,
+            symptoms = symptoms,
+            diffDiagnosis = diffDiagnosis,
+            protocol = protocol
+        )
+        viewModelScope.launch {
+            repository.insertGuideline(newGuideline)
+        }
+    }
+
+    fun deleteGuideline(guideline: TreatmentGuideline) {
+        viewModelScope.launch {
+            repository.deleteGuideline(guideline)
+        }
     }
 
     fun addCalendarEvent(
@@ -402,7 +445,7 @@ class MainViewModel(
             _activeExaminedPet.value = null
             _selectedSpecies.value = null
             _selectedExoticOption.value = null
-            _customDrugs.value = emptyList()
+            repository.deleteCustomDrugs()
             physicalComplaints.value = emptyMap()
             physicalSigns.value = emptyMap()
             labResults.value = emptyMap()
@@ -411,19 +454,6 @@ class MainViewModel(
 }
 
 // Data models for the Static Drugs catalog
-data class DrugItem(
-    val id: String,
-    val nameGeneric: String,
-    val nameScientific: String,
-    val category: String, // e.g. Antibiotics, Anesthetics etc.
-    val concentrationVal: Double, // in mg/ml
-    val concentrationText: String, // available packaging
-    val rangeAndRoute: String, // e.g. "10-20 mg/kg SC"
-    val rangeMin: Double,
-    val rangeMax: Double,
-    val route: String,
-    val defaultDosage: Double // Default drug dosage in mg/kg
-)
 
 val staticDrugCatalog = listOf(
     // Anesthetics
@@ -457,4 +487,71 @@ val staticDrugCatalog = listOf(
  
     // Multivitamins
     DrugItem("18", "B-Complex", "Vitamin B Complex", "Nutritional/fluids", 50.0, "50 mg/ml Combined", "0.1-0.2 ml/kg SC/IM", 0.1, 0.2, "SC/IM", 0.15)
+)
+
+val staticGuidelinesCatalog = listOf(
+    TreatmentGuideline(
+        id = "g_dog_cpv",
+        species = "dog",
+        name = "پاروویروس سگ‌سانان (CPV)",
+        symptoms = "اسهال خونی بسیار شدید و بدبو، استفراغ مداوم، بی‌اشتهایی کامل، تب بالا، دهیدراتاسیون بسیار سریع.",
+        diffDiagnosis = "کوروناویروس، ژیاردیازیس، انسداد مکانیکی گوارشی.",
+        protocol = "مایع‌درمانی وریدی تهاجمی رینگرلاکتات، آنتی‌بیوتیک محافظتی ثانویه آمپی‌سیلین، ماروپیتانت ضد استفراغ."
+    ),
+    TreatmentGuideline(
+        id = "g_dog_cdv",
+        species = "dog",
+        name = "دیستمپر سگ (CDV)",
+        symptoms = "ترشحات غلیظ چرکی چشم و بینی، افزایش ضخامت پد کف پنجه پا، پرش عضلانی عصبی، تب نوسانی.",
+        diffDiagnosis = "هاری، هپاتیت عفونی سگ‌سانان، مننژیت قارچی.",
+        protocol = "مراقبت‌های ویژه حمایتی، فنوپاربیتال ضدتشنج، داکسی‌سایکلین، مرطوب‌ساز مجرای تنفسی."
+    ),
+    TreatmentGuideline(
+        id = "g_dog_kc",
+        species = "dog",
+        name = "سرفه کنل (سیاه‌سرفه)",
+        symptoms = "سرفه‌های عمیق بوقی خشک و مکرر پس از فعالیت بدنی، ترشح کف دهان.",
+        diffDiagnosis = "کلاپس نای، نارسایی احتقانی قلبی، بلع جسم خارجی.",
+        protocol = "بخور ملایم آب گرم، داکسی‌سایکلین مناسب (۱۰mg/kg)، پرهیز از اعمال فشار قلاده بر مجرای نای."
+    ),
+    TreatmentGuideline(
+        id = "g_cat_fcv",
+        species = "cat",
+        name = "کلسی‌ویروس گربه‌سانان (FCV)",
+        symptoms = "بافتهای زخمی دهان و دندان، ریزش بزاق، تب، بی‌اشتهایی شدید به دلیل درد دهان.",
+        diffDiagnosis = "هرپس‌ویروس گربه، لنفوم دهانی، زخم‌های ناشی از اورمی کلیه.",
+        protocol = "ملوکسیکام ضددرد، کلیندامایسین برای برطرف کردن باکتری، تیتانیوم دهانی، تغذیه نرم و ولرم."
+    ),
+    TreatmentGuideline(
+        id = "g_cat_pan",
+        species = "cat",
+        name = "پنلوکوپنی گربه‌ها (Panleukopenia)",
+        symptoms = "تب کشنده نوسانی، اسهال بدبو، کاهش شدید ناگهانی سطح گلبول‌های سفید خون.",
+        diffDiagnosis = "سالمونلوز شدید حاد، عفونت پریتونیت FIP روده.",
+        protocol = "پنتوکسی‌فیلین، کواموکسی‌کلاو، سرم‌تراپی وریدی بسیار دقیق گرم شده، مراقبت‌های ایزوله حرارتی."
+    ),
+    TreatmentGuideline(
+        id = "g_cat_fvp",
+        species = "cat",
+        name = "راینوتراکئیت ویروسی گربه (FHV-1)",
+        symptoms = "زخم‌های قرنیه چشمی شاخه‌دار، ترشحات زیاد چشم و بینی، عطسه‌های دردآور.",
+        diffDiagnosis = "کلامیدیا فلیس، مایکوپلاسما عفونی گربه‌ها.",
+        protocol = "اسید آمینه ال‌لایزین، قطره ضد ویروس چشمی مکرر، بخارساز ملایم اتاق."
+    ),
+    TreatmentGuideline(
+        id = "g_exotic_egg",
+        species = "exotic",
+        name = "بند آمدن تخم در پرندگان",
+        symptoms = "کرنش شکم، نشستن کف قفس با بال‌های گشاده، تنفسی نامنظم حاد.",
+        diffDiagnosis = "تومور تخمدان، چاقی مفرط پرندگان.",
+        protocol = "تامین محیط گرم و با رطوبت بسیار بالا، تزریق کلسیم گلوکونات مناسب."
+    ),
+    TreatmentGuideline(
+        id = "g_exotic_wet",
+        species = "exotic",
+        name = "دم خیس در همسترها",
+        symptoms = "اسهال آبکی مداوم، خیسی و آلودگی مخرج، سستی کشنده.",
+        diffDiagnosis = "اسهال باکتریایی سبک، ژیاردیازیس.",
+        protocol = "مایع‌درمانی زیرپوستی گرم، داکسی‌سایکلین مناسب جوندگان."
+    )
 )

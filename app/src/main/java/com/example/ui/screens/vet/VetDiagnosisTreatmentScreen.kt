@@ -22,6 +22,8 @@ import androidx.compose.material.icons.filled.TripOrigin
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,11 +45,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.viewmodel.MainViewModel
+import com.example.viewmodel.staticGuidelinesCatalog
+import com.example.data.database.TreatmentGuideline
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.BorderStroke
 import com.example.R
-import com.example.viewmodel.MainViewModel
 
 // Simple data model for signs and their matching diagnoses
 data class DiagnosticSign(
@@ -63,6 +67,18 @@ data class DiagnosticSign(
 fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
     val activeExaminedPet by viewModel.activeExaminedPet.collectAsState()
     val activeSpecies by viewModel.selectedSpecies.collectAsState()
+    val customGuidelines by viewModel.allGuidelines.collectAsState()
+
+    val specFarsi = when (activeSpecies) {
+        "dog" -> "سگ‌سانان"
+        "cat" -> "گربه‌سانان"
+        else -> "پرندگان و اگزوتیک‌پت"
+    }
+    val speciesKey = when (activeSpecies) {
+        "dog" -> "dog"
+        "cat" -> "cat"
+        else -> "exotic"
+    }
 
     var activeSubTab by remember { mutableStateOf("تشخیص") } // "تشخیص" or "درمان"
     var currentSubScreen by remember { mutableStateOf("home") } // "home", "historical", "physical", "lab", "combine"
@@ -73,6 +89,13 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
     
     var searchQuery by remember { mutableStateOf("") }
     var showProDialog by remember { mutableStateOf(false) }
+
+    // Dialog for adding custom SQLite-backed guidelines
+    var showAddGuidelineDialog by remember { mutableStateOf(false) }
+    var newGuidelineName by remember { mutableStateOf("") }
+    var newGuidelineSymptoms by remember { mutableStateOf("") }
+    var newGuidelineDiffDiagnosis by remember { mutableStateOf("") }
+    var newGuidelineProtocol by remember { mutableStateOf("") }
 
     // State of selected symptomatology
     val selectedSigns = remember { mutableStateListOf<String>() }
@@ -1398,32 +1421,53 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                                 .border(1.dp, strokeColor, RoundedCornerShape(12.dp))
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                val specFarsi = when (activeSpecies) {
-                                    "dog" -> "سگ‌سانان"
-                                    "cat" -> "گربه‌سانان"
-                                    else -> "پرندگان و اگزوتیک‌پت"
+                                // Display guidelines dynamically from the SQLite local database (Room)
+                                val diseaseCatalog = customGuidelines.filter { it.species == speciesKey }.ifEmpty {
+                                    // Preloaded fallback lists
+                                    staticGuidelinesCatalog.filter { it.species == speciesKey }
                                 }
-                                Text(
-                                    text = "📋 پروتکل‌های جامع درمان بیماری‌ها ($specFarsi):",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = accentTeal,
+
+                                Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Right
-                                )
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Button(
+                                        onClick = { showAddGuidelineDialog = true },
+                                        colors = ButtonDefaults.buttonColors(containerColor = accentTeal),
+                                        shape = RoundedCornerShape(8.dp),
+                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                                        modifier = Modifier.height(34.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Add,
+                                            contentDescription = "Add therapy protocol",
+                                            tint = Color.White,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("پروتکل جدید", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                    }
+
+                                    Text(
+                                        text = "📋 پروتکل‌های درمان بیماری‌ها ($specFarsi):",
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = accentTeal,
+                                        textAlign = TextAlign.Right
+                                    )
+                                }
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
-                                    text = "جهت مطالعه درمان‌های دارویی حاد، یک مورد از پرونده‌های زیر را بررسی کنید:",
-                                    fontSize = 11.sp,
+                                    text = "جهت مطالعه درمان‌های دارویی حاد، या مدیریت پروتکل‌های محلی ذخیره شده در پایگاه‌داده SQLite ضربه بزنید:",
+                                    fontSize = 10.sp,
                                     color = secondaryText,
                                     modifier = Modifier.fillMaxWidth(),
                                     textAlign = TextAlign.Right
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
 
-                                // Simple dynamic list of disease items depending on active animal species
-                                val diseaseCatalog = getDiseaseCatalogFor(activeSpecies)
-                                diseaseCatalog.forEach { disease ->
+                                diseaseCatalog.forEach { disease_item ->
                                     var isExpanded by remember { mutableStateOf(false) }
                                     Card(
                                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)),
@@ -1438,23 +1482,47 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                                             modifier = Modifier.padding(12.dp),
                                             horizontalAlignment = Alignment.End
                                         ) {
-                                            Text(
-                                                text = disease.name,
-                                                fontWeight = FontWeight.Bold,
-                                                fontSize = 12.sp,
-                                                color = accentTeal,
-                                                textAlign = TextAlign.Right
-                                            )
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                if (disease_item.id.startsWith("custom_g_")) {
+                                                    IconButton(
+                                                        onClick = {
+                                                            viewModel.deleteGuideline(disease_item)
+                                                        },
+                                                        modifier = Modifier.size(28.dp)
+                                                    ) {
+                                                        Icon(
+                                                            imageVector = Icons.Default.Delete,
+                                                            contentDescription = "Delete Local Guidelines",
+                                                            tint = Color(0xFFEF4444),
+                                                            modifier = Modifier.size(18.dp)
+                                                        )
+                                                    }
+                                                } else {
+                                                    Spacer(modifier = Modifier.width(1.dp))
+                                                }
+
+                                                Text(
+                                                    text = disease_item.name,
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 12.sp,
+                                                    color = accentTeal,
+                                                    textAlign = TextAlign.Right
+                                                )
+                                            }
                                             Spacer(modifier = Modifier.height(2.dp))
-                                            Text("علائم بالینی: " + disease.symptoms, fontSize = 11.sp, color = primaryText, maxLines = if (isExpanded) 10 else 1)
+                                            Text("علائم بالینی: " + disease_item.symptoms, fontSize = 11.sp, color = primaryText, maxLines = if (isExpanded) 10 else 1, textAlign = TextAlign.Right, modifier = Modifier.fillMaxWidth())
 
                                             if (isExpanded) {
                                                 Spacer(modifier = Modifier.height(8.dp))
-                                                Text("تشخیص‌های افتراقی:", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
-                                                Text(disease.diffDiagnosis, fontSize = 11.sp, color = secondaryText)
+                                                Text("تشخیص‌های افتراقی:", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Right)
+                                                Text(disease_item.diffDiagnosis, fontSize = 11.sp, color = secondaryText, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Right)
                                                 Spacer(modifier = Modifier.height(6.dp))
-                                                Text("پروتکل درمانی تجویزی بیمارستان:", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = accentTeal)
-                                                Text(disease.protocol, fontSize = 11.sp, fontWeight = FontWeight.Medium, color = Color(0xFF15803D))
+                                                Text("دستورالعمل و پروتکل درمانی پزشک:", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = accentTeal, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Right)
+                                                Text(disease_item.protocol, fontSize = 11.sp, fontWeight = FontWeight.Medium, color = Color(0xFF15803D), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Right)
                                             } else {
                                                 Text("جهت باز کردن جزئیات ضربه بزنید...", fontSize = 9.sp, color = secondaryText, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Right)
                                             }
@@ -1499,6 +1567,122 @@ fun VetDiagnosisTreatmentScreen(viewModel: MainViewModel) {
                     fontSize = 12.sp,
                     textAlign = TextAlign.Right
                 )
+            }
+        )
+    }
+
+    if (showAddGuidelineDialog) {
+        AlertDialog(
+            onDismissRequest = { showAddGuidelineDialog = false },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (newGuidelineName.isNotBlank() && newGuidelineProtocol.isNotBlank()) {
+                            viewModel.insertGuideline(
+                                species = speciesKey,
+                                name = newGuidelineName,
+                                symptoms = newGuidelineSymptoms.ifBlank { "بدون علامت ثبت شده" },
+                                diffDiagnosis = newGuidelineDiffDiagnosis.ifBlank { "نامشخص/بررسی بالینی" },
+                                protocol = newGuidelineProtocol
+                            )
+                            // Reset state
+                            newGuidelineName = ""
+                            newGuidelineSymptoms = ""
+                            newGuidelineDiffDiagnosis = ""
+                            newGuidelineProtocol = ""
+                            showAddGuidelineDialog = false
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = accentTeal),
+                    enabled = newGuidelineName.isNotBlank() && newGuidelineProtocol.isNotBlank(),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("ذخیره در پایگاه‌داده", color = Color.White, fontSize = 12.sp)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAddGuidelineDialog = false }) {
+                    Text("انصراف", color = accentTeal, fontSize = 12.sp)
+                }
+            },
+            title = {
+                Text(
+                    text = "➕ افزودن دستورالعمل و پروتکل جدید ($specFarsi)",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = accentTeal,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Right
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        "مشخصات پروتکل درمانی محلی را جهت ذخیره در حافظه پایدار SQLite وارد نمایید:",
+                        fontSize = 11.sp,
+                        color = secondaryText,
+                        textAlign = TextAlign.Right,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
+                        value = newGuidelineName,
+                        onValueChange = { newGuidelineName = it },
+                        label = { Text("نام بیماری / عارضه (الزامی)", fontSize = 11.sp) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        shape = RoundedCornerShape(8.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = accentTeal,
+                            unfocusedBorderColor = strokeColor
+                        )
+                    )
+
+                    OutlinedTextField(
+                        value = newGuidelineSymptoms,
+                        onValueChange = { newGuidelineSymptoms = it },
+                        label = { Text("علائم بالینی شایع", fontSize = 11.sp) },
+                        modifier = Modifier.fillMaxWidth(),
+                        maxLines = 3,
+                        shape = RoundedCornerShape(8.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = accentTeal,
+                            unfocusedBorderColor = strokeColor
+                        )
+                    )
+
+                    OutlinedTextField(
+                        value = newGuidelineDiffDiagnosis,
+                        onValueChange = { newGuidelineDiffDiagnosis = it },
+                        label = { Text("تشخیص‌های افتراقی تفکیکی", fontSize = 11.sp) },
+                        modifier = Modifier.fillMaxWidth(),
+                        maxLines = 3,
+                        shape = RoundedCornerShape(8.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = accentTeal,
+                            unfocusedBorderColor = strokeColor
+                        )
+                    )
+
+                    OutlinedTextField(
+                        value = newGuidelineProtocol,
+                        onValueChange = { newGuidelineProtocol = it },
+                        label = { Text("دستورالعمل و پروتکل درمانی پزشک (الزامی)", fontSize = 11.sp) },
+                        modifier = Modifier.fillMaxWidth(),
+                        maxLines = 4,
+                        shape = RoundedCornerShape(8.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = accentTeal,
+                            unfocusedBorderColor = strokeColor
+                        )
+                    )
+                }
             }
         )
     }
