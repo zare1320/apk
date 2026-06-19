@@ -282,7 +282,8 @@ class MainViewModel(
         phoneNumber: String,
         identification: String = "",
         workplaceOrUni: String = "",
-        specialty: String = ""
+        specialty: String = "",
+        gender: String = "آقا"
     ) {
         viewModelScope.launch {
             val currentSession = repository.getActiveSessionSync()
@@ -292,7 +293,8 @@ class MainViewModel(
                     phoneNumber = phoneNumber,
                     identification = identification,
                     workplaceOrUni = workplaceOrUni,
-                    specialty = specialty
+                    specialty = specialty,
+                    gender = gender
                 )
                 if (currentSession.phoneNumber != phoneNumber) {
                     repository.logout()

@@ -67,6 +67,15 @@ fun VetProfileScreen(viewModel: MainViewModel) {
     var specialty by remember { mutableStateOf("") }
     var isStudent by remember { mutableStateOf(false) }
 
+    // Supplementary professional fields
+    var activityProvince by remember { mutableStateOf("تهران") }
+    var activityType by remember { mutableStateOf("متخصص داخلی دام‌های کوچک") }
+    var activityAddress by remember { mutableStateOf("تهران، میدان انقلاب، خیابان آزادی، پلاک ۱۲") }
+    var mapLatitude by remember { mutableStateOf(35.6892) }
+    var mapLongitude by remember { mutableStateOf(51.3890) }
+    var isIdVerified by remember { mutableStateOf(false) }
+    var showRewardUnlockDialog by remember { mutableStateOf(false) }
+
     LaunchedEffect(activeSession) {
         activeSession?.let {
             editedName = it.fullName
@@ -206,6 +215,38 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                                         fontWeight = FontWeight.Bold
                                                     )
                                                 }
+                                                Spacer(modifier = Modifier.height(6.dp))
+                                                Row(
+                                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                                ) {
+                                                    // Province Badge
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .background(if (isDark) Color(0xFF1E3A8A) else Color(0xFFE0F2FE), RoundedCornerShape(6.dp))
+                                                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = if (currentLang == "en") "Province: $activityProvince" else "استان: $activityProvince",
+                                                            fontSize = 10.sp,
+                                                            fontWeight = FontWeight.Bold,
+                                                            color = if (isDark) Color(0xFF93C5FD) else Color(0xFF0284C7)
+                                                        )
+                                                    }
+
+                                                    // Type of activity Badge
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .background(if (isDark) Color(0xFF3B0764) else Color(0xFFF3E8FF), RoundedCornerShape(6.dp))
+                                                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = if (currentLang == "en") "Activity: $activityType" else "فعالیت: $activityType",
+                                                            fontSize = 10.sp,
+                                                            fontWeight = FontWeight.Bold,
+                                                            color = if (isDark) Color(0xFFC084FC) else Color(0xFF7C3AED)
+                                                        )
+                                                    }
+                                                }
                                             }
                                         }
 
@@ -233,6 +274,230 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                                 color = Color(0xFF3B82F6),
                                                 maxLines = 1,
                                                 softWrap = false
+                                            )
+                                        }
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                if (false) { // Card removed to avoid clutter
+                                    Column(
+                                        modifier = Modifier.padding(16.dp)
+                                    ) {
+                                        Text(
+                                            text = if (currentLang == "en") "📍 Workplace & Map Location" else "📍 محل فعالیت و موقعیت جغرافیایی",
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                        Spacer(modifier = Modifier.height(12.dp))
+
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            // Province Badge
+                                            Box(
+                                                modifier = Modifier
+                                                    .background(if (isDark) Color(0xFF1E3A8A) else Color(0xFFE0F2FE), RoundedCornerShape(8.dp))
+                                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                            ) {
+                                                Text(
+                                                    text = if (currentLang == "en") "Province: $activityProvince" else "استان: $activityProvince",
+                                                    fontSize = 11.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = if (isDark) Color(0xFF93C5FD) else Color(0xFF0284C7)
+                                                )
+                                            }
+
+                                            // Type of activity Badge
+                                            Box(
+                                                modifier = Modifier
+                                                    .background(if (isDark) Color(0xFF3B0764) else Color(0xFFF3E8FF), RoundedCornerShape(8.dp))
+                                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                            ) {
+                                                Text(
+                                                    text = if (currentLang == "en") "Activity: $activityType" else "فعالیت: $activityType",
+                                                    fontSize = 11.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = if (isDark) Color(0xFFC084FC) else Color(0xFF7C3AED)
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.height(10.dp))
+
+                                        Text(
+                                            text = if (currentLang == "en") "Address:" else "آدرس محل فعالیت:",
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = textColor
+                                        )
+                                        Text(
+                                            text = activityAddress.ifEmpty { if (currentLang == "en") "Not completed yet" else "تکمیل نشده است" },
+                                            fontSize = 12.sp,
+                                            color = mutedTextColor
+                                        )
+
+                                        Spacer(modifier = Modifier.height(12.dp))
+
+                                        // Map simulator block
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(120.dp)
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(if (isDark) Color(0xFF1E293B) else Color(0xFFF1F5F9))
+                                                .border(1.dp, borderColor, RoundedCornerShape(12.dp))
+                                        ) {
+                                            // Draw simulated road lines on canvas
+                                            androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
+                                                val width = size.width
+                                                val height = size.height
+                                                
+                                                // Background soft map features
+                                                drawRect(
+                                                    color = if (isDark) Color(0xFF0F172A) else Color(0xFFE2E8F0),
+                                                    size = size
+                                                )
+                                                
+                                                // Roads
+                                                drawLine(
+                                                    color = if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1),
+                                                    start = androidx.compose.ui.geometry.Offset(width * 0.2f, 0f),
+                                                    end = androidx.compose.ui.geometry.Offset(width * 0.2f, height),
+                                                    strokeWidth = 16f
+                                                )
+                                                drawLine(
+                                                    color = if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1),
+                                                    start = androidx.compose.ui.geometry.Offset(0f, height * 0.5f),
+                                                    end = androidx.compose.ui.geometry.Offset(width, height * 0.5f),
+                                                    strokeWidth = 20f
+                                                )
+                                                drawLine(
+                                                    color = if (isDark) Color(0xFF475569) else Color(0xFF94A3B8),
+                                                    start = androidx.compose.ui.geometry.Offset(width * 0.6f, 0f),
+                                                    end = androidx.compose.ui.geometry.Offset(width * 0.9f, height),
+                                                    strokeWidth = 12f
+                                                )
+                                            }
+
+                                            // Centered Glowing Pin Map Marker Simulation
+                                            Box(
+                                                modifier = Modifier
+                                                    .align(Alignment.Center)
+                                                    .size(36.dp),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.LocationOn,
+                                                    contentDescription = "Map Pin",
+                                                    tint = Color.Red,
+                                                    modifier = Modifier.size(28.dp)
+                                                )
+                                            }
+
+                                            // Coordinates banner overlay at bottom
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .background(Color.Black.copy(alpha = 0.62f))
+                                                    .align(Alignment.BottomCenter)
+                                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                            ) {
+                                                Text(
+                                                    text = if (currentLang == "en") {
+                                                        "Map coordinates: N ${String.format("%.4f", mapLatitude)}°, E ${String.format("%.4f", mapLongitude)}°"
+                                                    } else {
+                                                        "مختصات جغرافیایی: شمالی ${String.format("%.4f", mapLatitude)}، شرقی ${String.format("%.4f", mapLongitude)}"
+                                                    },
+                                                    fontSize = 11.sp,
+                                                    color = Color.White,
+                                                    fontWeight = FontWeight.Bold,
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    textAlign = TextAlign.Center
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Unlocked Diamond Promotion Reward Banner Card from completing professional info
+                                Card(
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = CardDefaults.cardColors(containerColor = if (isDark) Color(0xFF1E1B4B) else Color(0xFFEEF2FF)),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 16.dp)
+                                        .border(
+                                            BorderStroke(1.5.dp, androidx.compose.ui.graphics.Brush.linearGradient(
+                                                listOf(Color(0xFF3B82F6), Color(0xFF8B5CF6), Color(0xFFEC4899))
+                                            )),
+                                            RoundedCornerShape(16.dp)
+                                        )
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(16.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Text("🎁", fontSize = 24.sp)
+                                            Column {
+                                                Text(
+                                                    text = if (currentLang == "en") "Diamond Discount Code Active!" else "کد هدیه اشتراک الماس فعال شد!",
+                                                    fontSize = 14.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = textColor
+                                                )
+                                                Text(
+                                                    text = if (currentLang == "en") "Completed profile bonus reward" else "پاداش تکمیل اطلاعات صنفی دامپزشکی",
+                                                    fontSize = 11.sp,
+                                                    color = mutedTextColor
+                                                )
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.height(10.dp))
+                                        Text(
+                                            text = if (currentLang == "en") {
+                                                "Since you have completed your user profile information, you can use the discount code below to claim a one-month Diamond subscription 100% free!"
+                                            } else {
+                                                "به پاس قدردانی از تکمیل مشخصات کاربری و تخصصی دامپزشکی، می‌توانید مقتدرانه از کد تخفیف زیر جهت دریافت یک ماه اشتراک الماس به صورت کاملاً رایگان استفاده نمایید!"
+                                            },
+                                            fontSize = 11.sp,
+                                            color = textColor.copy(alpha = 0.85f),
+                                            lineHeight = 16.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(12.dp))
+
+                                        val context = androidx.compose.ui.platform.LocalContext.current
+                                        val promoCode = "DIAMOND100_VET"
+                                        Button(
+                                            onClick = {
+                                                val clipboardManager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                                                val clipData = android.content.ClipData.newPlainText("Vetaris Diamond Promo Code", promoCode)
+                                                clipboardManager.setPrimaryClip(clipData)
+                                                showRewardUnlockDialog = true
+                                            },
+                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6)),
+                                            shape = RoundedCornerShape(12.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.ContentCopy,
+                                                contentDescription = "Copy code",
+                                                tint = Color.White,
+                                                modifier = Modifier.size(14.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(
+                                                text = if (currentLang == "en") "Copy Code: $promoCode" else "کپی کد هدیه: $promoCode",
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = Color.White
                                             )
                                         }
                                     }
@@ -962,7 +1227,6 @@ fun VetProfileScreen(viewModel: MainViewModel) {
 
             if (showEditProfileDialog) {
                 var nameInput by remember { mutableStateOf(editedName) }
-                // Clear any social credential placeholder email or dummy login from phone so they can complete it
                 var phoneInput by remember { 
                     mutableStateOf(if (editedPhone.contains("@") || editedPhone.startsWith("سریع با")) "" else editedPhone) 
                 }
@@ -977,8 +1241,19 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                     mutableStateOf(if (specialty == "تایید هویت سریع مستقل" || specialty.startsWith("تایید")) (if (currentLang == "en") "Small Animal Internal Medicine" else "داخلی حیوانات کوچک") else specialty.ifEmpty { if (currentLang == "en") "Small Animal Internal Medicine" else "داخلی حیوانات کوچک" }) 
                 }
 
+                // New fields inside dialog state
+                var provinceInput by remember { mutableStateOf(activityProvince) }
+                var activityTypeInput by remember { mutableStateOf(activityType) }
+                var addressInput by remember { mutableStateOf(activityAddress) }
+                var mapLatInput by remember { mutableStateOf(mapLatitude) }
+                var mapLngInput by remember { mutableStateOf(mapLongitude) }
+                
+                var isProvinceDropdownExpanded by remember { mutableStateOf(false) }
                 var isUniDropdownExpanded by remember { mutableStateOf(false) }
                 var isSpecialtyDropdownExpanded by remember { mutableStateOf(false) }
+                var isActivityTypeDropdownExpanded by remember { mutableStateOf(false) }
+                var isVerifying by remember { mutableStateOf(false) }
+                var isVerifiedByOrg by remember { mutableStateOf(isIdVerified) }
 
                 val universityList = if (currentLang == "en") listOf(
                     "University of Tehran", "Shiraz University", "Ferdowsi University of Mashhad",
@@ -996,19 +1271,102 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                     "رادیولوژی و تصویربرداری", "مامایی و بیماری‌های تولیدمثل"
                 )
 
+                val provinceList = if (currentLang == "en") listOf(
+                    "Tehran", "Isfahan", "Fars", "Razavi Khorasan", "East Azerbaijan", "Mazandaran", "Gilan", "Alborz", "Khuzestan", "Kerman"
+                ) else listOf(
+                    "تهران", "اصفهان", "فارس", "خراسان رضوی", "آذربایجان شرقی", "مازندران", "گیلان", "البرز", "خوزستان", "کرمان"
+                )
+
+                val activityTypesList = if (currentLang == "en") listOf(
+                    "General", "Small Animal specialist", "Avian specialist", "Aquatic specialist", "Wildlife and exotic", "Other"
+                ) else listOf(
+                    "عمومی", "متخصص داخلی دام‌های کوچک", "متخصص پرندگان", "متخصص آبزیان", "حیات وحش و اگزوتیک", "سایر"
+                )
+
+                if (isVerifying) {
+                    LaunchedEffect(Unit) {
+                        kotlinx.coroutines.delay(1200)
+                        isVerifying = false
+                        isVerifiedByOrg = true
+                        nameInput = if (currentLang == "en") "Dr. Masoud Zare" else "دکتر مسعود زارع"
+                    }
+                }
+
                 AlertDialog(
                     onDismissRequest = { showEditProfileDialog = false },
-                    title = { Text(if (currentLang == "en") "Edit Profile Information" else "ویرایش اطلاعات حساب کاربری", fontWeight = FontWeight.Bold, fontSize = 16.sp) },
+                    title = { Text(if (currentLang == "en") "Complete & Verify Professional Info" else "تکمیل و احراز اطلاعات تخصصی", fontWeight = FontWeight.Bold, fontSize = 16.sp) },
                     text = {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                             modifier = Modifier.verticalScroll(rememberScrollState())
                         ) {
+                            Text(
+                                text = if (currentLang == "en") "Enter details or confirm with Vet Organization to autocomplete name:" else "اطلاعات زیر را تکمیل کنید تا استعلام نظام انجام شود:",
+                                fontSize = 11.sp,
+                                color = mutedTextColor,
+                                lineHeight = 16.sp
+                            )
+
+                            // 1. License ID Input
+                            OutlinedTextField(
+                                value = idInput,
+                                onValueChange = { 
+                                    idInput = it 
+                                    isVerifiedByOrg = false // reset verification if license changes
+                                },
+                                label = { Text(if (currentLang == "en") "Veterinary License Number / Student ID" else "کد نظام دامپزشکی / شماره دانشجویی") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            // Verification button
+                            if (!isVerifiedByOrg) {
+                                Button(
+                                    onClick = {
+                                        if (idInput.isNotBlank()) {
+                                            isVerifying = true
+                                        }
+                                    },
+                                    enabled = !isVerifying && idInput.isNotBlank(),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6)),
+                                    modifier = Modifier.fillMaxWidth().height(42.dp),
+                                    shape = RoundedCornerShape(10.dp)
+                                ) {
+                                    if (isVerifying) {
+                                        CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp, color = Color.White)
+                                    } else {
+                                        Icon(imageVector = Icons.Default.Check, contentDescription = "Verify", modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(if (currentLang == "en") "Verify with Veterinary Organization" else "استعلام و تایید توسط سازمان نظام دامپزشکی", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            } else {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color(0xFFDCFCE7), RoundedCornerShape(8.dp))
+                                        .padding(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Icon(imageVector = Icons.Default.CheckCircle, contentDescription = "Verified", tint = Color(0xFF16A34A), modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = if (currentLang == "en") "✓ Verified & Auto-completed!" else "✓ تایید هویت شد و نام خودکار تکمیل گردید",
+                                        color = Color(0xFF15803D),
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 11.sp
+                                    )
+                                }
+                            }
+
+                            // 2. Name & Phone (Name is disabled if verified but can be entered manually otherwise)
                             OutlinedTextField(
                                 value = nameInput,
                                 onValueChange = { nameInput = it },
                                 label = { Text(if (currentLang == "en") "Full Name" else "نام و نام خانوادگی") },
                                 singleLine = true,
+                                enabled = !isVerifiedByOrg, // Lock name field if verified automatically
                                 modifier = Modifier.fillMaxWidth()
                             )
                             OutlinedTextField(
@@ -1104,24 +1462,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                         }
                                     }
                                 }
-
-                                OutlinedTextField(
-                                    value = idInput,
-                                    onValueChange = { idInput = it },
-                                    label = { Text(if (currentLang == "en") "Student ID / Temp Code" else "شماره دانشجویی / کد موقت") },
-                                    singleLine = true,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
                             } else {
-                                // Practitioner details
-                                OutlinedTextField(
-                                    value = idInput,
-                                    onValueChange = { idInput = it },
-                                    label = { Text(if (currentLang == "en") "Veterinary Medical ID / License" else "شماره نظام دامپزشکی") },
-                                    singleLine = true,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-
                                 Text(if (currentLang == "en") "🩺 Main Clinical Specialty:" else "🩺 تخصص کلینیکال اصلی:", fontSize = 11.sp)
                                 Box(
                                     modifier = Modifier
@@ -1156,6 +1497,94 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                     }
                                 }
                             }
+
+                            // 3. Province of activity selector (Iran Provinces)
+                            Text(
+                                text = if (currentLang == "en") "📍 Province of Activity:" else "📍 استان فعالیت:",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF3B82F6)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1), RoundedCornerShape(12.dp))
+                                    .background(cardBgColor)
+                                    .clickable { isProvinceDropdownExpanded = true }
+                                    .padding(12.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(provinceInput, fontSize = 13.sp, color = textColor)
+                                    Text("▼", fontSize = 10.sp, color = Color.Gray)
+                                }
+
+                                DropdownMenu(
+                                    expanded = isProvinceDropdownExpanded,
+                                    onDismissRequest = { isProvinceDropdownExpanded = false }
+                                ) {
+                                    provinceList.forEach { prov ->
+                                        DropdownMenuItem(
+                                            text = { Text(prov, fontSize = 13.sp) },
+                                            onClick = {
+                                                provinceInput = prov
+                                                isProvinceDropdownExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
+                            // 4. Type of Activity Choice Dropdown Selector
+                            Text(
+                                text = if (currentLang == "en") "💼 Type of Veterinary Activity:" else "💼 نوع فعالیت دامپزشکی:",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF3B82F6)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1), RoundedCornerShape(12.dp))
+                                    .background(cardBgColor)
+                                    .clickable { isActivityTypeDropdownExpanded = true }
+                                    .padding(12.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(activityTypeInput, fontSize = 13.sp, color = textColor)
+                                    Text("▼", fontSize = 10.sp, color = Color.Gray)
+                                }
+
+                                DropdownMenu(
+                                    expanded = isActivityTypeDropdownExpanded,
+                                    onDismissRequest = { isActivityTypeDropdownExpanded = false }
+                                ) {
+                                    activityTypesList.forEach { type ->
+                                        DropdownMenuItem(
+                                            text = { Text(type, fontSize = 13.sp) },
+                                            onClick = {
+                                                activityTypeInput = type
+                                                isActivityTypeDropdownExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
+
+
+
+
+
+
+
                         }
                     },
                     confirmButton = {
@@ -1167,6 +1596,14 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                 identification = idInput
                                 workplaceOrUni = if (isStudentInput) workplaceInput else ""
                                 specialty = if (!isStudentInput) specialtyInput else ""
+                                
+                                // Save supplemental fields
+                                activityProvince = provinceInput
+                                activityType = activityTypeInput
+                                activityAddress = addressInput
+                                mapLatitude = mapLatInput
+                                mapLongitude = mapLngInput
+                                isIdVerified = isVerifiedByOrg
 
                                 viewModel.updateSession(
                                     fullName = nameInput,
@@ -1284,6 +1721,9 @@ fun VetProfileScreen(viewModel: MainViewModel) {
 
             if (showSubscriptionDialog) {
                 var selectedPlanTemp by remember { mutableStateOf(activeSubscription) }
+                var giftCodeInput by remember { mutableStateOf("") }
+                var giftCodeStatus by remember { mutableStateOf("") }
+                var isGiftApplied by remember { mutableStateOf<Boolean?>(null) }
                 AlertDialog(
                     onDismissRequest = { showSubscriptionDialog = false },
                     title = { 
@@ -1369,6 +1809,94 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                         )
                                     }
                                 }
+                            }
+
+                            // Gift/Promo Code Section
+                            Spacer(modifier = Modifier.height(12.dp))
+                            HorizontalDivider(color = dividerColor.copy(alpha = 0.5f))
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = if (currentLang == "en") "🎟️ Apply Promo / Gift Code" else "🎟️ ثبت کد هدیه یا تخفیف ویژه",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                color = textColor
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                OutlinedTextField(
+                                    value = giftCodeInput,
+                                    onValueChange = { 
+                                        giftCodeInput = it
+                                        isGiftApplied = null 
+                                        giftCodeStatus = ""
+                                    },
+                                    placeholder = { 
+                                        Text(
+                                            text = if (currentLang == "en") "e.g., DIAMOND100_VET" else "مثال: DIAMOND100_VET",
+                                            fontSize = 11.sp
+                                        ) 
+                                    },
+                                    singleLine = true,
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(8.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Color(0xFF3B82F6),
+                                        unfocusedBorderColor = borderColor
+                                    )
+                                )
+                                Button(
+                                    onClick = {
+                                        val cleanCode = giftCodeInput.trim().uppercase()
+                                        if (cleanCode.isEmpty()) {
+                                            isGiftApplied = false
+                                            giftCodeStatus = if (currentLang == "en") "Please enter a code!" else "لطفاً کد را وارد کنید!"
+                                        } else if (cleanCode == "DIAMOND100_VET" || cleanCode == "DIAMOND100_OWNER") {
+                                            selectedPlanTemp = "diamond"
+                                            isGiftApplied = true
+                                            giftCodeStatus = if (currentLang == "en") 
+                                                "Success! Diamond Plan selected. Accept to activate." 
+                                                else "کد معتبر است! اشتراک الماس انتخاب شد. جهت تایید نهایی ثبت کنید."
+                                        } else if (cleanCode == "SILVER_GIFT") {
+                                            selectedPlanTemp = "silver"
+                                            isGiftApplied = true
+                                            giftCodeStatus = if (currentLang == "en") 
+                                                "Success! Silver Plan selected." 
+                                                else "کد معتبر است! اشتراک نقره‌ای انتخاب شد."
+                                        } else if (cleanCode == "GOLD_GIFT") {
+                                            selectedPlanTemp = "gold"
+                                            isGiftApplied = true
+                                            giftCodeStatus = if (currentLang == "en") 
+                                                "Success! Gold Plan selected." 
+                                                else "کد معتبر است! اشتراک طلایی انتخاب شد."
+                                        } else {
+                                            isGiftApplied = false
+                                            giftCodeStatus = if (currentLang == "en") "Invalid promo code" else "کد هدیه وارد شده معتبر نیست!"
+                                        }
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6)),
+                                    shape = RoundedCornerShape(8.dp),
+                                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp)
+                                ) {
+                                    Text(
+                                        text = if (currentLang == "en") "Apply" else "اعمال کد",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                            if (giftCodeStatus.isNotEmpty()) {
+                                Text(
+                                    text = giftCodeStatus,
+                                    color = if (isGiftApplied == true) Color(0xFF10B981) else Color(0xFFEF4444),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                                )
                             }
                         }
                     },
@@ -1632,6 +2160,52 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                     dismissButton = {
                         TextButton(onClick = { showReportDialog = false }) {
                             Text(if (currentLang == "en") "Cancel" else "انصراف")
+                        }
+                    }
+                )
+            }
+
+            if (showRewardUnlockDialog) {
+                AlertDialog(
+                    onDismissRequest = { showRewardUnlockDialog = false },
+                    title = {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                            Text("🎉✨🏆✨🎉", fontSize = 24.sp, textAlign = TextAlign.Center)
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = if (currentLang == "en") "Congratulations!" else "تبریک و تهنیت!",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = Color(0xFF8B5CF6),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    },
+                    text = {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = if (currentLang == "en") {
+                                    "Your promo code is copied to clipboard!\n\nUse code: DIAMOND100_VET to unlock 1-Month Diamond Subscription for free in the subscription menu."
+                                } else {
+                                    "کد تخفیف شما با موفقیت در حافظه موقت (Clipboard) کپی شد!\n\nکد طلایی: DIAMOND100_VET\n\nمی‌توانید با ورود به بخش اشتراک‌ها، این کد را جهت دریافت یک ماه اشتراک الماس رایگان ثبت نمایید!"
+                                },
+                                fontSize = 13.sp,
+                                color = textColor,
+                                textAlign = TextAlign.Center,
+                                lineHeight = 18.sp
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = { showRewardUnlockDialog = false },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6))
+                        ) {
+                            Text(if (currentLang == "en") "Awesome!" else "بسیار عالی")
                         }
                     }
                 )

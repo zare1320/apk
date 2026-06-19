@@ -57,11 +57,16 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
     // Interactivity state copies
     var editedName by remember { mutableStateOf("صاحب پت گرامی") }
     var editedPhone by remember { mutableStateOf("۰۹۱۲۳۴۵۶۷۸۹") }
+    var editedGender by remember { mutableStateOf("آقا") }
+    var showOwnerRewardUnlockDialog by remember { mutableStateOf(false) }
+    var showAddPetDialog by remember { mutableStateOf(false) }
+    var showPromoCodeCard by remember { mutableStateOf(true) }
 
     LaunchedEffect(activeSession) {
         if (activeSession != null) {
             editedName = activeSession?.fullName ?: "صاحب پت گرامی"
             editedPhone = activeSession?.phoneNumber ?: "۰۹۱۲۳۴۵۶۷۸۹"
+            editedGender = activeSession?.gender ?: "آقا"
         }
     }
 
@@ -178,6 +183,23 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                                     color = mutedTextColor,
                                                     fontWeight = FontWeight.Medium
                                                 )
+                                                Spacer(modifier = Modifier.height(4.dp))
+                                                Box(
+                                                    modifier = Modifier
+                                                        .background(if (isDark) Color(0xFF3F2B30) else Color(0xFFFEE2E2), RoundedCornerShape(6.dp))
+                                                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                                                ) {
+                                                    Text(
+                                                        text = if (currentLang == "en") {
+                                                            "Gender: ${if (editedGender == "خانم") "Female" else "Male"}"
+                                                         } else {
+                                                             "جنسیت: ${if (editedGender == "خانم") "خانم" else "آقا"}"
+                                                         },
+                                                        fontSize = 10.sp,
+                                                        fontWeight = FontWeight.Bold,
+                                                        color = Color(0xFFEF4444)
+                                                    )
+                                                }
                                             }
                                         }
 
@@ -206,13 +228,258 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                                 maxLines = 1,
                                                 softWrap = false
                                              )
-                                        }
-                                    }
-                                }
+                                         }
+                                     }
+                                 }
 
-                                Spacer(modifier = Modifier.height(8.dp))
+                                 Spacer(modifier = Modifier.height(12.dp))
 
-                                // 2. Account Management Category Grouping
+                                 // Promo code reward card for completed profile
+                                 if (showPromoCodeCard) {
+                                 Card(
+                                     shape = RoundedCornerShape(16.dp),
+                                     colors = CardDefaults.cardColors(containerColor = if (isDark) Color(0xFF3B1E2B) else Color(0xFFFFF1F2)),
+                                     modifier = Modifier
+                                         .fillMaxWidth()
+                                         .padding(bottom = 16.dp)
+                                         .border(
+                                             BorderStroke(1.5.dp, androidx.compose.ui.graphics.Brush.linearGradient(
+                                                 listOf(Color(0xFFF43F5E), Color(0xFFD946EF), Color(0xFF8B5CF6))
+                                             )),
+                                             RoundedCornerShape(16.dp)
+                                         )
+                                 ) {
+                                     Column(
+                                         modifier = Modifier.padding(16.dp),
+                                         horizontalAlignment = Alignment.CenterHorizontally
+                                     ) {
+                                         Row(
+                                             verticalAlignment = Alignment.CenterVertically,
+                                             horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                             modifier = Modifier.fillMaxWidth()
+                                         ) {
+                                             Text("🎁", fontSize = 24.sp)
+                                             Column(modifier = Modifier.weight(1f)) {
+                                                 Text(
+                                                     text = if (currentLang == "en") "Diamond Code Unlocked!" else "کد هدیه اشتراک الماس فعال شد!",
+                                                     fontSize = 14.sp,
+                                                     fontWeight = FontWeight.Bold,
+                                                     color = textColor
+                                                 )
+                                                 Text(
+                                                     text = if (currentLang == "en") "Completed profile bonus reward" else "پاداش تکمیل اطلاعات سرپرستی حیوانات",
+                                                     fontSize = 11.sp,
+                                                     color = mutedTextColor
+                                                 )
+                                             }
+                                             IconButton(
+                                                 onClick = { showPromoCodeCard = false },
+                                                 modifier = Modifier.size(24.dp)
+                                             ) {
+                                                 Icon(
+                                                     imageVector = Icons.Default.Close,
+                                                     contentDescription = "Ignore / Dismiss",
+                                                     tint = mutedTextColor,
+                                                     modifier = Modifier.size(16.dp)
+                                                 )
+                                             }
+                                         }
+                                         Spacer(modifier = Modifier.height(10.dp))
+                                         Text(
+                                             text = if (currentLang == "en") {
+                                                 "Since you have completed your user profile information, you can use the discount code below to claim a one-month Diamond subscription 100% free!"
+                                             } else {
+                                                 "به پاس قدردانی از تکمیل مشخصات کاربر و اطلاعات تبارشناسی پت‌، می‌توانید از کد تخفیف اختصاصی زیر جهت فعال‌سازی یک ماه اشتراک ممتاز الماس به صورت کاملاً رایگان استفاده نمایید!"
+                                             },
+                                             fontSize = 11.sp,
+                                             color = textColor.copy(alpha = 0.85f),
+                                             lineHeight = 16.sp
+                                         )
+                                         Spacer(modifier = Modifier.height(12.dp))
+
+                                         val context = androidx.compose.ui.platform.LocalContext.current
+                                         val promoCode = "DIAMOND100_OWNER"
+                                         Row(
+                                             horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                             verticalAlignment = Alignment.CenterVertically
+                                         ) {
+                                             Button(
+                                                 onClick = {
+                                                     val clipboardManager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                                                     val clipData = android.content.ClipData.newPlainText("Vetaris Owner Diamond Promo Code", promoCode)
+                                                     clipboardManager.setPrimaryClip(clipData)
+                                                     showOwnerRewardUnlockDialog = true
+                                                 },
+                                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444)),
+                                                 shape = RoundedCornerShape(12.dp)
+                                             ) {
+                                                 Icon(
+                                                     imageVector = Icons.Default.ContentCopy,
+                                                     contentDescription = "Copy code",
+                                                     tint = Color.White,
+                                                     modifier = Modifier.size(14.dp)
+                                                 )
+                                                 Spacer(modifier = Modifier.width(6.dp))
+                                                 Text(
+                                                     text = if (currentLang == "en") "Copy Code: $promoCode" else "کپی کد هدیه: $promoCode",
+                                                     fontSize = 11.sp,
+                                                     fontWeight = FontWeight.Bold,
+                                                     color = Color.White
+                                                 )
+                                             }
+
+                                             TextButton(
+                                                 onClick = { showPromoCodeCard = false }
+                                             ) {
+                                                 Text(
+                                                     text = if (currentLang == "en") "Ignore" else "نادیده گرفتن",
+                                                     fontSize = 11.sp,
+                                                     fontWeight = FontWeight.SemiBold,
+                                                     color = if (isDark) Color(0xFFF43F5E) else Color(0xFFEF4444)
+                                                  )
+                                             }
+                                         }
+                                     }
+                                 }
+                                 }
+
+                                 // My Pets Section Card
+                                 val allPets by viewModel.allPets.collectAsState()
+                                 Card(
+                                     shape = RoundedCornerShape(16.dp),
+                                     colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                     modifier = Modifier
+                                         .fillMaxWidth()
+                                         .padding(bottom = 16.dp)
+                                         .border(1.dp, borderColor, RoundedCornerShape(16.dp))
+                                 ) {
+                                     Column(
+                                         modifier = Modifier.padding(16.dp)
+                                     ) {
+                                         Row(
+                                             modifier = Modifier.fillMaxWidth(),
+                                             horizontalArrangement = Arrangement.SpaceBetween,
+                                             verticalAlignment = Alignment.CenterVertically
+                                         ) {
+                                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                                 Text("🐾", fontSize = 18.sp)
+                                                 Text(
+                                                     text = if (currentLang == "en") "My Registered Pets" else "شناسنامه حیوانات من",
+                                                     fontSize = 14.sp,
+                                                     fontWeight = FontWeight.Bold,
+                                                     color = Color(0xFFEF4444)
+                                                 )
+                                             }
+                                             
+                                             // Add Pet button inside main panel
+                                             Button(
+                                                 onClick = { showAddPetDialog = true },
+                                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+                                                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                                                 shape = RoundedCornerShape(8.dp),
+                                                 modifier = Modifier.height(30.dp)
+                                             ) {
+                                                 Icon(
+                                                     imageVector = Icons.Default.Add,
+                                                     contentDescription = "Add Pet",
+                                                     tint = Color.White,
+                                                     modifier = Modifier.size(14.dp)
+                                                 )
+                                                 Spacer(modifier = Modifier.width(4.dp))
+                                                 Text(
+                                                     text = if (currentLang == "en") "Add Pet" else "افزودن پت",
+                                                     fontSize = 11.sp,
+                                                     fontWeight = FontWeight.Bold,
+                                                     color = Color.White
+                                                 )
+                                             }
+                                         }
+                                         
+                                         Spacer(modifier = Modifier.height(12.dp))
+
+                                         val ownerPets = allPets.filter { it.ownerPhone == editedPhone || it.ownerPhone.isEmpty() }
+                                         
+                                         if (ownerPets.isEmpty()) {
+                                             Box(
+                                                 modifier = Modifier
+                                                     .fillMaxWidth()
+                                                     .background(if (isDark) Color(0xFF1E293B) else Color(0xFFF1F5F9), RoundedCornerShape(8.dp))
+                                                     .padding(16.dp),
+                                                 contentAlignment = Alignment.Center
+                                             ) {
+                                                 Text(
+                                                     text = if (currentLang == "en") "No pets registered yet. Click 'Add Pet' above!" else "هنوز هیچ پتی ثبت نکرده‌اید. روی دکمه افزودن پت کلیک کنید!",
+                                                     fontSize = 11.sp,
+                                                     color = mutedTextColor,
+                                                     textAlign = TextAlign.Center
+                                                 )
+                                             }
+                                         } else {
+                                             Column(
+                                                 verticalArrangement = Arrangement.spacedBy(8.dp),
+                                                 modifier = Modifier.fillMaxWidth()
+                                             ) {
+                                                 ownerPets.forEach { pet ->
+                                                     val petIcon = when (pet.species.lowercase()) {
+                                                         "dog", "سگ" -> "🐕"
+                                                         "cat", "گربه" -> "🐈"
+                                                         "bird", "پرنده" -> "🦜"
+                                                         "rodent", "همستر", "خرگوش" -> "🐇"
+                                                         "fish", "آبزی" -> "🐠"
+                                                         else -> "🐾"
+                                                     }
+                                                     
+                                                     Row(
+                                                         modifier = Modifier
+                                                             .fillMaxWidth()
+                                                             .background(if (isDark) Color(0xFF1E293B) else Color(0xFFF8FAFC), RoundedCornerShape(12.dp))
+                                                             .border(1.dp, borderColor, RoundedCornerShape(12.dp))
+                                                             .padding(12.dp),
+                                                         verticalAlignment = Alignment.CenterVertically,
+                                                         horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                                     ) {
+                                                         Text(petIcon, fontSize = 28.sp)
+                                                         
+                                                         Column(
+                                                             modifier = Modifier.weight(1f)
+                                                         ) {
+                                                             Text(
+                                                                 text = pet.name,
+                                                                 fontSize = 14.sp,
+                                                                 fontWeight = FontWeight.Bold,
+                                                                 color = textColor
+                                                             )
+                                                             Spacer(modifier = Modifier.height(2.dp))
+                                                             Text(
+                                                                 text = if (currentLang == "en") {
+                                                                     "Species: ${pet.species} | Breed: ${pet.breed} | Age: ${pet.age}"
+                                                                 } else {
+                                                                     "گونه: ${pet.species} | نژاد: ${pet.breed} | سن: ${pet.age}"
+                                                                 },
+                                                                 fontSize = 11.sp,
+                                                                 color = mutedTextColor
+                                                             )
+                                                             Spacer(modifier = Modifier.height(2.dp))
+                                                             Text(
+                                                                 text = if (currentLang == "en") {
+                                                                     "Gender: ${if (pet.gender == "ماده") "Female ♀" else "Male ♂"} | Weight: ${pet.weight} kg"
+                                                                 } else {
+                                                                     "جنسیت: ${if (pet.gender == "ماده") "ماده ♀" else "نر ♂"} | وزن: ${pet.weight} کیلوگرم"
+                                                                 },
+                                                                 fontSize = 11.sp,
+                                                                 color = mutedTextColor
+                                                             )
+                                                         }
+                                                     }
+                                                 }
+                                             }
+                                         }
+                                     }
+                                 }
+
+                                 Spacer(modifier = Modifier.height(8.dp))
+
+                                 // 2. Account Management Category Grouping
                                 Text(
                                     text = if (currentLang == "en") "Account Management" else "مدیریت حساب",
                                     textAlign = if (currentLang == "en") TextAlign.Left else TextAlign.Right,
@@ -624,6 +891,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
 
             if (showEditProfileDialog) {
                 var nameInput by remember { mutableStateOf(editedName) }
+                var genderInput by remember { mutableStateOf(editedGender) }
                 // Clear any social credential placeholder email or dummy login from phone so they can complete it
                 var phoneInput by remember { 
                     mutableStateOf(if (editedPhone.contains("@") || editedPhone.startsWith("سریع با")) "" else editedPhone) 
@@ -647,6 +915,43 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth()
                             )
+
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = if (currentLang == "en") "Owner Gender:" else "جنسیت صاحب حیوان خانگی:",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = mutedTextColor
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                val genders = listOf("آقا", "خانم")
+                                genders.forEach { g ->
+                                    val isSelected = genderInput == g
+                                    Button(
+                                        onClick = { genderInput = g },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (isSelected) Color(0xFFEF4444) else (if (isDark) Color(0xFF334155) else Color(0xFFE2E8F0)),
+                                            contentColor = if (isSelected) Color.White else textColor
+                                        ),
+                                        modifier = Modifier.weight(1f),
+                                        shape = RoundedCornerShape(8.dp),
+                                        contentPadding = PaddingValues(vertical = 8.dp)
+                                    ) {
+                                        Text(
+                                            text = if (g == "آقا") {
+                                                if (currentLang == "en") "Male 👨" else "آقا 👨"
+                                            } else {
+                                                if (currentLang == "en") "Female 👩" else "خانم 👩"
+                                            },
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+                            }
                         }
                     },
                     confirmButton = {
@@ -654,9 +959,11 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                             onClick = {
                                 editedName = nameInput
                                 editedPhone = phoneInput
+                                editedGender = genderInput
                                 viewModel.updateSession(
                                     fullName = nameInput,
-                                    phoneNumber = phoneInput
+                                    phoneNumber = phoneInput,
+                                    gender = genderInput
                                 )
                                 showEditProfileDialog = false
                             },
@@ -667,6 +974,245 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                     },
                     dismissButton = {
                         TextButton(onClick = { showEditProfileDialog = false }) {
+                            Text(if (currentLang == "en") "Cancel" else "انصراف")
+                        }
+                    }
+                )
+            }
+
+            if (showOwnerRewardUnlockDialog) {
+                AlertDialog(
+                    onDismissRequest = { showOwnerRewardUnlockDialog = false },
+                    title = { 
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                            Text("🎉✨🐈✨🎉", fontSize = 24.sp, textAlign = TextAlign.Center)
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = if (currentLang == "en") "Congratulations!" else "تبریک و تهنیت!",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = Color(0xFFEF4444),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    },
+                    text = {
+                        Text(
+                            text = if (currentLang == "en") {
+                                "Your promo code is copied to clipboard!\n\nUse code: DIAMOND100_OWNER to unlock 1-Month Diamond Subscription for free in the subscription menu."
+                            } else {
+                                "کد تخفیف شما با موفقیت در حافظه موقت (Clipboard) کپی شد!\n\nکد طلایی: DIAMOND100_OWNER\n\nمی‌توانید با ورود به بخش اشتراک‌ها، این کد را جهت دریافت یک ماه اشتراک الماس رایگان ثبت نمایید!"
+                            },
+                            fontSize = 13.sp,
+                            color = textColor,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 18.sp
+                        )
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = { showOwnerRewardUnlockDialog = false },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
+                        ) {
+                            Text(if (currentLang == "en") "Awesome!" else "بسیار عالی")
+                        }
+                    }
+                )
+            }
+
+            if (showAddPetDialog) {
+                var petNameInput by remember { mutableStateOf("") }
+                var petBreedInput by remember { mutableStateOf("") }
+                var petAgeInput by remember { mutableStateOf("") }
+                var petWeightInput by remember { mutableStateOf("") }
+                var petGenderInput by remember { mutableStateOf("نر") } // "نر" (Male) or "ماده" (Female)
+                var petSpeciesInput by remember { mutableStateOf("Cat") } // "Cat", "Dog", etc.
+                var errorMessage by remember { mutableStateOf("") }
+
+                AlertDialog(
+                    onDismissRequest = { showAddPetDialog = false },
+                    title = {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text("🐾", fontSize = 20.sp)
+                            Text(
+                                text = if (currentLang == "en") "Add New Pet Details" else "ثبت شناسنامه و مشخصات پت جدید",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
+                        }
+                    },
+                    text = {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier
+                                .verticalScroll(rememberScrollState())
+                                .fillMaxWidth()
+                        ) {
+                            // Pet Name
+                            OutlinedTextField(
+                                value = petNameInput,
+                                onValueChange = { petNameInput = it },
+                                label = { Text(if (currentLang == "en") "Pet Name" else "نام حیوان خانگی") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            // Species Choice
+                            Text(
+                                text = if (currentLang == "en") "Species:" else "نوع/گونه حیوان:",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = mutedTextColor
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                val speciesList = listOf(
+                                    "Cat" to "🐈",
+                                    "Dog" to "🐕",
+                                    "Bird" to "🦜",
+                                    "Rodent" to "🐇",
+                                    "Other" to "🐾"
+                                )
+                                speciesList.forEach { (spCode, spEmoji) ->
+                                    val isSelected = petSpeciesInput == spCode
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(if (isSelected) Color(0xFFEF4444) else (if (isDark) Color(0xFF334155) else Color(0xFFE2E8F0)))
+                                            .clickable { petSpeciesInput = spCode }
+                                            .padding(vertical = 6.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                            Text(spEmoji, fontSize = 18.sp)
+                                            Text(
+                                                text = if (currentLang == "en") spCode else {
+                                                    when(spCode) {
+                                                        "Cat" -> "گربه"
+                                                        "Dog" -> "سگ"
+                                                        "Bird" -> "پرنده"
+                                                        "Rodent" -> "جونده"
+                                                        else -> "سایر"
+                                                    }
+                                                },
+                                                fontSize = 9.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = if (isSelected) Color.White else textColor
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Breed
+                            OutlinedTextField(
+                                value = petBreedInput,
+                                onValueChange = { petBreedInput = it },
+                                label = { Text(if (currentLang == "en") "Breed (e.g. Persian, DSH...)" else "نژاد پت (مثلاً پرشین، ژرمن...)") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            // Age & Weight Row
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                OutlinedTextField(
+                                    value = petAgeInput,
+                                    onValueChange = { petAgeInput = it },
+                                    label = { Text(if (currentLang == "en") "Age (e.g., 2 years)" else "سن (مثلاً ۲ ساله)") },
+                                    singleLine = true,
+                                    modifier = Modifier.weight(1.5f)
+                                )
+                                OutlinedTextField(
+                                    value = petWeightInput,
+                                    onValueChange = { petWeightInput = it },
+                                    label = { Text(if (currentLang == "en") "Weight (kg)" else "وزن (کیلوگرم)") },
+                                    singleLine = true,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+
+                            // Gender Choice
+                            Text(
+                                text = if (currentLang == "en") "Pet Gender:" else "جنسیت حیوان:",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = mutedTextColor
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                val petGenders = listOf("نر", "ماده")
+                                petGenders.forEach { g ->
+                                    val isSelected = petGenderInput == g
+                                    Button(
+                                        onClick = { petGenderInput = g },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (isSelected) Color(0xFFEF4444) else (if (isDark) Color(0xFF334155) else Color(0xFFE2E8F0)),
+                                            contentColor = if (isSelected) Color.White else textColor
+                                        ),
+                                        modifier = Modifier.weight(1f),
+                                        shape = RoundedCornerShape(8.dp),
+                                        contentPadding = PaddingValues(vertical = 4.dp)
+                                    ) {
+                                        Text(
+                                            text = if (g == "نر") {
+                                                if (currentLang == "en") "Male ♂" else "نر ♂"
+                                            } else {
+                                                if (currentLang == "en") "Female ♀" else "ماده ♀"
+                                            },
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+                            }
+
+                            if (errorMessage.isNotEmpty()) {
+                                Text(errorMessage, color = Color.Red, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                if (petNameInput.isBlank() || petBreedInput.isBlank() || petAgeInput.isBlank() || petWeightInput.isBlank()) {
+                                    errorMessage = if (currentLang == "en") "Please fill all fields!" else "لطفاً تمامی فیلدها را تکمیل کنید!"
+                                    return@Button
+                                }
+                                val dWeight = petWeightInput.toDoubleOrNull()
+                                if (dWeight == null) {
+                                    errorMessage = if (currentLang == "en") "Weight must be a number!" else "وزن باید عددی معتبر باشد!"
+                                    return@Button
+                                }
+                                
+                                val newPet = com.example.data.database.Pet(
+                                    name = petNameInput,
+                                    species = petSpeciesInput,
+                                    breed = petBreedInput,
+                                    weight = dWeight,
+                                    age = petAgeInput,
+                                    gender = petGenderInput,
+                                    ownerPhone = editedPhone,
+                                    ownerName = editedName
+                                )
+
+                                viewModel.addNewPatient(newPet)
+                                showAddPetDialog = false
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
+                        ) {
+                            Text(if (currentLang == "en") "Save Pet" else "ثبت و تایید پت")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showAddPetDialog = false }) {
                             Text(if (currentLang == "en") "Cancel" else "انصراف")
                         }
                     }
@@ -1340,6 +1886,9 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
 
             if (showSubscriptionDialog) {
                 var selectedPlanTemp by remember { mutableStateOf(activeSubscription) }
+                var giftCodeInput by remember { mutableStateOf("") }
+                var giftCodeStatus by remember { mutableStateOf("") }
+                var isGiftApplied by remember { mutableStateOf<Boolean?>(null) }
                 AlertDialog(
                     onDismissRequest = { showSubscriptionDialog = false },
                     title = { 
@@ -1426,13 +1975,101 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                     }
                                 }
                             }
+
+                            // Gift/Promo Code Section
+                            Spacer(modifier = Modifier.height(12.dp))
+                            HorizontalDivider(color = dividerColor.copy(alpha = 0.5f))
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = if (currentLang == "en") "🎟️ Apply Promo / Gift Code" else "🎟️ ثبت کد هدیه یا تخفیف ویژه",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                color = textColor
+                             )
+                             Row(
+                                 modifier = Modifier.fillMaxWidth(),
+                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                 verticalAlignment = Alignment.CenterVertically
+                             ) {
+                                 OutlinedTextField(
+                                     value = giftCodeInput,
+                                     onValueChange = { 
+                                         giftCodeInput = it
+                                         isGiftApplied = null 
+                                         giftCodeStatus = ""
+                                     },
+                                     placeholder = { 
+                                         Text(
+                                             text = if (currentLang == "en") "e.g., DIAMOND100_OWNER" else "مثال: DIAMOND100_OWNER",
+                                             fontSize = 11.sp
+                                         ) 
+                                     },
+                                     singleLine = true,
+                                     modifier = Modifier.weight(1f),
+                                     shape = RoundedCornerShape(8.dp),
+                                     colors = OutlinedTextFieldDefaults.colors(
+                                         focusedBorderColor = Color(0xFFEF4444),
+                                         unfocusedBorderColor = borderColor
+                                     )
+                                 )
+                                 Button(
+                                     onClick = {
+                                         val cleanCode = giftCodeInput.trim().uppercase()
+                                         if (cleanCode.isEmpty()) {
+                                             isGiftApplied = false
+                                             giftCodeStatus = if (currentLang == "en") "Please enter a code!" else "لطفاً کد را وارد کنید!"
+                                         } else if (cleanCode == "DIAMOND100_VET" || cleanCode == "DIAMOND100_OWNER") {
+                                             selectedPlanTemp = "diamond"
+                                             isGiftApplied = true
+                                             giftCodeStatus = if (currentLang == "en") 
+                                                 "Success! Diamond Plan selected. Accept to activate." 
+                                                 else "کد معتبر است! اشتراک الماس انتخاب شد. جهت تایید نهایی ثبت کنید."
+                                         } else if (cleanCode == "SILVER_GIFT") {
+                                             selectedPlanTemp = "silver"
+                                             isGiftApplied = true
+                                             giftCodeStatus = if (currentLang == "en") 
+                                                 "Success! Silver Plan selected." 
+                                                 else "کد معتبر است! اشتراک نقره‌ای انتخاب شد."
+                                         } else if (cleanCode == "GOLD_GIFT") {
+                                             selectedPlanTemp = "gold"
+                                             isGiftApplied = true
+                                             giftCodeStatus = if (currentLang == "en") 
+                                                 "Success! Gold Plan selected." 
+                                                 else "کد معتبر است! اشتراک طلایی انتخاب شد."
+                                         } else {
+                                             isGiftApplied = false
+                                             giftCodeStatus = if (currentLang == "en") "Invalid promo code" else "کد هدیه وارد شده معتبر نیست!"
+                                         }
+                                     },
+                                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444)),
+                                     shape = RoundedCornerShape(8.dp),
+                                     contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp)
+                                 ) {
+                                     Text(
+                                         text = if (currentLang == "en") "Apply" else "اعمال کد",
+                                         fontSize = 11.sp,
+                                         fontWeight = FontWeight.Bold
+                                     )
+                                 }
+                             }
+                             if (giftCodeStatus.isNotEmpty()) {
+                                 Text(
+                                     text = giftCodeStatus,
+                                     color = if (isGiftApplied == true) Color(0xFF10B981) else Color(0xFFEF4444),
+                                     fontSize = 11.sp,
+                                     fontWeight = FontWeight.Bold,
+                                     modifier = Modifier
+                                         .fillMaxWidth()
+                                         .padding(horizontal = 4.dp, vertical = 2.dp)
+                                 )
+                             }
                         }
                     },
                     confirmButton = {
                         Button(
-                            onClick = { 
+                            onClick = {
                                 viewModel.setSubscription(selectedPlanTemp)
-                                showSubscriptionDialog = false 
+                                showSubscriptionDialog = false
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
                         ) {
