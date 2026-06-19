@@ -13,6 +13,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.graphics.Path
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -64,6 +66,9 @@ fun LoginScreen(
     var secondsLeft by remember { mutableStateOf(114) } // 01:54 = 114 seconds
     
     var showError by remember { mutableStateOf(false) }
+    var termsAccepted by remember { mutableStateOf(false) }
+    var showTermsError by remember { mutableStateOf(false) }
+    var showTermsDialog by remember { mutableStateOf(false) }
     var socialAuthChoice by remember { mutableStateOf<String?>(null) }
 
     val themeMode by viewModel.themeMode.collectAsState()
@@ -326,12 +331,73 @@ fun LoginScreen(
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(20.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Checkbox(
+                                    checked = termsAccepted,
+                                    onCheckedChange = { 
+                                        termsAccepted = it 
+                                        if (it) showTermsError = false
+                                    },
+                                    modifier = Modifier.testTag("terms_checkbox"),
+                                    colors = CheckboxDefaults.colors(
+                                        checkedColor = MaterialTheme.colorScheme.primary,
+                                        uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                                    )
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Row(
+                                    modifier = Modifier.weight(1f),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Start
+                                ) {
+                                    Text(
+                                        text = if (currentLanguage == "en") "I accept the " else "من ",
+                                        fontSize = 12.sp,
+                                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+                                    )
+                                    Text(
+                                        text = if (currentLanguage == "en") "Terms & Conditions" else "قوانین و مقررات استفاده",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier
+                                            .clickable { showTermsDialog = true }
+                                            .testTag("terms_and_conditions_text")
+                                    )
+                                    Text(
+                                        text = if (currentLanguage == "en") " of Vetaris." else " را می‌پذیرم.",
+                                        fontSize = 12.sp,
+                                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+                                    )
+                                }
+                            }
+
+                            if (showTermsError) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = if (currentLanguage == "en") "Please accept the terms and conditions to proceed." else "لطفاً برای ادامه، قوانین و مقررات را بپذیرید.",
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = if (currentLanguage == "en") TextAlign.Left else TextAlign.Right
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
 
                             // Action button matching color of screenshot (rust reddish-brown #B55D57)
                             Button(
                                 onClick = {
-                                    if (inputUsername.length >= 4) {
+                                    if (!termsAccepted) {
+                                        showTermsError = true
+                                    } else if (inputUsername.length >= 4) {
                                         isCheckingUser = true
                                         coroutineScope.launch {
                                             val found = viewModel.checkUserExists(inputUsername)
@@ -383,28 +449,7 @@ fun LoginScreen(
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = if (currentLanguage == "en") "Don't have an account yet? " else "هنوز ثبت‌نام نکرده‌اید؟ ",
-                                    fontSize = 13.sp,
-                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-                                )
-                                Text(
-                                    text = if (currentLanguage == "en") "Create new account" else "ایجاد حساب کاربری جدید",
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier
-                                        .clickable { onNavigateToRegister() }
-                                        .testTag("navigate_to_register")
-                                )
-                            }
+                            Spacer(modifier = Modifier.height(20.dp))
                         }
 
                         // --- STEP 2: VERIFICATION & REGISTRATION ---
@@ -813,6 +858,153 @@ fun LoginScreen(
             dismissButton = {
                 TextButton(onClick = { socialAuthChoice = null }) {
                     Text("انصراف")
+                }
+            }
+        )
+    }
+
+    if (showTermsDialog) {
+        AlertDialog(
+            onDismissRequest = { showTermsDialog = false },
+            title = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (currentLanguage == "en") "📋 Terms & Conditions" else "📋 شرایط و قوانین استفاده",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colorScheme.primary,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            },
+            text = {
+                val dialogLayoutDir = if (currentLanguage == "en") LayoutDirection.Ltr else LayoutDirection.Rtl
+                CompositionLocalProvider(LocalLayoutDirection provides dialogLayoutDir) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 380.dp)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = if (currentLanguage == "en") {
+                                "Welcome to Vetaris, your smart veterinary companion.\n\n" +
+                                "By accepting these terms and logging into Vetaris, you agree to the conditions listed below regarding application features, permissions, and professional practices:"
+                            } else {
+                                "به وتاریس، دستیار هوشمند دامپزشکی شما خوش آمدید.\n\n" +
+                                "با پذیرش این شرایط و ورود به وتاریس، شما موافقت خود را با قوانین زیر در زمینه امکانات برنامه، سطوح دسترسی و استفاده حرفه‌ای اعلام می‌نمایید:"
+                            },
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            lineHeight = 18.sp
+                        )
+
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+                        // Feature 1: Drug Manual & Calculations
+                        Text(
+                            text = if (currentLanguage == "en") "1. Drug Reference & Dose Calculations" else "۱. مرجع دارویی و محاسبه دوز",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = if (currentLanguage == "en") {
+                                "• Vetaris provides an automated veterinarian drug manual (pharmacopoeia) and clinical dose calculator (mg/ml/mcg).\n" +
+                                "• Standard references are guides. Vets must double-check formulas with clinical judgment before medical administration."
+                            } else {
+                                "• وتاریس دسترسی به مرجع دارویی جامع دامپزشکی و محاسبه هوشمند دوز (بر اساس میلی‌گرم، میلی‌لیتر و میکروگرم) را فراهم می‌کند.\n" +
+                                "• دوزهای مرجع صرفاً راهنما هستند. دامپزشک موظف است قبل از تجویز نهایی، محاسبات را با وضعیت بالینی حیوان تطبیق دهد."
+                            },
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                            lineHeight = 17.sp
+                        )
+
+                        // Feature 2: Prescription Generation
+                        Text(
+                            text = if (currentLanguage == "en") "2. Digital Prescription System" else "۲. سامانه نسخه‌نویسی دیجیتال",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = if (currentLanguage == "en") {
+                                "• Veterinarians can draft, customize, and finalize digital prescriptions with automated calculations.\n" +
+                                "• Finalized prescriptions are permanently logged to the patient's record for continuous reference."
+                            } else {
+                                "• دامپزشکان محترم می‌توانند با استفاده از سیستم هوشمند، نسخه نهایی را ثبت کرده و مقادیر محاسبه‌شده را ضمیمه نمایند.\n" +
+                                "• نسخه‌های نهایی ثبت‌شده در پرونده الکترونیکی بیمار ذخیره شده و قابل ردیابی دائم هستند."
+                            },
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                            lineHeight = 17.sp
+                        )
+
+                        // Feature 3: Customized Role Spaces (Vets vs Pet Owners)
+                        Text(
+                            text = if (currentLanguage == "en") "3. Role-Based Access (Vet vs Pet Owner)" else "۳. سطوح دسترسی مبتنی بر نقش (دامپزشک و صاحب پت)",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = if (currentLanguage == "en") {
+                                "• Veterinarians are granted advanced clinical menus, medical histories, and prescription toolkits.\n" +
+                                "• Pet Owners receive simplified explanations of medications, and access to view their pet's health log book."
+                            } else {
+                                "• پزشکان عزیز به منوهای پیشرفته بالینی، بانک داروهای تخصصی و ابزار مجهز نسخه‌نویسی دسترسی دارند.\n" +
+                                "• صاحبان حیوانات خانگی به راهنمای ساده عوارض جانبی داروهای پرکاربرد، سوابق پزشکی حیوان و پرونده بهداشتی دسترسی خواهند داشت."
+                            },
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                            lineHeight = 17.sp
+                        )
+
+                        // Feature 4: Privacy & HIPAA Alignment
+                        Text(
+                            text = if (currentLanguage == "en") "4. Secure Pet Profile Storage" else "۴. امنیت اطلاعات و پرونده‌های بیماری",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = if (currentLanguage == "en") {
+                                "• All patient information, phone credentials, and logs are kept encrypted on the offline database.\n" +
+                                "• Your data remains secure on your device unless backup options are explicitly enabled."
+                            } else {
+                                "• تمامی اطلاعات سگ، گربه یا سایر پت‌ها به همراه شماره موبایل کاربران به صورت کاملاً امن و محلی ذخیره می‌شود.\n" +
+                                "• امنیت شما در اولویت وتاریس است و اطلاعات محرمانه بیماران فاش نگردیده و در دستگاه شما ایمن خواهد بود."
+                            },
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                            lineHeight = 17.sp
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        termsAccepted = true
+                        showTermsError = false
+                        showTermsDialog = false
+                    },
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(if (currentLanguage == "en") "Accept & Close" else "پذیرش و بستن")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showTermsDialog = false }
+                ) {
+                    Text(if (currentLanguage == "en") "Reject" else "رد")
                 }
             }
         )
