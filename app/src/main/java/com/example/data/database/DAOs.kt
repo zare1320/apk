@@ -113,6 +113,9 @@ interface TreatmentGuidelineDao {
     @Query("DELETE FROM treatment_guidelines")
     suspend fun clearAll()
 
+    @Query("DELETE FROM treatment_guidelines WHERE id LIKE 'custom_g_%'")
+    suspend fun deleteCustomGuidelines()
+
     @Query("SELECT COUNT(*) FROM treatment_guidelines")
     suspend fun getCount(): Int
 }

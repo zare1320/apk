@@ -122,6 +122,10 @@ class VetRepository(private val db: AppDatabase) {
         treatmentGuidelineDao.deleteGuideline(guideline)
     }
 
+    suspend fun deleteCustomGuidelines() {
+        treatmentGuidelineDao.deleteCustomGuidelines()
+    }
+
     suspend fun getGuidelineCount(): Int = treatmentGuidelineDao.getCount()
 
     suspend fun seedGuidelines(guidelines: List<TreatmentGuideline>) {

@@ -446,6 +446,7 @@ class MainViewModel(
             _selectedSpecies.value = null
             _selectedExoticOption.value = null
             repository.deleteCustomDrugs()
+            repository.deleteCustomGuidelines()
             physicalComplaints.value = emptyMap()
             physicalSigns.value = emptyMap()
             labResults.value = emptyMap()

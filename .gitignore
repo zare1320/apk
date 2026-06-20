@@ -1,18 +1,33 @@
-*.iml
+# Gradle and Android Build outputs
 .gradle
-.kotlin
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
 /build
-/captures
-.externalNativeBuild
-.cxx
+/.gradle/buildOutputCleanup/*
+/.gradle/*
+/.kotlin/
+
+# IDE Specific files
+*.iml
+/.idea/*
+
+# Local Configurations & Secrets safely omitted
+/local.properties
 local.properties
 .env
 debug.keystore
+/app/release.keystore
+
+# Diagnostics or captures
+/captures
+.externalNativeBuild
+.cxx
+
+# OS Specific files
+.DS_Store
+
+# Modular & Plugin builds plus Baseline Profiles
+/baselineprofile/build/*
+/app/src/release/generated/*
+/core/build/
+/feature/build/
+/build-plugin/build
+/build-plugin/.gradle/*
