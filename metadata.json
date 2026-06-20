@@ -1,6 +1,8 @@
 {
   "name": "Vetaris",
-  "description": "دستیار فوق‌حرفه‌ای و تخصصی دامپزشکی با قابلیت‌های محاسبات دارویی هوشمند، پرونده الکترونیک، تشخیص و تفکیک گونه‌ای و محیط مجزا برای دامپزشکان و صاحبان حیوانات خانگی",
+  "description": "دستیار فوق‌حرفه‌ای و تخصصی دامپزشکی با قابلیت‌های محاسبات دارویی هوشمند، پرونده الکترونیک، تشخیص و تفکیک گونه‌ای و محیط مجزا برای دامپزشکان و صاحبان حیوانات خانگی | Vetaris: An ultra-professional veterinary assistant featuring smart drug calculations, EHR, species identification, and distinct portals for veterinarians and pet owners.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
