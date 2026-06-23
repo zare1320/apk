@@ -60,7 +60,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
     var editedGender by remember { mutableStateOf("آقا") }
     var showOwnerRewardUnlockDialog by remember { mutableStateOf(false) }
     var showAddPetDialog by remember { mutableStateOf(false) }
-    var showPromoCodeCard by remember { mutableStateOf(true) }
+    var showPromoCodeCard by remember { mutableStateOf(false) }
 
     LaunchedEffect(activeSession) {
         if (activeSession != null) {
@@ -949,6 +949,80 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                                             fontSize = 12.sp,
                                             fontWeight = FontWeight.Bold
                                         )
+                                    }
+                                }
+                            }
+
+                            val isAllCompleted = nameInput.isNotBlank() && phoneInput.isNotBlank() && genderInput.isNotBlank()
+                            if (isAllCompleted) {
+                                Spacer(modifier = Modifier.height(14.dp))
+                                Card(
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = if (isDark) Color(0xFF1E1B4B) else Color(0xFFEEF2FF)
+                                    ),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .border(
+                                            1.dp,
+                                            Color(0xFF8B5CF6),
+                                            RoundedCornerShape(12.dp)
+                                        )
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(12.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                        ) {
+                                            Text("🎁", fontSize = 18.sp)
+                                            Text(
+                                                text = if (currentLang == "en") "Profile Completion Bonus Unlocked!" else "پاداش تکمیل اطلاعات فعال شد!",
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 12.sp,
+                                                color = if (isDark) Color.White else Color(0xFF1E1B4B)
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                        Text(
+                                            text = if (currentLang == "en") {
+                                                "Congratulations! You can claim 1-Month Diamond Subscription with code:"
+                                            } else {
+                                                "به پاس تکمیل اطلاعات، می‌توانید از کد هدیه یک ماه اشتراک ممتاز الماس استفاده کنید:"
+                                            },
+                                            fontSize = 10.sp,
+                                            color = textColor.copy(alpha = 0.8f),
+                                            textAlign = TextAlign.Center
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        val context = androidx.compose.ui.platform.LocalContext.current
+                                        val tempPromo = "DIAMOND100_OWNER"
+                                        Button(
+                                            onClick = {
+                                                val clipboardManager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                                                val clipData = android.content.ClipData.newPlainText("Vetaris Owner Diamond Promo Code", tempPromo)
+                                                clipboardManager.setPrimaryClip(clipData)
+                                            },
+                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6)),
+                                            shape = RoundedCornerShape(8.dp),
+                                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.ContentCopy,
+                                                contentDescription = "Copy code",
+                                                tint = Color.White,
+                                                modifier = Modifier.size(12.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text(
+                                                text = if (currentLang == "en") "Copy: $tempPromo" else "کپی کد: $tempPromo",
+                                                fontSize = 10.sp,
+                                                color = Color.White,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
                                     }
                                 }
                             }

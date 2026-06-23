@@ -374,85 +374,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                     }
                                 }
 
-                                // Unlocked Diamond Promotion Reward Banner Card from completing professional info
-                                Card(
-                                    shape = RoundedCornerShape(16.dp),
-                                    colors = CardDefaults.cardColors(containerColor = if (isDark) Color(0xFF1E1B4B) else Color(0xFFEEF2FF)),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(bottom = 16.dp)
-                                        .border(
-                                            BorderStroke(1.5.dp, androidx.compose.ui.graphics.Brush.linearGradient(
-                                                listOf(Color(0xFF3B82F6), Color(0xFF8B5CF6), Color(0xFFEC4899))
-                                            )),
-                                            RoundedCornerShape(16.dp)
-                                        )
-                                ) {
-                                    Column(
-                                        modifier = Modifier.padding(16.dp),
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                            modifier = Modifier.fillMaxWidth()
-                                        ) {
-                                            Text("🎁", fontSize = 24.sp)
-                                            Column {
-                                                Text(
-                                                    text = if (currentLang == "en") "Diamond Discount Code Active!" else "کد هدیه اشتراک الماس فعال شد!",
-                                                    fontSize = 14.sp,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = textColor
-                                                )
-                                                Text(
-                                                    text = if (currentLang == "en") "Completed profile bonus reward" else "پاداش تکمیل اطلاعات صنفی دامپزشکی",
-                                                    fontSize = 11.sp,
-                                                    color = mutedTextColor
-                                                )
-                                            }
-                                        }
-                                        Spacer(modifier = Modifier.height(10.dp))
-                                        Text(
-                                            text = if (currentLang == "en") {
-                                                "Since you have completed your user profile information, you can use the discount code below to claim a one-month Diamond subscription 100% free!"
-                                            } else {
-                                                "به پاس قدردانی از تکمیل مشخصات کاربری و تخصصی دامپزشکی، می‌توانید مقتدرانه از کد تخفیف زیر جهت دریافت یک ماه اشتراک الماس به صورت کاملاً رایگان استفاده نمایید!"
-                                            },
-                                            fontSize = 11.sp,
-                                            color = textColor.copy(alpha = 0.85f),
-                                            lineHeight = 16.sp
-                                        )
-                                        Spacer(modifier = Modifier.height(12.dp))
 
-                                        val context = androidx.compose.ui.platform.LocalContext.current
-                                        val promoCode = "DIAMOND100_VET"
-                                        Button(
-                                            onClick = {
-                                                val clipboardManager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-                                                val clipData = android.content.ClipData.newPlainText("Vetaris Diamond Promo Code", promoCode)
-                                                clipboardManager.setPrimaryClip(clipData)
-                                                showRewardUnlockDialog = true
-                                            },
-                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6)),
-                                            shape = RoundedCornerShape(12.dp)
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.ContentCopy,
-                                                contentDescription = "Copy code",
-                                                tint = Color.White,
-                                                modifier = Modifier.size(14.dp)
-                                            )
-                                            Spacer(modifier = Modifier.width(6.dp))
-                                            Text(
-                                                text = if (currentLang == "en") "Copy Code: $promoCode" else "کپی کد هدیه: $promoCode",
-                                                fontSize = 11.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                color = Color.White
-                                            )
-                                        }
-                                    }
-                                }
 
                                 // 2. Coins (پی‌کلاپ) & Subscriptions cards side by side
                                 Row(
@@ -1629,13 +1551,79 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                 }
                             }
 
-
-
-
-
-
-
-
+                            val isAllCompleted = nameInput.isNotBlank() && phoneInput.isNotBlank() && idInput.isNotBlank() && provinceInput.isNotBlank() && cityInput.isNotBlank() && activityTypeInput.isNotBlank() && (!isStudentInput || workplaceInput.isNotBlank())
+                            if (isAllCompleted) {
+                                Spacer(modifier = Modifier.height(14.dp))
+                                Card(
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = if (isDark) Color(0xFF1E1B4B) else Color(0xFFEEF2FF)
+                                    ),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .border(
+                                            1.dp,
+                                            Color(0xFF8B5CF6),
+                                            RoundedCornerShape(12.dp)
+                                        )
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(12.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                        ) {
+                                            Text("🎁", fontSize = 18.sp)
+                                            Text(
+                                                text = if (currentLang == "en") "Profile Completion Bonus Unlocked!" else "پاداش تکمیل اطلاعات فعال شد!",
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 12.sp,
+                                                color = if (isDark) Color.White else Color(0xFF1E1B4B)
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                        Text(
+                                            text = if (currentLang == "en") {
+                                                "Congratulations! You can claim 1-Month Diamond Subscription with code:"
+                                            } else {
+                                                "به پاس تکمیل اطلاعات، می‌توانید از کد هدیه یک ماه اشتراک ممتاز الماس استفاده کنید:"
+                                            },
+                                            fontSize = 10.sp,
+                                            color = textColor.copy(alpha = 0.8f),
+                                            textAlign = TextAlign.Center
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        val context = androidx.compose.ui.platform.LocalContext.current
+                                        val tempPromo = "DIAMOND100_VET"
+                                        Button(
+                                            onClick = {
+                                                val clipboardManager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                                                val clipData = android.content.ClipData.newPlainText("Vetaris Diamond Promo Code", tempPromo)
+                                                clipboardManager.setPrimaryClip(clipData)
+                                            },
+                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6)),
+                                            shape = RoundedCornerShape(8.dp),
+                                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.ContentCopy,
+                                                contentDescription = "Copy code",
+                                                tint = Color.White,
+                                                modifier = Modifier.size(12.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text(
+                                                text = if (currentLang == "en") "Copy: $tempPromo" else "کپی کد: $tempPromo",
+                                                fontSize = 10.sp,
+                                                color = Color.White,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                         }
                     },
                     confirmButton = {
