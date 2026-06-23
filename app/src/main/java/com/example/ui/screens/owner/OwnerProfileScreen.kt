@@ -1893,7 +1893,7 @@ fun OwnerProfileScreen(viewModel: MainViewModel) {
                     onDismissRequest = { showSubscriptionDialog = false },
                     title = { 
                         Text(
-                            text = "مدیریت اشتراک پت‌کلاب", 
+                            text = if (currentLang == "en") "Subscription Management" else "مدیریت اشتراک", 
                             fontWeight = FontWeight.Bold, 
                             fontSize = 16.sp,
                             color = textColor,

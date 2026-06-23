@@ -567,13 +567,13 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                             }
                                             Spacer(modifier = Modifier.height(14.dp))
                                             Text(
-                                                text = if (currentLang == "en") "Vet-Club Score" else "امتیاز وت‌کلاب",
+                                                text = if (currentLang == "en") "Doctor's Club Rating" else "امتیاز علمی و باشگاه پزشکان",
                                                 fontSize = 11.sp,
                                                 color = mutedTextColor
                                             )
                                             Spacer(modifier = Modifier.height(2.dp))
                                             Text(
-                                                text = if (currentLang == "en") "${activeSession?.coins ?: 100} Coins" else "${(activeSession?.coins ?: 100).toPersianDigits()} سکه",
+                                                text = if (currentLang == "en") "${activeSession?.coins ?: 100} Clinician Stars" else "${(activeSession?.coins ?: 100).toPersianDigits()} ستاره علمی",
                                                 fontSize = 14.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = textColor
@@ -584,7 +584,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                                 horizontalArrangement = Arrangement.spacedBy(2.dp)
                                             ) {
                                                 Text(
-                                                    text = if (currentLang == "en") "Rewards & Discounts" else "جوایز و تخفیف‌ها",
+                                                    text = if (currentLang == "en") "Awards & Perks" else "جوایز، تخفیف‌ها و ارتقای رتبه",
                                                     fontSize = 11.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = Color(0xFF3B82F6)
@@ -1780,7 +1780,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                     onDismissRequest = { showSubscriptionDialog = false },
                     title = { 
                         Text(
-                            text = if (currentLang == "en") "Manage PetClub Subscription" else "مدیریت اشتراک پت‌کلاب", 
+                            text = if (currentLang == "en") "Subscription Management" else "مدیریت اشتراک", 
                             fontWeight = FontWeight.Bold, 
                             fontSize = 16.sp,
                             color = textColor,
@@ -1974,32 +1974,284 @@ fun VetProfileScreen(viewModel: MainViewModel) {
             if (showRewardsDialog) {
                 AlertDialog(
                     onDismissRequest = { showRewardsDialog = false },
-                    title = { Text(if (currentLang == "en") "Vet-Club Wallet & Rewards" else "کیف پول و جوایز وت‌کلاب", fontWeight = FontWeight.Bold) },
+                    title = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text("🏅", fontSize = 24.sp)
+                            Text(
+                                text = if (currentLang == "en") "Clinician Elite Club" else "باشگاه پزشکان نخبه پت‌کلاب",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = textColor
+                            )
+                        }
+                    },
                     text = {
-                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth().background(if (isDark) Color(0xFF3A301E) else Color(0xFFFEF3C7)).padding(12.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(14.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .verticalScroll(rememberScrollState())
+                                .padding(vertical = 4.dp)
+                        ) {
+                            // Point Balance Card
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isDark) Color(0xFF1E293B) else Color(0xFFEFF6FF)
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(
+                                        1.dp,
+                                        if (isDark) Color(0xFF334155) else Color(0xFFBFDBFE),
+                                        RoundedCornerShape(12.dp)
+                                    )
                             ) {
-                                Text((activeSession?.coins ?: 100).toPersianDigits(), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFFD69E2E))
-                                Text("امتياز کل سکه‌ها", fontWeight = FontWeight.Medium, color = textColor)
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(14.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = if (currentLang == "en") "Scientific Credibility Score" else "رتبه اعتبار علمی شما",
+                                            fontSize = 11.sp,
+                                            color = mutedTextColor
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = if (currentLang == "en") "Level 3 Clinician Badge (Gold) ⭐️" else "نشان پزشک برجسته (سطح ۳ طلایی) ⭐️",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFFD97706)
+                                        )
+                                    }
+                                    Column(horizontalAlignment = Alignment.End) {
+                                        Text(
+                                            text = (activeSession?.coins ?: 100).toPersianDigits(),
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 20.sp,
+                                            color = Color(0xFFF59E0B)
+                                        )
+                                        Text(
+                                            text = if (currentLang == "en") "Stars" else "ستاره تخصصی",
+                                            fontSize = 10.sp,
+                                            color = mutedTextColor
+                                        )
+                                    }
+                                }
                             }
-                            Text("با ثبت نسخه و استفاده منظم از ویژگی‌های برنامه، سکه‌های هدیه جمع‌آوری کنید و کد تخفیف بگیرید.", fontSize = 12.sp, color = mutedTextColor)
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = dividerColor)
-                            Text("پاداش های قابل فعال‌سازی:", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textColor)
-                            Button(
-                                onClick = { showRewardsDialog = false },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF319795))
+
+                            // Dynamic call-to-action description
+                            Text(
+                                text = if (currentLang == "en") {
+                                    "In Vet-Club, your medical contributions and daily activities are highly valued! Increase your score by logging prescriptions, utilizing emergency calculators, and keeping diagnostic records. Gain premium benefits, map prioritization, and partner perks!"
+                                } else {
+                                    "در باشگاه پزشکان پت‌کلاب، هر فعالیت بالینی شما گامی به سوی تعالی حرفه‌ای است! با ارتقای اعتبار علمی خود از طریق ثبت بهینه‌سازها، انجام فرمولاسیون دوز دارویی و تکمیل رزومه، قفل ابزارهای مجهز، رتبه‌بندی برتر در نقشه نوبت‌دهی و تخفیف‌های گران‌بهای همایش‌ها را باز کنید."
+                                },
+                                fontSize = 12.sp,
+                                color = textColor,
+                                lineHeight = 18.sp
+                            )
+
+                            HorizontalDivider(color = dividerColor)
+
+                            // How to Earn Points Section
+                            Text(
+                                text = if (currentLang == "en") "📈 How to Earn Stars:" else "📈 شیوه جمع‌آوری ستاره‌های علمی:",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                color = textColor
+                            )
+
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isDark) Color(0xFF0F172A) else Color(0xFFF8FAFC)
+                                ),
+                                shape = RoundedCornerShape(10.dp),
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text("دریافت کد تخفیف ۵۰٪ اشتراک (۲۰۰۰ سکه)", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Column(
+                                    modifier = Modifier.padding(10.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    listOf(
+                                        "✍️" to (if (currentLang == "en") "Write and log an E-Prescription: +50 Stars" else "ثبت هر نسخه موفق الکترونیکی: +۵۰ ستاره"),
+                                        "🚑" to (if (currentLang == "en") "Calculate Trauma Triage / clinical index: +20 Stars" else "محاسبه تریاژ تروما یا شاخص‌های بالینی: +۲۰ ستاره"),
+                                        "🧪" to (if (currentLang == "en") "Perform medical dosage / daily usage: +10 Stars" else "استفاده روزانه از محاسبات دوز دارویی: +۱۰ ستاره"),
+                                        "👤" to (if (currentLang == "en") "Complete professional profile & docs: +200 Stars" else "تکمیل مدارک نظام دامپزشکی و رزومه: +۲۰۰ ستاره")
+                                    ).forEach { (emoji, textStr) ->
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            Text(emoji, fontSize = 14.sp)
+                                            Text(textStr, fontSize = 11.sp, color = textColor)
+                                        }
+                                    }
+                                }
+                            }
+
+                            HorizontalDivider(color = dividerColor)
+
+                            // Perks & Rewards Section
+                            Text(
+                                text = if (currentLang == "en") "🎁 Redeemable Professional Rewards:" else "🎁 صندوق پاداش‌ها و جوایز فعال:",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                color = textColor
+                            )
+
+                            // Reward 1: Diamond Subscription
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                shape = RoundedCornerShape(10.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, borderColor, RoundedCornerShape(10.dp))
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(10.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = if (currentLang == "en") "Unlock 30 Days Diamond Access" else "فعال‌سازی ۳۰ روز اشتراک ویژه الماس",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = textColor
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = if (currentLang == "en") "Full offline access to Plumb's & BSAVA Guides" else "دسترسی کامل آفلاین به دارونامه و محاسبات تروما",
+                                            fontSize = 9.sp,
+                                            color = mutedTextColor
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = if (currentLang == "en") "Requires 500 Stars" else "نیاز به ۵۰۰ ستاره علمی",
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFFD97706)
+                                        )
+                                    }
+                                    Button(
+                                        onClick = { showRewardsDialog = false },
+                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+                                        shape = RoundedCornerShape(6.dp)
+                                    ) {
+                                        Text(if (currentLang == "en") "Redeem" else "دریافت", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            }
+
+                            // Reward 2: Search Ranking Priority boost
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                shape = RoundedCornerShape(10.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, borderColor, RoundedCornerShape(10.dp))
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(10.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = if (currentLang == "en") "Search Result Boost (Priority Map)" else "ارتقای رتبه و ثبت اولویت در نقشه",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = textColor
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = if (currentLang == "en") "Priority placement in pet owners' searches" else "قرارگیری در صدر جستجوهای آنلاین صاحبان پت کشور",
+                                            fontSize = 9.sp,
+                                            color = mutedTextColor
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = if (currentLang == "en") "Requires 150 Stars" else "نیاز به ۱۵۰ ستاره علمی",
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFFD97706)
+                                        )
+                                    }
+                                    Button(
+                                        onClick = { showRewardsDialog = false },
+                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+                                        shape = RoundedCornerShape(6.dp)
+                                    ) {
+                                        Text(if (currentLang == "en") "Redeem" else "دریافت", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            }
+
+                            // Reward 3: Partner National Veterinary Congress discount
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                                shape = RoundedCornerShape(10.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, borderColor, RoundedCornerShape(10.dp))
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(10.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = if (currentLang == "en") "50% Off National Vet Congress Ticket" else "کد تخفیف ۵۰٪ ثبت‌نام در همایش‌های تخصصی کادر درمان",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = textColor
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = if (currentLang == "en") "Sponsored discount in coordination with authorities" else "کاهش ۵۰ درصدی ورودی معتبرترین مجامع دامپزشکی ایران",
+                                            fontSize = 9.sp,
+                                            color = mutedTextColor
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = if (currentLang == "en") "Requires 1000 Stars" else "نیاز به ۱۰۰۰ ستاره علمی",
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFFD97706)
+                                        )
+                                    }
+                                    Button(
+                                        onClick = { showRewardsDialog = false },
+                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+                                        shape = RoundedCornerShape(6.dp)
+                                    ) {
+                                        Text(if (currentLang == "en") "Redeem" else "دریافت", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
                             }
                         }
                     },
                     confirmButton = {
                         TextButton(onClick = { showRewardsDialog = false }) {
-                            Text("بازگشت")
+                            Text(if (currentLang == "en") "Back" else "بازگشت")
                         }
                     }
                 )
