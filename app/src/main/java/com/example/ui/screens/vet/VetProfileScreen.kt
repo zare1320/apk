@@ -69,6 +69,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
 
     // Supplementary professional fields
     var activityProvince by remember { mutableStateOf("تهران") }
+    var activityCity by remember { mutableStateOf("تهران") }
     var activityType by remember { mutableStateOf("متخصص داخلی دام‌های کوچک") }
     var activityAddress by remember { mutableStateOf("تهران، میدان انقلاب، خیابان آزادی، پلاک ۱۲") }
     var mapLatitude by remember { mutableStateOf(35.6892) }
@@ -188,65 +189,15 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                                     modifier = Modifier.size(32.dp)
                                                 )
                                             }
-                                            Column {
+                                            Column(
+                                                verticalArrangement = Arrangement.Center
+                                            ) {
                                                 Text(
                                                     text = editedName,
-                                                    fontSize = 16.sp,
+                                                    fontSize = 17.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = textColor
                                                 )
-                                                Spacer(modifier = Modifier.height(2.dp))
-                                                Text(
-                                                    text = editedPhone,
-                                                    fontSize = 12.sp,
-                                                    color = mutedTextColor,
-                                                    fontWeight = FontWeight.Medium
-                                                )
-                                                if (identification.isNotEmpty() || workplaceOrUni.isNotEmpty() || specialty.isNotEmpty()) {
-                                                    Spacer(modifier = Modifier.height(4.dp))
-                                                    Text(
-                                                        text = if (isStudent) {
-                                                            if (currentLang == "en") "🎓 Student/Resident: $workplaceOrUni | ID: $identification" else "🎓 دانشجو/رزیدنت: $workplaceOrUni | کد: $identification"
-                                                        } else {
-                                                            if (currentLang == "en") "🩺 Specialist Doctor: $specialty | License: $identification" else "🩺 پزشک متخصص: $specialty | پروانه: $identification"
-                                                        },
-                                                        fontSize = 11.sp,
-                                                        color = Color(0xFF3B82F6),
-                                                        fontWeight = FontWeight.Bold
-                                                    )
-                                                }
-                                                Spacer(modifier = Modifier.height(6.dp))
-                                                Row(
-                                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                                ) {
-                                                    // Province Badge
-                                                    Box(
-                                                        modifier = Modifier
-                                                            .background(if (isDark) Color(0xFF1E3A8A) else Color(0xFFE0F2FE), RoundedCornerShape(6.dp))
-                                                            .padding(horizontal = 6.dp, vertical = 2.dp)
-                                                    ) {
-                                                        Text(
-                                                            text = if (currentLang == "en") "Province: $activityProvince" else "استان: $activityProvince",
-                                                            fontSize = 10.sp,
-                                                            fontWeight = FontWeight.Bold,
-                                                            color = if (isDark) Color(0xFF93C5FD) else Color(0xFF0284C7)
-                                                        )
-                                                    }
-
-                                                    // Type of activity Badge
-                                                    Box(
-                                                        modifier = Modifier
-                                                            .background(if (isDark) Color(0xFF3B0764) else Color(0xFFF3E8FF), RoundedCornerShape(6.dp))
-                                                            .padding(horizontal = 6.dp, vertical = 2.dp)
-                                                    ) {
-                                                        Text(
-                                                            text = if (currentLang == "en") "Activity: $activityType" else "فعالیت: $activityType",
-                                                            fontSize = 10.sp,
-                                                            fontWeight = FontWeight.Bold,
-                                                            color = if (isDark) Color(0xFFC084FC) else Color(0xFF7C3AED)
-                                                        )
-                                                    }
-                                                }
                                             }
                                         }
 
@@ -1243,12 +1194,14 @@ fun VetProfileScreen(viewModel: MainViewModel) {
 
                 // New fields inside dialog state
                 var provinceInput by remember { mutableStateOf(activityProvince) }
+                var cityInput by remember { mutableStateOf(activityCity) }
                 var activityTypeInput by remember { mutableStateOf(activityType) }
                 var addressInput by remember { mutableStateOf(activityAddress) }
                 var mapLatInput by remember { mutableStateOf(mapLatitude) }
                 var mapLngInput by remember { mutableStateOf(mapLongitude) }
                 
                 var isProvinceDropdownExpanded by remember { mutableStateOf(false) }
+                var isCityDropdownExpanded by remember { mutableStateOf(false) }
                 var isUniDropdownExpanded by remember { mutableStateOf(false) }
                 var isSpecialtyDropdownExpanded by remember { mutableStateOf(false) }
                 var isActivityTypeDropdownExpanded by remember { mutableStateOf(false) }
@@ -1272,10 +1225,95 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                 )
 
                 val provinceList = if (currentLang == "en") listOf(
-                    "Tehran", "Isfahan", "Fars", "Razavi Khorasan", "East Azerbaijan", "Mazandaran", "Gilan", "Alborz", "Khuzestan", "Kerman"
+                    "Alborz", "Ardabil", "East Azerbaijan", "West Azerbaijan", "Bushehr",
+                    "Chaharmahal and Bakhtiari", "Fars", "Gilan", "Golestan", "Hamadan",
+                    "Hormozgan", "Ilam", "Isfahan", "Kerman", "Kermanshah",
+                    "North Khorasan", "Razavi Khorasan", "South Khorasan", "Khuzestan", "Kohgiluyeh and Boyer-Ahmad",
+                    "Kurdistan", "Lorestan", "Markazi", "Mazandaran", "Qazvin",
+                    "Qom", "Semnan", "Sistan and Baluchestan", "Tehran", "Yazd", "Zanjan"
                 ) else listOf(
-                    "تهران", "اصفهان", "فارس", "خراسان رضوی", "آذربایجان شرقی", "مازندران", "گیلان", "البرز", "خوزستان", "کرمان"
+                    "البرز", "اردبیل", "آذربایجان شرقی", "آذربایجان غربی", "بوشهر",
+                    "چهارمحال و بختیاری", "فارس", "گیلان", "گلستان", "همدان",
+                    "هرمزگان", "ایلام", "اصفهان", "کرمان", "کرمانشاه",
+                    "خراسان شمالی", "خراسان رضوی", "خراسان جنوبی", "خوزستان", "کهگیلویه و بویراحمد",
+                    "کردستان", "لرستان", "مرکزی", "مازندران", "قزوین",
+                    "قم", "سمنان", "سیستان و بلوچستان", "تهران", "یزد", "زنجان"
                 )
+
+                fun getCitiesListForProvince(prov: String): List<String> {
+                    val isEn = currentLang == "en"
+                    return if (isEn) {
+                        when (prov) {
+                            "Tehran" -> listOf("Tehran", "Rey", "Shemiranat", "Eslamshahr", "Shahriar", "Malard", "Qods", "Pakdasht", "Damavand")
+                            "Isfahan" -> listOf("Isfahan", "Kashan", "Khomeyni Shahr", "Najafabad", "Shahin Shahr", "Shahreza", "Golpayegan")
+                            "Fars" -> listOf("Shiraz", "Marvdasht", "Jahrom", "Fasa", "Darab", "Kazerun", "Lar", "Abadeh")
+                            "Razavi Khorasan" -> listOf("Mashhad", "Nishapur", "Sabzevar", "Torbat-e Heydarieh", "Quchan", "Kashmar", "Gonabad")
+                            "East Azerbaijan" -> listOf("Tabriz", "Maragheh", "Marand", "Miyaneh", "Ahar", "Bonab", "Sarab")
+                            "West Azerbaijan" -> listOf("Urmia", "Khoy", "Miandoab", "Mahabad", "Bukan", "Salmas", "Piranshahr")
+                            "Mazandaran" -> listOf("Sari", "Babil", "Amol", "Qaem Shahr", "Behshahr", "Tonekabon", "Chalus", "Babolsar")
+                            "Gilan" -> listOf("Rasht", "Bandar-e Anzali", "Lahijan", "Langarud", "Talysh", "Rudsar", "Fuman")
+                            "Alborz" -> listOf("Karaj", "Fardis", "Savojbolagh", "Nazarbad", "Hashtgerd")
+                            "Khuzestan" -> listOf("Ahvaz", "Dezful", "Abadan", "Khorramshahr", "Mahshahr", "Behbehan", "Andimeshk")
+                            "Kerman" -> listOf("Kerman", "Sirjan", "Rafsanjan", "Jiroft", "Bam", "Zarand", "Shahr-e Babak")
+                            "Yazd" -> listOf("Yazd", "Meybod", "Ardakan", "Bafq", "Mehriz", "Taft")
+                            "Qazvin" -> listOf("Qazvin", "Takestan", "Alvand", "Abyek", "Buin Zahra")
+                            "Markazi" -> listOf("Arak", "Saveh", "Khomein", "Mahallat", "Delijan", "Tafresh")
+                            "Qom" -> listOf("Qom", "Qanavat", "Kahak")
+                            "Hamadan" -> listOf("Hamadan", "Malayer", "Nahavand", "Tuyserkan", "Kabudarahang")
+                            "Zanjan" -> listOf("Zanjan", "Abhar", "Khorramdarreh", "Khodabandeh")
+                            "Semnan" -> listOf("Semnan", "Shahrud", "Damghan", "Garmsar", "Mehdishahr")
+                            "Kermanshah" -> listOf("Kermanshah", "Islamabad-e Gharb", "Kangavar", "Sunqur", "Javanrud")
+                            "Kurdistan" -> listOf("Sanandaj", "Saqqez", "Marivan", "Baneh", "Qorveh", "Bijar")
+                            "Ardabil" -> listOf("Ardabil", "Parsabad", "Meshgin Shahr", "Khalkhal", "Germi")
+                            "Lorestan" -> listOf("Khorramabad", "Borujerd", "Dorud", "Kuhdasht", "Aligudarz")
+                            "Ilam" -> listOf("Ilam", "Dehloran", "Eyvan", "Abdanan", "Mehran")
+                            "Chaharmahal and Bakhtiari" -> listOf("Shahrekord", "Borujen", "Lordegan", "Farsan")
+                            "Kohgiluyeh and Boyer-Ahmad" -> listOf("Yasuj", "Dogonbadan", "Dehdasht", "Sisakht")
+                            "Sistan and Baluchestan" -> listOf("Zahedan", "Zabol", "Chabahar", "Iranshahr", "Saravan")
+                            "Hormozgan" -> listOf("Bandar Abbas", "Minab", "Qeshm", "Kish", "Bandar Lengeh")
+                            "Bushehr" -> listOf("Bushehr", "Borazjan", "Kangan", "Genaveh", "Asaluyeh")
+                            "Golestan" -> listOf("Gorgan", "Gonbad-e Qabus", "Bandar Torkaman", "Aliabad-e Katol")
+                            "North Khorasan" -> listOf("Bojnurd", "Shirvan", "Esfarayen", "Jajarm")
+                            "South Khorasan" -> listOf("Birjand", "Qaen", "Ferdows", "Tabs")
+                            else -> listOf("Tehran")
+                        }
+                    } else {
+                        when (prov) {
+                            "تهران" -> listOf("تهران", "ری", "شمیرانات", "اسلامشهر", "شهریار", "ملارد", "قدس", "پاکدشت", "دماوند")
+                            "اصفهان" -> listOf("اصفهان", "کاشان", "خمینی‌شهر", "نجف‌آباد", "شاهین‌شهر", "شهرضا", "گلپایگان")
+                            "فارس" -> listOf("شیراز", "مرودشت", "جهرم", "فسا", "داراب", "کازرون", "لار", "آباده")
+                            "خراسان رضوی" -> listOf("مشهد", "نیشابور", "سبزوار", "تربت حیدریه", "قوچان", "کاشمر", "گناباد")
+                            "آذربایجان شرقی" -> listOf("تبریز", "مراغه", "مرند", "میانه", "اهر", "بناب", "سراب")
+                            "آذربایجان غربی" -> listOf("ارومیه", "خوی", "میاندوآب", "مهاباد", "بوکان", "سلماس", "پیرانشهر")
+                            "مازندران" -> listOf("ساری", "بابل", "آمل", "قائم‌شهر", "بهشهر", "تنکابن", "چالوس", "بابلسر")
+                            "گیلان" -> listOf("رشت", "بندر انزلی", "لاهیجان", "لنگرود", "تالش", "رودسر", "فومن")
+                            "البرز" -> listOf("کرج", "فردیس", "ساوجبلاغ", "نظرآباد", "هشتگرد")
+                            "خوزستان" -> listOf("اهواز", "دزفول", "آبادان", "خرمشهر", "ماهشهر", "بهبهان", "اندیمشک")
+                            "کرمان" -> listOf("کرمان", "سیرجان", "رفسنجان", "جیرفت", "بم", "زرند", "شهربابک")
+                            "یزد" -> listOf("یزد", "میبد", "اردکان", "بافق", "مهریز", "تفت")
+                            "قزوین" -> listOf("قزوین", "تاکستان", "الوند", "آبیک", "بویین‌زهرا")
+                            "مرکزی" -> listOf("اراک", "ساوه", "خمین", "محلات", "دلیجان", "تفرش")
+                            "قم" -> listOf("قم", "قنوات", "کهک")
+                            "همدان" -> listOf("همدان", "ملایر", "نهاوند", "تویسرکان", "کبودرآهنگ")
+                            "زنجان" -> listOf("زنجان", "ابهر", "خرمدره", "خدابنده")
+                            "سمنان" -> listOf("سمنان", "شاهرود", "دامغان", "گرمسار", "مهدیشهر")
+                            "کرمانشاه" -> listOf("کرمانشاه", "اسلام‌آباد غرب", "کنگاور", "سنقر", "جوانرود")
+                            "کردستان" -> listOf("سنندج", "سقز", "مریوان", "بانه", "قروه", "بیجار")
+                            "اردبیل" -> listOf("اردبیل", "پارس‌آباد", "مشگین‌شهر", "خلخال", "گرمی")
+                            "لرستان" -> listOf("خرم‌آباد", "بروجرد", "دورود", "کوهدشت", "الیگودرز")
+                            "ایلام" -> listOf("ایلام", "دهلران", "ایوان", "آبدانان", "مهران")
+                            "چهارمحال و بختیاری" -> listOf("شهرکرد", "بروجن", "لردگان", "فارسان")
+                            "کهگیلویه و بویراحمد" -> listOf("یاسوج", "دوگنبدان", "دهدشت", "سی‌سخت")
+                            "سیستان و بلوچستان" -> listOf("زاهدان", "زابل", "چابهار", "ایرانشهر", "سراوان")
+                            "هرمزگان" -> listOf("بندرعباس", "میناب", "قشم", "کیش", "بندرلنگه")
+                            "بوشهر" -> listOf("بوشهر", "برازجان", "کنگان", "گناوه", "عسلویه")
+                            "گلستان" -> listOf("گرگان", "گنبد کاووس", "بندر ترکمن", "علی‌آباد کتول")
+                            "خراسان شمالی" -> listOf("بجنورد", "شیروان", "اسفراین", "جاجرم")
+                            "خراسان جنوبی" -> listOf("بیرجند", "قائن", "فردوس", "طبس")
+                            else -> listOf("تهران")
+                        }
+                    }
+                }
 
                 val activityTypesList = if (currentLang == "en") listOf(
                     "General", "Small Animal specialist", "Avian specialist", "Aquatic specialist", "Wildlife and exotic", "Other"
@@ -1462,40 +1500,6 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                         }
                                     }
                                 }
-                            } else {
-                                Text(if (currentLang == "en") "🩺 Main Clinical Specialty:" else "🩺 تخصص کلینیکال اصلی:", fontSize = 11.sp)
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .border(1.dp, if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1), RoundedCornerShape(12.dp))
-                                        .background(cardBgColor)
-                                        .clickable { isSpecialtyDropdownExpanded = true }
-                                        .padding(12.dp)
-                                ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(specialtyInput, fontSize = 13.sp, color = textColor)
-                                        Text("▼", fontSize = 10.sp, color = Color.Gray)
-                                    }
-
-                                    DropdownMenu(
-                                        expanded = isSpecialtyDropdownExpanded,
-                                        onDismissRequest = { isSpecialtyDropdownExpanded = false }
-                                    ) {
-                                        specialtyList.forEach { spec ->
-                                            DropdownMenuItem(
-                                                text = { Text(spec, fontSize = 13.sp) },
-                                                onClick = {
-                                                    specialtyInput = spec
-                                                    isSpecialtyDropdownExpanded = false
-                                                }
-                                            )
-                                        }
-                                    }
-                                }
                             }
 
                             // 3. Province of activity selector (Iran Provinces)
@@ -1532,6 +1536,53 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                             onClick = {
                                                 provinceInput = prov
                                                 isProvinceDropdownExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
+                            // 4. City of activity selector (Iran Cities based on Province)
+                            Text(
+                                text = if (currentLang == "en") "🏙️ City of Activity:" else "🏙️ شهر فعالیت:",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF3B82F6)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1), RoundedCornerShape(12.dp))
+                                    .background(cardBgColor)
+                                    .clickable { isCityDropdownExpanded = true }
+                                    .padding(12.dp)
+                            ) {
+                                val citiesOfProvince = getCitiesListForProvince(provinceInput)
+                                LaunchedEffect(provinceInput) {
+                                    if (citiesOfProvince.isNotEmpty() && !citiesOfProvince.contains(cityInput)) {
+                                        cityInput = citiesOfProvince.first()
+                                    }
+                                }
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(cityInput, fontSize = 13.sp, color = textColor)
+                                    Text("▼", fontSize = 10.sp, color = Color.Gray)
+                                }
+
+                                DropdownMenu(
+                                    expanded = isCityDropdownExpanded,
+                                    onDismissRequest = { isCityDropdownExpanded = false }
+                                ) {
+                                    citiesOfProvince.forEach { city ->
+                                        DropdownMenuItem(
+                                            text = { Text(city, fontSize = 13.sp) },
+                                            onClick = {
+                                                cityInput = city
+                                                isCityDropdownExpanded = false
                                             }
                                         )
                                     }
@@ -1599,6 +1650,7 @@ fun VetProfileScreen(viewModel: MainViewModel) {
                                 
                                 // Save supplemental fields
                                 activityProvince = provinceInput
+                                activityCity = cityInput
                                 activityType = activityTypeInput
                                 activityAddress = addressInput
                                 mapLatitude = mapLatInput
