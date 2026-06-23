@@ -346,14 +346,14 @@ fun SharedSpeciesCircleButton(
     val outlineCol by animateColorAsState(if (isSelected) Color(0xFF2DD4BF) else Color.Transparent)
     val textCol by animateColorAsState(if (isSelected) Color(0xFF2DD4BF) else MaterialTheme.colorScheme.onSurfaceVariant)
 
-    val gradient = when (speciesKey) {
-        "dog" -> Brush.verticalGradient(listOf(Color(0xFF38BDF8), Color(0xFF0284C7)))
-        "cat" -> Brush.verticalGradient(listOf(Color(0xFF2DD4BF), Color(0xFF0D9488)))
-        "bird" -> Brush.verticalGradient(listOf(Color(0xFF60A5FA), Color(0xFF2563EB)))
-        "rodent" -> Brush.verticalGradient(listOf(Color(0xFF34D399), Color(0xFF059669)))
-        "aquatic" -> Brush.verticalGradient(listOf(Color(0xFF38BDF8), Color(0xFF0369A1)))
-        "amphibian" -> Brush.verticalGradient(listOf(Color(0xFF4ADE80), Color(0xFF16A34A)))
-        else -> Brush.verticalGradient(listOf(Color(0xFFFBBF24), Color(0xFFD97706))) // reptile
+    val imageRes = when (speciesKey) {
+        "dog" -> R.drawable.img_species_dog
+        "cat" -> R.drawable.img_species_cat
+        "bird" -> R.drawable.img_species_bird
+        "rodent" -> R.drawable.img_species_rodent
+        "aquatic" -> R.drawable.img_species_aquatic
+        "amphibian" -> R.drawable.img_species_amphibian
+        else -> R.drawable.img_species_reptile
     }
 
     Column(
@@ -366,42 +366,16 @@ fun SharedSpeciesCircleButton(
             modifier = Modifier
                 .size(85.dp)
                 .clip(CircleShape)
-                .background(gradient)
+                .background(Color.White)
                 .border(3.dp, outlineCol, CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            when (speciesKey) {
-                "dog" -> DogVectorIcon(
-                    modifier = Modifier.fillMaxSize(0.65f),
-                    tint = Color.White
-                )
-                "cat" -> CatVectorIcon(
-                    modifier = Modifier.fillMaxSize(0.68f),
-                    tint = Color.White
-                )
-                "bird" -> ExoticVectorIcon(
-                    modifier = Modifier.fillMaxSize(0.65f),
-                    tint = Color.White
-                )
-                "rodent" -> RodentVectorIcon(
-                    modifier = Modifier.fillMaxSize(0.65f),
-                    tint = Color.White
-                )
-                "aquatic" -> AquaticVectorIcon(
-                    modifier = Modifier.fillMaxSize(0.65f),
-                    tint = Color.White
-                )
-                "amphibian" -> AmphibianVectorIcon(
-                    modifier = Modifier.fillMaxSize(0.65f),
-                    tint = Color.White
-                )
-                else -> {
-                    ReptileVectorIcon(
-                        modifier = Modifier.fillMaxSize(0.65f),
-                        tint = Color.White
-                    )
-                }
-            }
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = label,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+            )
         }
         Spacer(modifier = Modifier.height(6.dp))
         Text(

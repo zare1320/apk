@@ -1093,34 +1093,30 @@ fun WhiteSpeciesCircleButton(
             .clickable { onClick() }
             .padding(2.dp)
     ) {
+        val imageRes = when (speciesKey) {
+            "dog" -> com.example.R.drawable.img_species_dog
+            "cat" -> com.example.R.drawable.img_species_cat
+            "bird" -> com.example.R.drawable.img_species_bird
+            "rodent" -> com.example.R.drawable.img_species_rodent
+            "aquatic" -> com.example.R.drawable.img_species_aquatic
+            "amphibian" -> com.example.R.drawable.img_species_amphibian
+            else -> com.example.R.drawable.img_species_reptile
+        }
+
         Box(
             modifier = Modifier
                 .size(62.dp)
                 .clip(CircleShape)
                 .background(Color.White)
-                .border(outlineWidth, outlineCol, CircleShape)
-                .padding(10.dp),
+                .border(outlineWidth, outlineCol, CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            val iconColor = when (speciesKey) {
-                "dog" -> Color(0xFF38BDF8)
-                "cat" -> Color(0xFF0D9488)
-                "bird" -> Color(0xFF60A5FA)
-                "rodent" -> Color(0xFF34D399)
-                "aquatic" -> Color(0xFF38BDF8)
-                "amphibian" -> Color(0xFF4ADE80)
-                else -> Color(0xFFFBBF24) // reptile / exotic
-            }
-
-            when (speciesKey) {
-                "dog" -> DogVectorIcon(modifier = Modifier.fillMaxSize(), tint = iconColor)
-                "cat" -> CatVectorIcon(modifier = Modifier.fillMaxSize(), tint = iconColor)
-                "bird" -> ExoticVectorIcon(modifier = Modifier.fillMaxSize(), tint = iconColor)
-                "rodent" -> RodentVectorIcon(modifier = Modifier.fillMaxSize(), tint = iconColor)
-                "aquatic" -> AquaticVectorIcon(modifier = Modifier.fillMaxSize(), tint = iconColor)
-                "amphibian" -> AmphibianVectorIcon(modifier = Modifier.fillMaxSize(), tint = iconColor)
-                else -> ReptileVectorIcon(modifier = Modifier.fillMaxSize(), tint = iconColor)
-            }
+            androidx.compose.foundation.Image(
+                painter = androidx.compose.ui.res.painterResource(id = imageRes),
+                contentDescription = label,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+            )
         }
         Spacer(modifier = Modifier.height(6.dp))
         Text(
