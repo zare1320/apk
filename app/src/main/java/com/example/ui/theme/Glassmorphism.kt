@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
  */
 
 @Composable
-fun getGlassmorphicBrush(isDark: Boolean = isSystemInDarkTheme()): Brush {
+fun getGlassmorphicBrush(isDark: Boolean = LocalIsDark.current): Brush {
     return if (isDark) {
         Brush.linearGradient(
             colors = listOf(
@@ -50,7 +50,7 @@ fun getGlassmorphicBrush(isDark: Boolean = isSystemInDarkTheme()): Brush {
 }
 
 @Composable
-fun getGlassmorphicBorderColor(isDark: Boolean = isSystemInDarkTheme()): Color {
+fun getGlassmorphicBorderColor(isDark: Boolean = LocalIsDark.current): Color {
     return if (isDark) {
         Color.White.copy(alpha = 0.08f)
     } else {
@@ -63,7 +63,7 @@ fun getGlassmorphicBorderColor(isDark: Boolean = isSystemInDarkTheme()): Color {
  */
 @Composable
 fun Modifier.glassmorphic(
-    isDark: Boolean = isSystemInDarkTheme(),
+    isDark: Boolean = LocalIsDark.current,
     cornerRadius: Dp = 16.dp,
     borderWidth: Dp = 1.dp,
     accentGlow: Boolean = false
@@ -109,7 +109,7 @@ fun Modifier.glassmorphic(
 @Composable
 fun GlassBackgroundBox(
     modifier: Modifier = Modifier,
-    isDark: Boolean = isSystemInDarkTheme(),
+    isDark: Boolean = LocalIsDark.current,
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(

@@ -11,8 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+
+val LocalIsDark = staticCompositionLocalOf { false }
 
 private val DarkColorScheme = darkColorScheme(
     primary = VetDarkPrimary,
@@ -49,7 +52,10 @@ fun MyApplicationTheme(
   val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
   MaterialTheme(colorScheme = colorScheme, typography = Typography) {
-    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+    CompositionLocalProvider(
+      LocalLayoutDirection provides layoutDirection,
+      LocalIsDark provides darkTheme
+    ) {
       content()
     }
   }
