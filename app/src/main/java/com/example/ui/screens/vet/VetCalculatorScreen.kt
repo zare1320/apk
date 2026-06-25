@@ -173,7 +173,7 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
                         GestationCalculatorView(viewModel)
                     }
                     "سن معادل انسان" -> {
-                        HumanAgeCalculatorView(initWeight = weightInput)
+                        HumanAgeCalculatorView(initWeight = weightInput, currentLang = currentLang)
                     }
                     "تریاژ تروما" -> {
                         TraumaTriageView()

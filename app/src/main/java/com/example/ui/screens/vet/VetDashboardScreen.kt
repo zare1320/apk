@@ -936,6 +936,42 @@ fun VetDashboardScreen(viewModel: MainViewModel) {
                                     return@Button
                                 }
 
+                                val targetRecordNumber = recordNumber.trim()
+                                val currentPet = activeExaminedPet
+                                if (targetRecordNumber.isNotEmpty()) {
+                                    val duplicateRecord = allPets.any {
+                                        it.recordNumber.trim().isNotEmpty() &&
+                                        it.recordNumber.trim() == targetRecordNumber &&
+                                        (currentPet == null || it.id != currentPet.id)
+                                    }
+                                    if (duplicateRecord) {
+                                        errorMessage = if (currentLang == "en") "Duplicate case." else "پرونده تکراری (Duplicate case.)"
+                                        return@Button
+                                    }
+                                }
+
+                                val targetName = petName.trim().ifEmpty { if (currentLang == "en") "Unnamed" else "بدون نام" }
+                                val targetPhone = ownerPhone.trim()
+                                val speciesValue = activeSpecies ?: "dog"
+                                val targetSpecies = if (speciesValue == "exotic") {
+                                    activeExotic ?: "exotic"
+                                } else {
+                                    speciesValue
+                                }
+
+                                if (targetPhone.isNotEmpty()) {
+                                    val duplicatePetNamePhoneSpecies = allPets.any {
+                                        it.name.trim().lowercase() == targetName.lowercase() &&
+                                        it.ownerPhone.trim() == targetPhone &&
+                                        it.species.trim().lowercase() == targetSpecies.lowercase() &&
+                                        (currentPet == null || it.id != currentPet.id)
+                                    }
+                                    if (duplicatePetNamePhoneSpecies) {
+                                        errorMessage = if (currentLang == "en") "Duplicate case." else "پرونده تکراری (Duplicate case.)"
+                                        return@Button
+                                    }
+                                }
+
                                 errorMessage = ""
                                 viewModel.saveExaminedPet(
                                     name = petName.trim().ifEmpty { if (currentLang == "en") "Unnamed" else "بدون نام" },

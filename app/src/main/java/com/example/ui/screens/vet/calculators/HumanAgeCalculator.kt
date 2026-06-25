@@ -20,8 +20,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+fun String.toPersianDigits(currentLang: String): String {
+    if (currentLang != "fa") return this
+    return this.map { char ->
+        when (char) {
+            '0' -> '۰'
+            '1' -> '۱'
+            '2' -> '۲'
+            '3' -> '۳'
+            '4' -> '۴'
+            '5' -> '۵'
+            '6' -> '۶'
+            '7' -> '۷'
+            '8' -> '۸'
+            '9' -> '۹'
+            else -> char
+        }
+    }.joinToString("")
+}
+
 @Composable
-fun HumanAgeCalculatorView(initWeight: String) {
+fun HumanAgeCalculatorView(initWeight: String, currentLang: String = "en") {
     val isDark = MaterialTheme.colorScheme.background.red < 0.3f
     val bgColor = MaterialTheme.colorScheme.background
     val surfaceColor = if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f) else MaterialTheme.colorScheme.surface
@@ -40,7 +59,14 @@ fun HumanAgeCalculatorView(initWeight: String) {
     val today = remember { java.util.Date() }
     val sdfLabel = remember { java.text.SimpleDateFormat("EEE MMM dd yyyy", java.util.Locale.ENGLISH) }
     val sdfFormat = remember { java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.ENGLISH) }
-    val formattedToday = remember { sdfLabel.format(today) }
+    val formattedToday = remember(currentLang) {
+        if (currentLang == "en") {
+            sdfLabel.format(today)
+        } else {
+            val faFormat = java.text.SimpleDateFormat("yyyy/MM/dd", java.util.Locale.ENGLISH)
+            faFormat.format(today).toPersianDigits("fa")
+        }
+    }
 
     // Dog natural log age computation states
     var dogAgeStr by remember { mutableStateOf("") }
@@ -80,7 +106,9 @@ fun HumanAgeCalculatorView(initWeight: String) {
     // Help function to format calculated accurate pet age from DOB
     fun getCalculatedPetAgeString(dob: java.util.Date?, current: java.util.Date): String {
         if (dob == null) return "—"
-        if (dob.after(current)) return "Date of Birth in future"
+        if (dob.after(current)) {
+            return if (currentLang == "fa") "تاریخ تولد در آینده است" else "Date of Birth in future"
+        }
         
         val calDob = java.util.Calendar.getInstance().apply { time = dob }
         val calCurrent = java.util.Calendar.getInstance().apply { time = current }
@@ -107,15 +135,23 @@ fun HumanAgeCalculatorView(initWeight: String) {
         }
         
         val parts = mutableListOf<String>()
-        if (years > 0) parts.add("$years year" + (if (years > 1) "s" else ""))
-        if (months > 0) parts.add("$months month" + (if (months > 1) "s" else ""))
-        if (days > 0 || parts.isEmpty()) parts.add("$days day" + (if (days != 1) "s" else ""))
-        
-        return parts.joinToString(", ")
+        if (currentLang == "fa") {
+            if (years > 0) parts.add("$years سال")
+            if (months > 0) parts.add("$months ماه")
+            if (days > 0 || parts.isEmpty()) parts.add("$days روز")
+            return parts.joinToString(" و ").toPersianDigits("fa")
+        } else {
+            if (years > 0) parts.add("$years year" + (if (years > 1) "s" else ""))
+            if (months > 0) parts.add("$months month" + (if (months > 1) "s" else ""))
+            if (days > 0 || parts.isEmpty()) parts.add("$days day" + (if (days != 1) "s" else ""))
+            return parts.joinToString(", ")
+        }
     }
 
-    // Force LTR alignment for English/Scientific content exactly as shown in reference layout
-    CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr) {
+    // Determine layout direction according to user selection
+    val layoutDirection = if (currentLang == "en") androidx.compose.ui.unit.LayoutDirection.Ltr else androidx.compose.ui.unit.LayoutDirection.Rtl
+
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -137,7 +173,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Calculate Pets Current Age",
+                        text = if (currentLang == "en") "Calculate Pets Current Age" else "محاسبه سن فعلی حیوان خانگی",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = primaryText
@@ -150,7 +186,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                         // Date picker column
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Choose Date of Birth",
+                                text = if (currentLang == "en") "Choose Date of Birth" else "انتخاب تاریخ تولد",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = secondaryText
@@ -184,7 +220,11 @@ fun HumanAgeCalculatorView(initWeight: String) {
                                 contentAlignment = Alignment.CenterStart
                             ) {
                                 Text(
-                                    text = if (dobDate == null) "Select date" else sdfFormat.format(dobDate!!),
+                                    text = if (dobDate == null) {
+                                        if (currentLang == "en") "Select date" else "انتخاب تاریخ"
+                                    } else {
+                                        sdfFormat.format(dobDate!!).toPersianDigits(currentLang)
+                                    },
                                     fontSize = 12.sp,
                                     color = if (dobDate == null) secondaryText.copy(alpha = 0.6f) else primaryText,
                                     fontWeight = FontWeight.Medium
@@ -195,7 +235,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                         // Result age display column
                         Column(modifier = Modifier.weight(1.1f)) {
                             Text(
-                                text = "Age on $formattedToday",
+                                text = if (currentLang == "en") "Age on $formattedToday" else "سن در تاریخ $formattedToday",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = secondaryText
@@ -242,7 +282,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Calculate Age in Human Years",
+                        text = if (currentLang == "en") "Calculate Age in Human Years" else "محاسبه سن به سال‌های انسانی",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = primaryText
@@ -256,7 +296,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                         // Dogs current age in years input field
                         Column(modifier = Modifier.weight(1.2f)) {
                             Text(
-                                text = "Dogs Current Age in Years",
+                                text = if (currentLang == "en") "Dogs Current Age in Years" else "سن فعلی سگ (به سال)",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = secondaryText
@@ -269,7 +309,8 @@ fun HumanAgeCalculatorView(initWeight: String) {
                                 textStyle = androidx.compose.ui.text.TextStyle(
                                     fontSize = 12.sp,
                                     color = primaryText,
-                                    fontWeight = FontWeight.Medium
+                                    fontWeight = FontWeight.Medium,
+                                    textAlign = if (currentLang == "en") TextAlign.Left else TextAlign.Right
                                 ),
                                 singleLine = true,
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -284,7 +325,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                                     ) {
                                         if (dogAgeStr.isEmpty()) {
                                             Text(
-                                                text = "Enter age (e.g. 1.5)",
+                                                text = if (currentLang == "en") "Enter age (e.g. 1.5)" else "ورود سن (مثلا ۱.۵)",
                                                 color = secondaryText.copy(alpha = 0.6f),
                                                 fontSize = 12.sp
                                             )
@@ -298,7 +339,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                         // Output displaying Age in Human Years
                         Column(modifier = Modifier.weight(0.8f)) {
                             Text(
-                                text = "Age in Human Years:",
+                                text = if (currentLang == "en") "Age in Human Years:" else "سن به سال‌های انسانی:",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = secondaryText
@@ -312,7 +353,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                                 contentAlignment = Alignment.CenterStart
                             ) {
                                 val roundedText = if (calculatedHumanAge != null) {
-                                    String.format(java.util.Locale.US, "%.1f", calculatedHumanAge)
+                                    String.format(java.util.Locale.US, "%.1f", calculatedHumanAge).toPersianDigits(currentLang)
                                 } else {
                                     ""
                                 }
@@ -330,7 +371,11 @@ fun HumanAgeCalculatorView(initWeight: String) {
                     
                     // Scientific Explanation & Natural Log study
                     Text(
-                        text = "The new formula for calculating a dog's ages, based on the study referenced below, is to multiply the natural logarithm of a dog's age by 16, then add 31.",
+                        text = if (currentLang == "en") {
+                            "The new formula for calculating a dog's ages, based on the study referenced below, is to multiply the natural logarithm of a dog's age by 16, then add 31."
+                        } else {
+                            "فرمول جدید برای محاسبه سن سگ، بر اساس مطالعه مرجع زیر، عبارت است از ضرب لگاریتم طبیعی سن سگ در ۱۶ و سپس افزودن عدد ۳۱."
+                        },
                         fontSize = 11.sp,
                         color = secondaryText,
                         lineHeight = 16.sp,
@@ -355,7 +400,11 @@ fun HumanAgeCalculatorView(initWeight: String) {
                     }
                     
                     Text(
-                        text = "Quantitative Translation of Dog-to-Human Aging by Conserved Remodeling of the DNA Methylome",
+                        text = if (currentLang == "en") {
+                            "Quantitative Translation of Dog-to-Human Aging by Conserved Remodeling of the DNA Methylome"
+                        } else {
+                            "ترجمه کمی روند پیری سگ به انسان بر اساس بازسازی فرگشتی متیلوم DNA"
+                        },
                         fontSize = 11.sp,
                         color = linkColor,
                         fontWeight = FontWeight.Bold,
@@ -390,7 +439,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Traditional Aging Table",
+                        text = if (currentLang == "en") "Traditional Aging Table" else "جدول سنتی تعیین سن معادل",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = primaryText
@@ -415,7 +464,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                             Box(modifier = Modifier.weight(1f)) // Pet years spacer
                             
                             Text(
-                                text = "Feline",
+                                text = if (currentLang == "en") "Feline" else "گربه (Feline)",
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = primaryText,
@@ -424,7 +473,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                             )
                             
                             Text(
-                                text = "Canine",
+                                text = if (currentLang == "en") "Canine" else "سگ (Canine)",
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = primaryText,
@@ -444,7 +493,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Pet Years",
+                                text = if (currentLang == "en") "Pet Years" else "سن حیوان",
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = primaryText,
@@ -452,7 +501,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                                 textAlign = TextAlign.Center
                             )
                             Text(
-                                text = "0-20 lbs",
+                                text = if (currentLang == "en") "0-20 lbs" else "۰-۲۰ پوند",
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = secondaryText,
@@ -460,7 +509,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                                 textAlign = TextAlign.Center
                             )
                             Text(
-                                text = "0-20 lbs",
+                                text = if (currentLang == "en") "0-20 lbs" else "۰-۲۰ پوند",
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = secondaryText,
@@ -468,7 +517,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                                 textAlign = TextAlign.Center
                             )
                             Text(
-                                text = "20-50 lbs",
+                                text = if (currentLang == "en") "20-50 lbs" else "۲۰-۵۰ پوند",
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = secondaryText,
@@ -476,7 +525,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                                 textAlign = TextAlign.Center
                             )
                             Text(
-                                text = "50-90 lbs",
+                                text = if (currentLang == "en") "50-90 lbs" else "۵۰-۹۰ پوند",
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = secondaryText,
@@ -484,7 +533,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                                 textAlign = TextAlign.Center
                             )
                             Text(
-                                text = ">90 lbs",
+                                text = if (currentLang == "en") ">90 lbs" else "بیشتر از ۹۰",
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = secondaryText,
@@ -512,7 +561,7 @@ fun HumanAgeCalculatorView(initWeight: String) {
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = rowData[0],
+                                    text = rowData[0].toPersianDigits(currentLang),
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = primaryText,
@@ -520,35 +569,35 @@ fun HumanAgeCalculatorView(initWeight: String) {
                                     textAlign = TextAlign.Center
                                 )
                                 Text(
-                                    text = rowData[1],
+                                    text = rowData[1].toPersianDigits(currentLang),
                                     fontSize = 10.sp,
                                     color = secondaryText,
                                     modifier = Modifier.weight(1.1f),
                                     textAlign = TextAlign.Center
                                 )
                                 Text(
-                                    text = rowData[2],
+                                    text = rowData[2].toPersianDigits(currentLang),
                                     fontSize = 10.sp,
                                     color = secondaryText,
                                     modifier = Modifier.weight(1.1f),
                                     textAlign = TextAlign.Center
                                 )
                                 Text(
-                                    text = rowData[3],
+                                    text = rowData[3].toPersianDigits(currentLang),
                                     fontSize = 10.sp,
                                     color = secondaryText,
                                     modifier = Modifier.weight(1.1f),
                                     textAlign = TextAlign.Center
                                 )
                                 Text(
-                                    text = rowData[4],
+                                    text = rowData[4].toPersianDigits(currentLang),
                                     fontSize = 10.sp,
                                     color = secondaryText,
                                     modifier = Modifier.weight(1.1f),
                                     textAlign = TextAlign.Center
                                 )
                                 Text(
-                                    text = rowData[5],
+                                    text = rowData[5].toPersianDigits(currentLang),
                                     fontSize = 10.sp,
                                     color = secondaryText,
                                     modifier = Modifier.weight(1.1f),
