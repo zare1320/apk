@@ -2,6 +2,7 @@ package com.example.ui.screens.vet
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -26,8 +28,7 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
     val selectedSpecies by viewModel.selectedSpecies.collectAsState()
     val currentLang by viewModel.currentLanguage.collectAsState()
 
-    val defaultCalculator = if (currentLang == "en") "Fluid Therapy" else "مایع‌درمانی"
-    var activeCalculator by remember(currentLang) { mutableStateOf(defaultCalculator) }
+    var activeCalculator by remember(currentLang) { mutableStateOf<String?>(null) }
 
     // Forms States
     var weightInput by remember { mutableStateOf("") }
@@ -89,37 +90,113 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
                 }
             }
 
+            if (activeExaminedPet == null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (isSystemInDarkTheme()) Color(0xFF7F1D1D) else Color(0xFFFEE2E2),
+                        contentColor = if (isSystemInDarkTheme()) Color(0xFFFECACA) else Color(0xFF991B1B)
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text(
+                            text = if (currentLang == "en") "⚠️ No active patient selected." else "⚠️ بیمار فعالی انتخاب نشده است.",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = if (currentLang == "en") {
+                                "Calculations are performed based on a default weight of 1 kg. Please activate a patient record at the front desk first for accurate calculations."
+                            } else {
+                                "محاسبات بر اساس وزن پیش‌فرض ۱ کیلوگرم انجام می‌شوند. لطفاً ابتدا پرونده یک بیمار را در پذیرش فعال کنید تا محاسبات دقیق‌تری داشته باشید."
+                            },
+                            fontSize = 11.sp,
+                            lineHeight = 16.sp
+                        )
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
             // Interactive Display
-            val standardCalName = when (activeCalculator) {
-                "Fluid Therapy", "مایع‌درمانی" -> "مایع‌درمانی"
-                "Blood Transfusion", "انتقال خون" -> "انتقال خون"
-                "Calorie Calculator", "محاسبه کالری غذا" -> "محاسبه کالری غذا"
-                "Gestation Calendar", "زمان زایمان" -> "زمان زایمان"
-                "Human Age Equiv.", "سن معادل انسان" -> "سن معادل انسان"
-                "Trauma Triage", "تریاژ تروما" -> "تریاژ تروما"
-                else -> activeCalculator
+            val standardCalName = activeCalculator?.let {
+                when (it) {
+                    "Fluid Therapy", "مایع‌درمانی" -> "مایع‌درمانی"
+                    "Blood Transfusion", "انتقال خون" -> "انتقال خون"
+                    "Calorie Calculator", "محاسبه کالری غذا" -> "محاسبه کالری غذا"
+                    "Gestation Calendar", "زمان زایمان" -> "زمان زایمان"
+                    "Human Age Equiv.", "سن معادل انسان" -> "سن معادل انسان"
+                    "Trauma Triage", "تریاژ تروما" -> "تریاژ تروما"
+                    else -> it
+                }
             }
 
-            when (standardCalName) {
-                "مایع‌درمانی" -> {
-                    FluidTherapyCalculator(activePet = activeExaminedPet, selectedSpecies = selectedSpecies)
+            if (standardCalName != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = activeCalculator ?: "",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    TextButton(onClick = { activeCalculator = null }) {
+                        Text(
+                            text = if (currentLang == "en") "❌ Close Tool" else "❌ بستن ابزار",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
-                "انتقال خون" -> {
-                    BloodTransfusionCalculator(activePet = activeExaminedPet, initWeight = weightInput, selectedSpecies = selectedSpecies)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                when (standardCalName) {
+                    "مایع‌درمانی" -> {
+                        FluidTherapyCalculator(activePet = activeExaminedPet, selectedSpecies = selectedSpecies, currentLang = currentLang)
+                    }
+                    "انتقال خون" -> {
+                        BloodTransfusionCalculator(activePet = activeExaminedPet, initWeight = weightInput, selectedSpecies = selectedSpecies)
+                    }
+                    "محاسبه کالری غذا" -> {
+                        CalorieCalculatorView(activePet = activeExaminedPet, initWeight = weightInput, selectedSpecies = selectedSpecies)
+                    }
+                    "زمان زایمان" -> {
+                        GestationCalculatorView(viewModel)
+                    }
+                    "سن معادل انسان" -> {
+                        HumanAgeCalculatorView(initWeight = weightInput)
+                    }
+                    "تریاژ تروما" -> {
+                        TraumaTriageView()
+                    }
                 }
-                "محاسبه کالری غذا" -> {
-                    CalorieCalculatorView(activePet = activeExaminedPet, initWeight = weightInput, selectedSpecies = selectedSpecies)
-                }
-                "زمان زایمان" -> {
-                    GestationCalculatorView(viewModel)
-                }
-                "سن معادل انسان" -> {
-                    HumanAgeCalculatorView(initWeight = weightInput)
-                }
-                "تریاژ تروما" -> {
-                    TraumaTriageView()
+            } else {
+                Spacer(modifier = Modifier.height(24.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (currentLang == "en") {
+                            "Select a calculator tool from the options above to view its interactive controls."
+                        } else {
+                            "یکی از ابزارهای محاسبه‌گر بالا را انتخاب کنید تا کنترل‌های تعاملی آن نمایش داده شود."
+                        },
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }

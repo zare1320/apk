@@ -28,7 +28,8 @@ import com.example.data.database.Pet
 @Composable
 fun FluidTherapyCalculator(
     activePet: Pet?,
-    selectedSpecies: String? = null
+    selectedSpecies: String? = null,
+    currentLang: String = "en"
 ) {
     val initWeight = activePet?.weight?.toString() ?: ""
     val isDog = if (activePet != null) {
@@ -38,7 +39,7 @@ fun FluidTherapyCalculator(
     }
 
     // 1. Enter Weight - Select Species States
-    var weightKgInput by remember(initWeight) { mutableStateOf(initWeight.ifEmpty { "10.0" }) }
+    var weightKgInput by remember(initWeight) { mutableStateOf(initWeight.ifEmpty { "1" }) }
     var weightLbsInput by remember(weightKgInput) {
         val kgVal = weightKgInput.toDoubleOrNull()
         mutableStateOf(if (kgVal != null) String.format("%.2f", kgVal * 2.20462) else "")
@@ -67,6 +68,7 @@ fun FluidTherapyCalculator(
     var surgicalDosage by remember { mutableStateOf("5") }
     var hetastarchDosage by remember { mutableStateOf("10") }
     var vetstarchDosage by remember { mutableStateOf("20") }
+    var hypertonicSalineDosage by remember { mutableStateOf("4") }
 
     // IV Drip Rate state fields
     var dripVolumeInput by remember { mutableStateOf("100") }
@@ -90,8 +92,9 @@ fun FluidTherapyCalculator(
 
     val bulletColor = if (isDark) MaterialTheme.colorScheme.primary else Color(0xFFC7D2FE)
 
-    // Let's do calculations in LTR layout as in screenshots
-    CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr) {
+    // Let's do calculations in layout matching language direction
+    val layoutDir = if (currentLang == "fa") androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDir) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -109,14 +112,6 @@ fun FluidTherapyCalculator(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
-                    // Title Header to make it feel premium
-                    Text(
-                        text = "💧 Veterinary Fluid Therapy Planner",
-                        fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 15.sp
-                    )
-
                     // STEP 1 Header
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -132,17 +127,33 @@ fun FluidTherapyCalculator(
                             Text("1", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                         }
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Enter Weight - Select Species", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        Text(
+                            text = if (currentLang == "fa") "وارد کردن وزن حیوان" else "Enter animal weight",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp
+                        )
                         if (activePet != null) {
                             Spacer(modifier = Modifier.weight(1f))
                             Text(
-                                text = "🔒 ${activePet.name} (اطلاعات ثبت شده)",
+                                text = if (currentLang == "fa") "🔒 ${activePet.name} (اطلاعات ثبت شده)" else "🔒 ${activePet.name} (Registered)",
                                 color = MaterialTheme.colorScheme.primary,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                     }
+
+                    Text(
+                        text = if (currentLang == "fa") {
+                            "این وزن بر اساس وزن ثبت شده در پرونده بیمار در داشبورد است. در صورتی که پرونده‌ای را باز نکرده باشید، به طور پیش‌فرض روی ۱ کیلوگرم قرار می‌گیرد."
+                        } else {
+                            "This weight is based on the weight recorded in the pet's file on the dashboard. If no file is open, it defaults to 1 kg."
+                        },
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                        fontSize = 11.sp,
+                        lineHeight = 15.sp,
+                        modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+                    )
 
                     // STEP 1 Inputs
                     val currentKg = weightKgInput.toDoubleOrNull() ?: 0.0
@@ -176,8 +187,8 @@ fun FluidTherapyCalculator(
                                 }
                             },
                             readOnly = activePet != null,
-                            label = { Text("Pounds") },
-                            placeholder = { Text("lbs") },
+                            label = { Text(if (currentLang == "fa") "پوند" else "Pounds") },
+                            placeholder = { Text(if (currentLang == "fa") "پوند" else "lbs") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             modifier = Modifier.weight(1f),
                             singleLine = true,
@@ -197,8 +208,8 @@ fun FluidTherapyCalculator(
                                 }
                             },
                             readOnly = activePet != null,
-                            label = { Text("Kilogram") },
-                            placeholder = { Text("kgs") },
+                            label = { Text(if (currentLang == "fa") "کیلوگرم" else "Kilogram") },
+                            placeholder = { Text(if (currentLang == "fa") "ک‌گ" else "kgs") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             modifier = Modifier.weight(1f),
                             singleLine = true,
@@ -208,12 +219,12 @@ fun FluidTherapyCalculator(
 
                     if (showWeightWarning) {
                         Text(
-                            text = "⚠️ آیا از وزن وارد شده اطمینان دارید؟",
+                            text = if (currentLang == "fa") "⚠️ آیا از وزن وارد شده اطمینان دارید؟" else "⚠️ Are you sure about the entered weight?",
                             color = Color(0xFFD97706),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(top = 2.dp, bottom = 4.dp).fillMaxWidth(),
-                            textAlign = TextAlign.Right
+                            textAlign = if (currentLang == "fa") TextAlign.Right else TextAlign.Left
                         )
                     }
 
@@ -234,7 +245,11 @@ fun FluidTherapyCalculator(
                             Text("2", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                         }
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Set Fluid Volume/Duration/Rate", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        Text(
+                            text = if (currentLang == "fa") "تعیین حجم مایع / مدت زمان / نرخ" else "Set Fluid Volume/Duration/Rate",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp
+                        )
                     }
 
                     // STEP 2 Inputs
@@ -246,10 +261,26 @@ fun FluidTherapyCalculator(
                         // Fluid Volume dropdown
                         var volDropdownExpanded by remember { mutableStateOf(false) }
                         Box(modifier = Modifier.weight(1.2f)) {
+                            val dispValue = if (currentLang == "fa") {
+                                when (fluidVolumeSelected) {
+                                    "20 ml" -> "۲۰ میلی‌لیتر"
+                                    "30 ml" -> "۳۰ میلی‌لیتر"
+                                    "50 ml" -> "۵۰ میلی‌لیتر"
+                                    "60 ml" -> "۶۰ میلی‌لیتر"
+                                    "100 ml" -> "۱۰۰ میلی‌لیتر"
+                                    "250 ml" -> "۲۵۰ میلی‌لیتر"
+                                    "500 ml" -> "۵۰۰ میلی‌لیتر"
+                                    "1000 ml" -> "۱۰۰۰ میلی‌لیتر"
+                                    else -> fluidVolumeSelected
+                                }
+                            } else {
+                                fluidVolumeSelected
+                            }
+
                             OutlinedTextField(
-                                value = fluidVolumeSelected,
+                                value = dispValue,
                                 onValueChange = { fluidVolumeSelected = it },
-                                label = { Text("Fluid Volume") },
+                                label = { Text(if (currentLang == "fa") "حجم مایع" else "Fluid Volume") },
                                 readOnly = true,
                                 trailingIcon = {
                                     Icon(
@@ -264,9 +295,24 @@ fun FluidTherapyCalculator(
                                 expanded = volDropdownExpanded,
                                 onDismissRequest = { volDropdownExpanded = false }
                             ) {
-                                listOf("50 ml", "100 ml", "250 ml", "500 ml", "1000 ml").forEach { vol ->
+                                listOf("20 ml", "30 ml", "50 ml", "60 ml", "100 ml", "250 ml", "500 ml", "1000 ml").forEach { vol ->
+                                    val dispVol = if (currentLang == "fa") {
+                                        when (vol) {
+                                            "20 ml" -> "۲۰ میلی‌لیتر"
+                                            "30 ml" -> "۳۰ میلی‌لیتر"
+                                            "50 ml" -> "۵۰ میلی‌لیتر"
+                                            "60 ml" -> "۶۰ میلی‌لیتر"
+                                            "100 ml" -> "۱۰۰ میلی‌لیتر"
+                                            "250 ml" -> "۲۵۰ میلی‌لیتر"
+                                            "500 ml" -> "۵۰۰ میلی‌لیتر"
+                                            "1000 ml" -> "۱۰۰۰ میلی‌لیتر"
+                                            else -> vol
+                                        }
+                                    } else {
+                                        vol
+                                    }
                                     DropdownMenuItem(
-                                        text = { Text(vol) },
+                                        text = { Text(dispVol) },
                                         onClick = {
                                             fluidVolumeSelected = vol
                                             volDropdownExpanded = false
@@ -280,7 +326,7 @@ fun FluidTherapyCalculator(
                         OutlinedTextField(
                             value = fluidTimeHrs,
                             onValueChange = { fluidTimeHrs = it },
-                            label = { Text("Fluid Time (hrs)") },
+                            label = { Text(if (currentLang == "fa") "مدت زمان (ساعت)" else "Fluid Time (hrs)") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             modifier = Modifier.weight(1f),
                             singleLine = true
@@ -292,7 +338,7 @@ fun FluidTherapyCalculator(
                             OutlinedTextField(
                                 value = dripRateGttSelected,
                                 onValueChange = {},
-                                label = { Text("Drip Rate (gtt)") },
+                                label = { Text(if (currentLang == "fa") "نرخ قطره (gtt)" else "Drip Rate (gtt)") },
                                 readOnly = true,
                                 trailingIcon = {
                                     Icon(
@@ -342,7 +388,11 @@ fun FluidTherapyCalculator(
                             onCheckedChange = { addFluidDeficit = it }
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Add any Fluid Deficit (Dehydration)", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        Text(
+                            text = if (currentLang == "fa") "افزودن کسری مایع (کم‌آبی)" else "Add any Fluid Deficit (Dehydration)",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
 
                     // STEP 3 Slider Expanded Form
@@ -361,7 +411,11 @@ fun FluidTherapyCalculator(
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                     Text("💡", fontSize = 14.sp)
-                                    Text("Fluid Deficit", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+                                    Text(
+                                        text = if (currentLang == "fa") "کسری مایع" else "Fluid Deficit",
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontSize = 12.sp
+                                    )
                                 }
                                 // Gold Badge
                                 Box(
@@ -379,7 +433,11 @@ fun FluidTherapyCalculator(
                                     )
                                 }
                             }
-                            Text("Set % Dehydration", fontSize = 11.sp, color = textSecondary)
+                            Text(
+                                text = if (currentLang == "fa") "تعیین درصد کم‌آبی" else "Set % Dehydration",
+                                fontSize = 11.sp,
+                                color = textSecondary
+                            )
                             Slider(
                                 value = dehydrationPctSlider,
                                 onValueChange = { dehydrationPctSlider = it },
@@ -400,12 +458,16 @@ fun FluidTherapyCalculator(
                             }
                             if (dehydrationPctSlider >= 12f) {
                                 Text(
-                                    text = "⚠️ آیا از درصد دهیدراتاسیون وارد شده اطمینان دارید؟ درصد دهیدراتاسیون بالای ۱۲٪ نشان‌دهنده شوک بالینی شدید است.",
+                                    text = if (currentLang == "fa") {
+                                        "⚠️ آیا از درصد کم‌آبی وارد شده اطمینان دارید؟ کم‌آبی بالای ۱۲٪ نشان‌دهنده شوک بالینی شدید است."
+                                    } else {
+                                        "⚠️ Are you sure about the entered dehydration percentage? Dehydration above 12% indicates severe clinical shock."
+                                    },
                                     color = Color(0xFFD97706),
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier.padding(top = 4.dp).fillMaxWidth(),
-                                    textAlign = TextAlign.Right
+                                    textAlign = if (currentLang == "fa") TextAlign.Right else TextAlign.Left
                                 )
                             }
                         }
@@ -431,7 +493,11 @@ fun FluidTherapyCalculator(
                             onCheckedChange = { addOngoingLosses = it }
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Add any Ongoing Losses", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        Text(
+                            text = if (currentLang == "fa") "افزودن هدررفت مداوم مایعات" else "Add any Ongoing Losses",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
 
                     // STEP 4 Slider Expanded Form
@@ -450,7 +516,11 @@ fun FluidTherapyCalculator(
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                     Text("💡", fontSize = 14.sp)
-                                    Text("Ongoing Losses", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+                                    Text(
+                                        text = if (currentLang == "fa") "هدررفت مداوم مایعات" else "Ongoing Losses",
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontSize = 12.sp
+                                    )
                                 }
                                 // Gold Badge
                                 Box(
@@ -468,7 +538,11 @@ fun FluidTherapyCalculator(
                                     )
                                 }
                             }
-                            Text("Set Ongoing Losses (mls)", fontSize = 11.sp, color = textSecondary)
+                            Text(
+                                text = if (currentLang == "fa") "تعیین میزان هدررفت مداوم (میلی‌لیتر)" else "Set Ongoing Losses (mls)",
+                                fontSize = 11.sp,
+                                color = textSecondary
+                            )
                             Slider(
                                 value = ongoingLossesMlsSlider,
                                 onValueChange = { ongoingLossesMlsSlider = it },
@@ -498,189 +572,10 @@ fun FluidTherapyCalculator(
                             OutlinedTextField(
                                 value = replaceTimeHrs,
                                 onValueChange = { replaceTimeHrs = it },
-                                label = { Text("Time (hrs) to Replace Deficit and Losses") },
+                                label = { Text(if (currentLang == "fa") "زمان (ساعت) جهت جبران کسری و هدررفت" else "Time (hrs) to Replace Deficit and Losses") },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true
-                            )
-                        }
-                    }
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .clip(RoundedCornerShape(12.dp))
-                    .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-                    .background(if (isDark) MaterialTheme.colorScheme.primaryContainer else Color.White)
-                    .clickable { showDripRateCalculator = !showDripRateCalculator }
-                    .padding(horizontal = 24.dp, vertical = 12.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text("💧", fontSize = 18.sp)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Drip Rate Calculator",
-                        color = if (isDark) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 13.sp
-                    )
-                }
-            }
-
-            // Interactive Drip Rate Calculator Component
-            AnimatedVisibility(
-                visible = showDripRateCalculator,
-                enter = expandVertically() + fadeIn(),
-                exit = shrinkVertically() + fadeOut()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("💧", fontSize = 18.sp)
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text("IV Drip Rate Calculator", fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                        }
-
-                        // Reset label button
-                        Row(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(6.dp))
-                                .clickable {
-                                    dripVolumeInput = "100"
-                                    dropFactorSelected = "15 gtts/ml"
-                                    dripTimeMinutes = "30"
-                                }
-                                .padding(horizontal = 6.dp, vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("🔄", fontSize = 14.sp)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Reset", fontSize = 11.sp, color = textSecondary, fontWeight = FontWeight.Bold)
-                        }
-                    }
-
-                    Text(
-                        text = "Calculate the drip rate for a specific volume of fluid to administer over a specific time.\ngtt = drops, gtts = drops/sec\n\nIV Drip Rate (gtt/min) =\nVolume to give (mls) x Drop factor (gtts/mL) / Time (min)",
-                        fontSize = 11.sp,
-                        color = textSecondary,
-                        lineHeight = 16.sp
-                    )
-
-                    // Volume to Give Textfield
-                    OutlinedTextField(
-                        value = dripVolumeInput,
-                        onValueChange = { dripVolumeInput = it },
-                        label = { Text("Volume to give (mls)") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
-
-                    // Drop Factor Dropdown
-                    var dripSelectorExpanded by remember { mutableStateOf(false) }
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        OutlinedTextField(
-                            value = dropFactorSelected,
-                            onValueChange = {},
-                            readOnly = true,
-                            label = { Text("IV Drop Factor") },
-                            trailingIcon = {
-                                Icon(
-                                    Icons.Default.KeyboardArrowDown,
-                                    contentDescription = null,
-                                    modifier = Modifier.clickable { dripSelectorExpanded = true }
-                                )
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        DropdownMenu(
-                            expanded = dripSelectorExpanded,
-                            onDismissRequest = { dripSelectorExpanded = false }
-                        ) {
-                            listOf("10 gtts/ml", "15 gtts/ml", "20 gtts/ml", "60 gtts/ml").forEach { item ->
-                                DropdownMenuItem(
-                                    text = { Text(item) },
-                                    onClick = {
-                                        dropFactorSelected = item
-                                        dripSelectorExpanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-
-                    // Time in Minutes Textfield
-                    OutlinedTextField(
-                        value = dripTimeMinutes,
-                        onValueChange = { dripTimeMinutes = it },
-                        label = { Text("Time in Minutes") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    // Outputs in stunning light blue badges
-                    val calcDripVol = dripVolumeInput.toDoubleOrNull() ?: 100.0
-                    val calcDripFactor = dropFactorSelected.substringBefore(" ").toDoubleOrNull() ?: 15.0
-                    val calcDripTime = dripTimeMinutes.toDoubleOrNull() ?: 30.0
-                    val computedMin = if (calcDripTime > 0) (calcDripVol * calcDripFactor) / calcDripTime else 0.0
-                    val computedSec = computedMin / 60.0
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("IV Drip Rate =", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        // Badge 1: Min
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(blueBgColor)
-                                .padding(horizontal = 12.dp, vertical = 6.dp)
-                        ) {
-                            Text(
-                                text = "${String.format("%.1f", computedMin)} gtts/min",
-                                color = blueTextColor,
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 13.sp
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(6.dp))
-
-                        // Badge 2: Sec
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(blueBgColor)
-                                .padding(horizontal = 12.dp, vertical = 6.dp)
-                        ) {
-                            Text(
-                                text = "${String.format("%.1f", computedSec)} gtts/sec",
-                                color = blueTextColor,
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 13.sp
                             )
                         }
                     }
@@ -710,13 +605,22 @@ fun FluidTherapyCalculator(
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text("💬", fontSize = 16.sp)
-                        Text("Fluids - Maintenance", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = textPrimary)
+                        Text(
+                            text = if (currentLang == "fa") "مایعات - نگهداری" else "Fluids - Maintenance",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 14.sp,
+                            color = textPrimary
+                        )
                         Text("ℹ️", fontSize = 12.sp, modifier = Modifier.clickable { /* info click secondary action */ })
                     }
 
                     // Editable Dosage
                     Column(horizontalAlignment = Alignment.End) {
-                        Text("Dosage", fontSize = 10.sp, color = textSecondary)
+                        Text(
+                            text = if (currentLang == "fa") "دوز تجویز" else "Dosage",
+                            fontSize = 10.sp,
+                            color = textSecondary
+                        )
                         Spacer(modifier = Modifier.height(2.dp))
                         CompactDosageField(
                             value = maintenanceDosageCoeff,
@@ -733,7 +637,11 @@ fun FluidTherapyCalculator(
                     Text(if (isDog) "🐕" else "🐈", fontSize = 14.sp)
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = if (isDog) "132 x (kg)0.75, deliver over 12–24 hours" else "80 x (kg)0.75, deliver over 12–24 hours",
+                        text = if (currentLang == "fa") {
+                            if (isDog) "132 × (کیلوگرم)^0.75، تجویز در طول ۱۲ تا ۲۴ ساعت" else "80 × (کیلوگرم)^0.75، تجویز در طول ۱۲ تا ۲۴ ساعت"
+                        } else {
+                            if (isDog) "132 x (kg)0.75, deliver over 12–24 hours" else "80 x (kg)0.75, deliver over 12–24 hours"
+                        },
                         fontSize = 11.sp,
                         color = textSecondary
                     )
@@ -750,7 +658,12 @@ fun FluidTherapyCalculator(
                         .padding(vertical = 4.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Maintenance Fluid Rate for 24hr", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, color = bannerTextColor)
+                    Text(
+                        text = if (currentLang == "fa") "نرخ مایع نگهداری برای ۲۴ ساعت" else "Maintenance Fluid Rate for 24hr",
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 12.sp,
+                        color = bannerTextColor
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -762,31 +675,58 @@ fun FluidTherapyCalculator(
                 ) {
                     // 1X
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                        Text("1X Maintenance", fontSize = 10.sp, color = textSecondary)
+                        Text(
+                            text = if (currentLang == "fa") "نگهداری ۱ برابر" else "1X Maintenance",
+                            fontSize = 10.sp,
+                            color = textSecondary
+                        )
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(modifier = Modifier.size(5.dp).background(bulletColor, RoundedCornerShape(50)))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("${String.format("%.1f", hourlyMaintenance)} ml/hr", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = textPrimary)
+                            Text(
+                                text = "${String.format("%.1f", hourlyMaintenance)} ${if (currentLang == "fa") "میلی‌لیتر/ساعت" else "ml/hr"}",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = textPrimary
+                            )
                         }
                     }
 
                     // 1.5X
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                        Text("1.5X Maintenance", fontSize = 10.sp, color = textSecondary)
+                        Text(
+                            text = if (currentLang == "fa") "نگهداری ۱.۵ برابر" else "1.5X Maintenance",
+                            fontSize = 10.sp,
+                            color = textSecondary
+                        )
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(modifier = Modifier.size(5.dp).background(bulletColor, RoundedCornerShape(50)))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("${String.format("%.1f", hourlyMaintenance * 1.5)} ml/hr", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = textPrimary)
+                            Text(
+                                text = "${String.format("%.1f", hourlyMaintenance * 1.5)} ${if (currentLang == "fa") "میلی‌لیتر/ساعت" else "ml/hr"}",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = textPrimary
+                            )
                         }
                     }
 
                     // 2X
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                        Text("2X Maintenance", fontSize = 10.sp, color = textSecondary)
+                        Text(
+                            text = if (currentLang == "fa") "نگهداری ۲ برابر" else "2X Maintenance",
+                            fontSize = 10.sp,
+                            color = textSecondary
+                        )
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(modifier = Modifier.size(5.dp).background(bulletColor, RoundedCornerShape(50)))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("${String.format("%.1f", hourlyMaintenance * 2.0)} ml/hr", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = textPrimary)
+                            Text(
+                                text = "${String.format("%.1f", hourlyMaintenance * 2.0)} ${if (currentLang == "fa") "میلی‌لیتر/ساعت" else "ml/hr"}",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = textPrimary
+                            )
                         }
                     }
                 }
@@ -816,7 +756,12 @@ fun FluidTherapyCalculator(
                             .padding(vertical = 6.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("Maintenance + Dehydration + Ongoing Loss Rate", fontWeight = FontWeight.ExtraBold, fontSize = 11.sp, color = bannerTextColor)
+                        Text(
+                            text = if (currentLang == "fa") "نرخ مایع نگهداری + کم‌آبی + هدررفت مداوم" else "Maintenance + Dehydration + Ongoing Loss Rate",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 11.sp,
+                            color = bannerTextColor
+                        )
                     }
 
                     Column(
@@ -827,10 +772,19 @@ fun FluidTherapyCalculator(
                         // Initial Fluid Rate Subheader
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Text("Initial Fluid Rate", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = textPrimary)
+                                Text(
+                                    text = if (currentLang == "fa") "نرخ مایع اولیه" else "Initial Fluid Rate",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp,
+                                    color = textPrimary
+                                )
                                 Text("ℹ️", fontSize = 12.sp)
                             }
-                            Text("Maintenance + Deficit+ Ongoing Losses", fontSize = 11.sp, color = textSecondary)
+                            Text(
+                                text = if (currentLang == "fa") "نگهداری + کسری + هدررفت مداوم" else "Maintenance + Deficit+ Ongoing Losses",
+                                fontSize = 11.sp,
+                                color = textSecondary
+                            )
                         }
 
                         // Rate for replaced hours
@@ -838,7 +792,11 @@ fun FluidTherapyCalculator(
                             Box(modifier = Modifier.size(6.dp).background(bulletColor, RoundedCornerShape(50)))
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "for ${replaceTimeHours.toInt()}hr: ${String.format("%.1f", initialFluidRate)} ml/hr",
+                                text = if (currentLang == "fa") {
+                                    "برای ${replaceTimeHours.toInt()} ساعت: ${String.format("%.1f", initialFluidRate)} میلی‌لیتر/ساعت"
+                                } else {
+                                    "for ${replaceTimeHours.toInt()}hr: ${String.format("%.1f", initialFluidRate)} ml/hr"
+                                },
                                 fontWeight = FontWeight.ExtraBold,
                                 color = MaterialTheme.colorScheme.primary,
                                 fontSize = 14.sp
@@ -849,13 +807,22 @@ fun FluidTherapyCalculator(
 
                         // Then reduce rate
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Then Reduce Rate to Maintenance", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = textPrimary)
+                            Text(
+                                text = if (currentLang == "fa") "سپس کاهش نرخ به میزان نگهداری" else "Then Reduce Rate to Maintenance",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                color = textPrimary
+                            )
                             Spacer(modifier = Modifier.height(4.dp))
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Box(modifier = Modifier.size(6.dp).background(bulletColor, RoundedCornerShape(50)))
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
-                                    text = "for ${fluidTimeHrs}hr: ${String.format("%.1f", hourlyMaintenance)} ml/hr",
+                                    text = if (currentLang == "fa") {
+                                        "برای ${fluidTimeHrs} ساعت: ${String.format("%.1f", hourlyMaintenance)} میلی‌لیتر/ساعت"
+                                    } else {
+                                        "for ${fluidTimeHrs}hr: ${String.format("%.1f", hourlyMaintenance)} ml/hr"
+                                    },
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 12.sp,
                                     color = textSecondary
@@ -884,13 +851,22 @@ fun FluidTherapyCalculator(
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text("💬", fontSize = 16.sp)
-                        Text("Fluids - Resuscitation", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = textPrimary)
+                        Text(
+                            text = if (currentLang == "fa") "مایعات - احیاء" else "Fluids - Resuscitation",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 14.sp,
+                            color = textPrimary
+                        )
                         Text("ℹ️", fontSize = 12.sp)
                     }
 
                     // Dosage field
                     Column(horizontalAlignment = Alignment.End) {
-                        Text("Dosage", fontSize = 10.sp, color = textSecondary)
+                        Text(
+                            text = if (currentLang == "fa") "دوز تجویز" else "Dosage",
+                            fontSize = 10.sp,
+                            color = textSecondary
+                        )
                         Spacer(modifier = Modifier.height(2.dp))
                         CompactDosageField(
                             value = resuscitationDosage,
@@ -907,8 +883,13 @@ fun FluidTherapyCalculator(
                     Text(if (isDog) "🐕" else "🐈", fontSize = 14.sp)
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = if (isDog) "15-20 ml/kg IV, Give calculated volume over 15 minutes and re-assess."
-                               else "10-15 ml/kg IV, Give calculated volume over 15 minutes.",
+                        text = if (isDog) {
+                            if (currentLang == "fa") "۱۵-۲۰ میلی‌لیتر/کیلوگرم وریدی، حجم محاسبه‌شده را در مدت ۱۵ دقیقه تجویز و مجدداً ارزیابی کنید."
+                            else "15-20 ml/kg IV, Give calculated volume over 15 minutes and re-assess."
+                        } else {
+                            if (currentLang == "fa") "۱۰-۱۵ میلی‌لیتر/کیلوگرم وریدی، حجم محاسبه‌شده را در مدت ۱۵ دقیقه تجویز کنید."
+                            else "10-15 ml/kg IV, Give calculated volume over 15 minutes."
+                        },
                         fontSize = 10.sp,
                         color = textSecondary
                     )
@@ -922,12 +903,26 @@ fun FluidTherapyCalculator(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Volume - 15 Minutes", fontSize = 11.sp, color = textSecondary, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        text = if (currentLang == "fa") "حجم - ۱۵ دقیقه" else "Volume - 15 Minutes",
+                        fontSize = 11.sp,
+                        color = textSecondary,
+                        fontWeight = FontWeight.SemiBold
+                    )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(modifier = Modifier.size(5.dp).background(bulletColor, RoundedCornerShape(50)))
                         Spacer(modifier = Modifier.width(6.dp))
                         val factor = resuscitationDosage.toDoubleOrNull() ?: 20.0
-                        Text("${String.format("%.1f", kg * factor)} ml total", fontWeight = FontWeight.ExtraBold, fontSize = 13.sp, color = textPrimary)
+                        Text(
+                            text = if (currentLang == "fa") {
+                                "${String.format("%.1f", kg * factor)} میلی‌لیتر در کل"
+                            } else {
+                                "${String.format("%.1f", kg * factor)} ml total"
+                            },
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 13.sp,
+                            color = textPrimary
+                        )
                     }
                 }
             }
@@ -950,14 +945,31 @@ fun FluidTherapyCalculator(
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text("💬", fontSize = 16.sp)
-                        Text("Fluids - Surgical", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = textPrimary)
+                        Text(
+                            text = if (currentLang == "fa") "مایعات - جراحی" else "Fluids - Surgical",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 14.sp,
+                            color = textPrimary
+                        )
                         Spacer(modifier = Modifier.width(2.dp))
-                        Text(if (isDog) "🐕 2 – 6 ml/kg/hr IV" else "🐈 2 – 6 ml/kg/hr IV", fontSize = 11.sp, color = textSecondary)
+                        Text(
+                            text = if (currentLang == "fa") {
+                                if (isDog) "🐕 ۲ – ۶ میلی‌لیتر/کیلوگرم/ساعت وریدی" else "🐈 ۲ – ۶ میلی‌لیتر/کیلوگرم/ساعت وریدی"
+                            } else {
+                                if (isDog) "🐕 2 – 6 ml/kg/hr IV" else "🐈 2 – 6 ml/kg/hr IV"
+                            },
+                            fontSize = 11.sp,
+                            color = textSecondary
+                        )
                     }
 
                     // Dosage Customizer
                     Column(horizontalAlignment = Alignment.End) {
-                        Text("Dosage", fontSize = 10.sp, color = textSecondary)
+                        Text(
+                            text = if (currentLang == "fa") "دوز تجویز" else "Dosage",
+                            fontSize = 10.sp,
+                            color = textSecondary
+                        )
                         Spacer(modifier = Modifier.height(2.dp))
                         CompactDosageField(
                             value = surgicalDosage,
@@ -976,12 +988,22 @@ fun FluidTherapyCalculator(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Volume Rate", fontSize = 11.sp, color = textSecondary, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        text = if (currentLang == "fa") "نرخ حجم مایع" else "Volume Rate",
+                        fontSize = 11.sp,
+                        color = textSecondary,
+                        fontWeight = FontWeight.SemiBold
+                    )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(modifier = Modifier.size(5.dp).background(bulletColor, RoundedCornerShape(50)))
                         Spacer(modifier = Modifier.width(6.dp))
                         val surgeFact = surgicalDosage.toDoubleOrNull() ?: 5.0
-                        Text("${String.format("%.1f", kg * surgeFact)} ml/hr", fontWeight = FontWeight.ExtraBold, fontSize = 13.sp, color = textPrimary)
+                        Text(
+                            text = "${String.format("%.1f", kg * surgeFact)} ${if (currentLang == "fa") "میلی‌لیتر/ساعت" else "ml/hr"}",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 13.sp,
+                            color = textPrimary
+                        )
                     }
                 }
             }
@@ -1004,13 +1026,22 @@ fun FluidTherapyCalculator(
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text("💬", fontSize = 16.sp)
-                        Text("Hetastarch", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = textPrimary)
+                        Text(
+                            text = if (currentLang == "fa") "هتااستارچ (Hetastarch)" else "Hetastarch",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 14.sp,
+                            color = textPrimary
+                        )
                         Text("ℹ️", fontSize = 12.sp)
                     }
 
                     // Dosage Customizer
                     Column(horizontalAlignment = Alignment.End) {
-                        Text("Dosage", fontSize = 10.sp, color = textSecondary)
+                        Text(
+                            text = if (currentLang == "fa") "دوز تجویز" else "Dosage",
+                            fontSize = 10.sp,
+                            color = textSecondary
+                        )
                         Spacer(modifier = Modifier.height(2.dp))
                         CompactDosageField(
                             value = hetastarchDosage,
@@ -1022,7 +1053,12 @@ fun FluidTherapyCalculator(
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("10-20 ml/kg IV over 15-30 minutes, 1mL/kg/hr CRI;", fontSize = 11.sp, color = textSecondary)
+                Text(
+                    text = if (currentLang == "fa") "۱۰-۲۰ میلی‌لیتر/کیلوگرم وریدی در طول ۱۵-۳۰ دقیقه، ۱ میلی‌لیتر/کیلوگرم/ساعت تزریق مداوم (CRI)؛"
+                           else "10-20 ml/kg IV over 15-30 minutes, 1mL/kg/hr CRI;",
+                    fontSize = 11.sp,
+                    color = textSecondary
+                )
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -1032,21 +1068,39 @@ fun FluidTherapyCalculator(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
-                        Text("Volume in 15min", fontSize = 10.sp, color = textSecondary)
+                        Text(
+                            text = if (currentLang == "fa") "حجم در ۱۵ دقیقه" else "Volume in 15min",
+                            fontSize = 10.sp,
+                            color = textSecondary
+                        )
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(modifier = Modifier.size(5.dp).background(bulletColor, RoundedCornerShape(50)))
                             Spacer(modifier = Modifier.width(4.dp))
                             val hetCoeff = hetastarchDosage.toDoubleOrNull() ?: 10.0
-                            Text("${String.format("%.1f", kg * hetCoeff)} ml", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = textPrimary)
+                            Text(
+                                text = "${String.format("%.1f", kg * hetCoeff)} ${if (currentLang == "fa") "میلی‌لیتر" else "ml"}",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 11.sp,
+                                color = textPrimary
+                            )
                         }
                     }
 
                     Column {
-                        Text("Max Volume/24hrs", fontSize = 10.sp, color = textSecondary)
+                        Text(
+                            text = if (currentLang == "fa") "حداکثر حجم در ۲۴ ساعت" else "Max Volume/24hrs",
+                            fontSize = 10.sp,
+                            color = textSecondary
+                        )
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(modifier = Modifier.size(5.dp).background(bulletColor, RoundedCornerShape(50)))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("${String.format("%.1f", kg * 20.0)} ml", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = textPrimary)
+                            Text(
+                                text = "${String.format("%.1f", kg * 20.0)} ${if (currentLang == "fa") "میلی‌لیتر" else "ml"}",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 11.sp,
+                                color = textPrimary
+                            )
                         }
                     }
                 }
@@ -1070,13 +1124,22 @@ fun FluidTherapyCalculator(
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text("💬", fontSize = 16.sp)
-                        Text("Vetstarch 6%", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = textPrimary)
+                        Text(
+                            text = if (currentLang == "fa") "وت‌استارچ ۶٪" else "Vetstarch 6%",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 14.sp,
+                            color = textPrimary
+                        )
                         Text("ℹ️", fontSize = 12.sp)
                     }
 
                     // Dosage Customizer
                     Column(horizontalAlignment = Alignment.End) {
-                        Text("Dosage", fontSize = 10.sp, color = textSecondary)
+                        Text(
+                            text = if (currentLang == "fa") "دوز تجویز" else "Dosage",
+                            fontSize = 10.sp,
+                            color = textSecondary
+                        )
                         Spacer(modifier = Modifier.height(2.dp))
                         CompactDosageField(
                             value = vetstarchDosage,
@@ -1088,7 +1151,13 @@ fun FluidTherapyCalculator(
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("130/0.4 IN 0.9% NACL\n10-20 ml/kg/24hrs IV", fontSize = 10.sp, color = textSecondary, lineHeight = 14.sp)
+                Text(
+                    text = if (currentLang == "fa") "۱۳۰/۰.۴ در نرمال سالین ۰.۹٪\n۱۰-۲۰ میلی‌لیتر/کیلوگرم/۲۴ ساعت وریدی"
+                           else "130/0.4 IN 0.9% NACL\n10-20 ml/kg/24hrs IV",
+                    fontSize = 10.sp,
+                    color = textSecondary,
+                    lineHeight = 14.sp
+                )
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -1098,13 +1167,332 @@ fun FluidTherapyCalculator(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("24 Hour Volume", fontSize = 11.sp, color = textSecondary, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        text = if (currentLang == "fa") "حجم کل ۲۴ ساعت" else "24 Hour Volume",
+                        fontSize = 11.sp,
+                        color = textSecondary,
+                        fontWeight = FontWeight.SemiBold
+                    )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(modifier = Modifier.size(5.dp).background(bulletColor, RoundedCornerShape(50)))
                         Spacer(modifier = Modifier.width(6.dp))
                         val vetCoeff = vetstarchDosage.toDoubleOrNull() ?: 20.0
-                        Text("${String.format("%.1f", kg * vetCoeff)} ml", fontWeight = FontWeight.ExtraBold, fontSize = 13.sp, color = textPrimary)
+                        Text(
+                            text = "${String.format("%.1f", kg * vetCoeff)} ${if (currentLang == "fa") "میلی‌لیتر" else "ml"}",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 13.sp,
+                            color = textPrimary
+                        )
                     }
+                }
+            }
+
+            // 6. Hypertonic Saline Card (7.2 %)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+                    .background(themeCardBg)
+                    .padding(14.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("💬", fontSize = 16.sp)
+                        Text(
+                            text = if (currentLang == "fa") "سالین هایپرتونیک" else "Hypertonic Saline",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 14.sp,
+                            color = textPrimary
+                        )
+                        Text("ℹ️", fontSize = 12.sp)
+
+                        // 7.2 % pill/badge
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(goldBgColor)
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = "7.2 %",
+                                color = goldTextColor,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 10.sp
+                            )
+                        }
+                    }
+
+                    // Dosage Customizer
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(
+                            text = if (currentLang == "fa") "دوز تجویز" else "Dosage",
+                            fontSize = 10.sp,
+                            color = textSecondary
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        CompactDosageField(
+                            value = hypertonicSalineDosage,
+                            onValueChange = { hypertonicSalineDosage = it },
+                            isDark = isDark,
+                            textPrimary = textPrimary
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = if (currentLang == "fa") "۱-۸ میلی‌لیتر/کیلوگرم وریدی" else "1-8 ml/kg IV",
+                    fontSize = 11.sp,
+                    color = textSecondary
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Calculated Hypertonic Saline details
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    val hyperCoeff = hypertonicSalineDosage.toDoubleOrNull() ?: 4.0
+                    val totalHyperVolume = kg * hyperCoeff
+                    val hyperVolPerMin = totalHyperVolume / 4.0
+
+                    Column {
+                        Text(
+                            text = if (currentLang == "fa") "حجم/دقیقه" else "Volume/minute",
+                            fontSize = 10.sp,
+                            color = textSecondary
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(modifier = Modifier.size(5.dp).background(bulletColor, RoundedCornerShape(50)))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "${String.format("%.1f", hyperVolPerMin)} ${if (currentLang == "fa") "میلی‌لیتر/دقیقه" else "ml/min"}",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 11.sp,
+                                color = textPrimary
+                            )
+                        }
+                    }
+
+                    Column {
+                        Text(
+                            text = if (currentLang == "fa") "حجم کل" else "Total Volume",
+                            fontSize = 10.sp,
+                            color = textSecondary
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(modifier = Modifier.size(5.dp).background(bulletColor, RoundedCornerShape(50)))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "${String.format("%.1f", totalHyperVolume)} ${if (currentLang == "fa") "میلی‌لیتر" else "ml"}",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 11.sp,
+                                color = textPrimary
+                            )
+                        }
+                    }
+                }
+            }
+
+            // 7. Potassium Supplementation Card
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+                    .background(themeCardBg)
+            ) {
+                // Header Banner "Potassium Supplementation"
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                        .background(bannerBgColor)
+                        .padding(vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (currentLang == "fa") "مکمل‌یاری پتاسیم" else "Potassium Supplementation",
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 13.sp,
+                        color = bannerTextColor
+                    )
+                }
+
+                Column(
+                    modifier = Modifier.padding(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    val parsedVolume = try {
+                        val cleaned = fluidVolumeSelected
+                            .replace(" ml", "")
+                            .replace(" میلی‌لیتر", "")
+                            .replace(" ", "")
+                            .trim()
+                        cleaned.toDoubleOrNull() ?: 250.0
+                    } catch (e: Exception) {
+                        250.0
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1.2f)) {
+                            Text(
+                                text = if (currentLang == "fa") "پتاسیم سرم (mEq/L)\nحداکثر نرخ* (ml/kg/hr)" else "Serum K⁺ (mEq/L)\nMax rate* (ml/kg/hr)",
+                                fontSize = 11.sp,
+                                color = textSecondary,
+                                fontWeight = FontWeight.Bold,
+                                lineHeight = 14.sp
+                            )
+                        }
+
+                        Column(modifier = Modifier.weight(1.8f), horizontalAlignment = Alignment.End) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Text(
+                                    text = if (currentLang == "fa") "KCL (۲ mEq/ml) جهت افزودن به:" else "KCL (2 mEq/ml) To Add To",
+                                    fontSize = 10.sp,
+                                    color = textSecondary,
+                                    lineHeight = 12.sp
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(blueBgColor)
+                                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                                ) {
+                                    val dispVolStr = if (currentLang == "fa") "${parsedVolume.toInt()} میلی‌لیتر" else "${parsedVolume.toInt()} mls"
+                                    Text(
+                                        text = dispVolStr,
+                                        color = blueTextColor,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 10.sp
+                                    )
+                                }
+                            }
+                            Text(
+                                text = if (currentLang == "fa") "حجم مایع (تعیین‌شده در بالا)" else "Fluid Volume* (set above)",
+                                fontSize = 9.sp,
+                                color = textSecondary
+                            )
+                        }
+                    }
+
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+
+                    val kRows = listOf(
+                        Triple(
+                            if (currentLang == "fa") "K⁺ < ۲ mEq/L\n۶ mL/kg/hr" else "K⁺ < 2mEq/L\n6 mL/kg/hr",
+                            80.0,
+                            "6"
+                        ),
+                        Triple(
+                            if (currentLang == "fa") "K⁺ = ۲.۱-۲.۵ mEq/L\n۸ mL/kg/hr" else "K⁺ = 2.1-2.5mEq/L\n8 mL/kg/hr",
+                            60.0,
+                            "8"
+                        ),
+                        Triple(
+                            if (currentLang == "fa") "K⁺ = ۲.۶-۳.۰ mEq/L\n۱۲ mL/kg/hr" else "K⁺ = 2.6-3.0mEq/L\n12 mL/kg/hr",
+                            40.0,
+                            "12"
+                        ),
+                        Triple(
+                            if (currentLang == "fa") "K⁺ = ۳.۱-۳.۵ mEq/L\n۱۸ mL/kg/hr" else "K⁺ = 3.1-3.5mEq/L\n18 mL/kg/hr",
+                            28.0,
+                            "18"
+                        ),
+                        Triple(
+                            if (currentLang == "fa") "K⁺ = ۳.۶-۵.۰ mEq/L\n۲۵ mL/kg/hr" else "K⁺ = 3.6-5.0mEq/L\n25 mL/kg/hr",
+                            20.0,
+                            "25"
+                        )
+                    )
+
+                    kRows.forEach { (label, kConc, maxRate) ->
+                        val mEq = kConc * (parsedVolume / 1000.0)
+                        val mls = mEq / 2.0
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 2.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = label,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = textPrimary,
+                                lineHeight = 14.sp,
+                                modifier = Modifier.weight(1.2f)
+                            )
+
+                            Row(
+                                modifier = Modifier.weight(1.8f),
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = if (currentLang == "fa") "افزودن " else "Add ",
+                                    fontSize = 11.sp,
+                                    color = textSecondary
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(if (isDark) MaterialTheme.colorScheme.primaryContainer else Color(0xFFE5E7EB))
+                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                                ) {
+                                    val dispResult = if (currentLang == "fa") {
+                                        "${String.format("%.1f", mEq)} mEq (${String.format("%.1f", mls)} میلی‌لیتر)"
+                                    } else {
+                                        "${String.format("%.1f", mEq)} mEq (${String.format("%.1f", mls)} mls)"
+                                    }
+                                    Text(
+                                        text = dispResult,
+                                        color = textPrimary,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 11.sp
+                                    )
+                                }
+                                Text(
+                                    text = " KCL",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = textPrimary
+                                )
+                            }
+                        }
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+                    }
+
+                    Spacer(modifier = Modifier.height(2.dp))
+
+                    Text(
+                        text = if (currentLang == "fa") {
+                            "⚠️ به مایعات مورد استفاده برای انفوزیون سریع KCL اضافه نکنید.\n" +
+                            "* از دوز ۰.۵ mEq/kg/hr تجاوز نکنید. (منبع: DiBartola SP. Fluid Therapy in Small Animal Practice. 3rd ed. Philadelphia (PA): WB Saunders)"
+                        } else {
+                            "⚠️ Do not add KCl to fluids used for rapid infusion.\n" +
+                            "* Do not exceed 0.5 mEq/kg/hr. (Source: DiBartola SP. Fluid Therapy in Small Animal Practice. 3rd ed. Philadelphia (PA): WB Saunders)"
+                        },
+                        fontSize = 10.sp,
+                        color = textSecondary,
+                        lineHeight = 14.sp
+                    )
                 }
             }
         }
