@@ -202,14 +202,14 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
     var ownerName by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
     var species by remember { mutableStateOf("Canine") }
-    var sex by remember { mutableStateOf("Male") }
+    var sex by remember { mutableStateOf("Female") }
     var addPatientNotes by remember { mutableStateOf(false) }
     var patientNotes by remember { mutableStateOf("") }
     var viewPatients by remember { mutableStateOf(false) }
     
     val savedPatients = remember {
         mutableStateListOf(
-            LocalPatient("101", "Max", "John Doe", "3", "Canine", "Male", "Healthy, regular gestation tracking"),
+            LocalPatient("101", "Max", "John Doe", "3", "Canine", "Female", "Healthy, regular gestation tracking"),
             LocalPatient("102", "Bella", "Jane Smith", "2", "Feline", "Female", "First litter")
         )
     }
@@ -229,7 +229,7 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
             val localSpec = if (pet.species.lowercase() == "cat" || pet.species.lowercase() == "feline") "Feline" else "Canine"
             species = localSpec
             isCanine = (localSpec == "Canine")
-            sex = if (pet.gender == "ماده" || pet.gender.lowercase() == "female") "Female" else "Male"
+            sex = "Female"
             patientNotes = if (pet.healthStatus.isNotEmpty()) pet.healthStatus else ""
             addPatientNotes = pet.healthStatus.isNotEmpty()
         }
@@ -239,7 +239,7 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
         val list = mutableListOf<LocalPatient>()
         dbPets.forEach { pet ->
             val localSpec = if (pet.species.lowercase() == "cat" || pet.species.lowercase() == "feline") "Feline" else "Canine"
-            val localSex = if (pet.gender == "ماده" || pet.gender.lowercase() == "female") "Female" else "Male"
+            val localSex = "Female"
             list.add(
                 LocalPatient(
                     id = if (pet.recordNumber.isNotEmpty()) pet.recordNumber else pet.id.toString(),
@@ -294,6 +294,37 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                 .fillMaxWidth()
                 .padding(bottom = 24.dp)
         ) {
+            // Warning Box
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.9f)
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+                shape = RoundedCornerShape(8.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+            ) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text("⚠️", fontSize = 16.sp)
+                    Text(
+                        text = if (currentLang == "en") {
+                            "To automatically populate the fields, please activate a patient's record in the Admissions tab. Otherwise, you can enter the details manually."
+                        } else {
+                            "کاربر گرامی، جهت تکمیل خودکار اطلاعات، لطفا ابتدا پرونده یک بیمار را در بخش پذیرش فعال کنید. در غیر این صورت، باید فیلدها را به صورت دستی پر نمایید."
+                        },
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        lineHeight = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
             // Patients Card
             Card(
                 colors = CardDefaults.cardColors(containerColor = surfaceColor),
@@ -320,37 +351,6 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                     }
                     
                     Column(modifier = Modifier.padding(14.dp)) {
-                        // Warning Box
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.9f)
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 12.dp),
-                            shape = RoundedCornerShape(8.dp),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.error)
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(12.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Text("⚠️", fontSize = 16.sp)
-                                Text(
-                                    text = if (currentLang == "en") {
-                                        "To automatically populate the fields, please activate a patient's record in the Admissions tab. Otherwise, you can enter the details manually."
-                                    } else {
-                                        "کاربر گرامی، جهت تکمیل خودکار اطلاعات، لطفا ابتدا پرونده یک بیمار را در بخش پذیرش فعال کنید. در غیر این صورت، باید فیلدها را به صورت دستی پر نمایید."
-                                    },
-                                    fontSize = 11.sp,
-                                    color = MaterialTheme.colorScheme.onErrorContainer,
-                                    lineHeight = 16.sp,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-                        }
-
                         // View Toggle & Save New Button Row
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -499,19 +499,15 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                                 modifier = Modifier.weight(1.2f)
                             )
                             
-                            val displaySex = if (sex == "Male") {
-                                if (currentLang == "en") "Male" else "نر (Male)"
-                            } else {
-                                if (currentLang == "en") "Female" else "ماده (Female)"
-                            }
-                            val sexOptions = if (currentLang == "en") listOf("Male", "Female") else listOf("نر (Male)", "ماده (Female)")
+                            val displaySex = if (currentLang == "en") "Female" else "ماده (Female)"
+                            val sexOptions = if (currentLang == "en") listOf("Female") else listOf("ماده (Female)")
                             
                             CustomDropdownField(
                                 label = if (currentLang == "en") "Sex" else "جنسیت",
                                 selectedValue = displaySex,
                                 options = sexOptions,
-                                onSelect = { selectedDisplay ->
-                                    sex = if (selectedDisplay == "نر (Male)" || selectedDisplay == "Male") "Male" else "Female"
+                                onSelect = { _ ->
+                                    sex = "Female"
                                 },
                                 modifier = Modifier.weight(1.2f)
                             )
