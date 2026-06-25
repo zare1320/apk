@@ -176,7 +176,7 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
                         HumanAgeCalculatorView(initWeight = weightInput, currentLang = currentLang)
                     }
                     "تریاژ تروما" -> {
-                        TraumaTriageView()
+                        TraumaTriageView(activePet = activeExaminedPet, currentLang = currentLang)
                     }
                 }
             } else {

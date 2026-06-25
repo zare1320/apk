@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun TraumaTriageView() {
+fun TraumaTriageView(activePet: com.example.data.database.Pet? = null, currentLang: String = "en") {
     val isDark = MaterialTheme.colorScheme.background.red < 0.3f
     val bgColor = MaterialTheme.colorScheme.background
     val surfaceColor = if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f) else MaterialTheme.colorScheme.surface
@@ -35,10 +35,14 @@ fun TraumaTriageView() {
     val onHighlightColor = MaterialTheme.colorScheme.onPrimary
     val linkColor = MaterialTheme.colorScheme.primary
 
+    val initialKilos = activePet?.weight ?: 1.0
+    val initialPounds = initialKilos * 2.20462262
+    val initialIsFeline = activePet?.species?.lowercase() == "cat"
+
     // Main States for Weight - Species Unit Control
-    var poundsStr by remember { mutableStateOf("") }
-    var kilosStr by remember { mutableStateOf("") }
-    var isFeline by remember { mutableStateOf(false) } // false = Dog, true = Cat
+    var poundsStr by remember(activePet) { mutableStateOf(String.format(java.util.Locale.US, "%.2f", initialPounds)) }
+    var kilosStr by remember(activePet) { mutableStateOf(String.format(java.util.Locale.US, "%.2f", initialKilos)) }
+    var isFeline by remember(activePet) { mutableStateOf(initialIsFeline) } // false = Dog, true = Cat
 
     var activeTab by remember { mutableStateOf("ATT") } // "ATT", "SPI", "Applefast"
 
@@ -121,7 +125,8 @@ fun TraumaTriageView() {
     var expandSpi by remember { mutableStateOf(false) }
     var expandApple by remember { mutableStateOf(false) }
 
-    CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr) {
+    val layoutDirection = if (currentLang == "fa") androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -140,7 +145,7 @@ fun TraumaTriageView() {
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Weight - Species",
+                        text = if (currentLang == "fa") "وزن - گونه" else "Weight - Species",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = primaryText
@@ -155,7 +160,7 @@ fun TraumaTriageView() {
                         // 1. Pounds block
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Pounds",
+                                text = if (currentLang == "fa") "پوند" else "Pounds",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = secondaryText
@@ -181,7 +186,7 @@ fun TraumaTriageView() {
                                         contentAlignment = Alignment.CenterStart
                                     ) {
                                         if (poundsStr.isEmpty()) {
-                                            Text("lbs", color = secondaryText.copy(alpha = 0.5f), fontSize = 12.sp)
+                                            Text(if (currentLang == "fa") "پوند" else "lbs", color = secondaryText.copy(alpha = 0.5f), fontSize = 12.sp)
                                         }
                                         innerTextField()
                                     }
@@ -192,7 +197,7 @@ fun TraumaTriageView() {
                         // 2. Kilograms block
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Kilograms",
+                                text = if (currentLang == "fa") "کیلوگرم" else "Kilograms",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = secondaryText
@@ -218,7 +223,7 @@ fun TraumaTriageView() {
                                         contentAlignment = Alignment.CenterStart
                                     ) {
                                         if (kilosStr.isEmpty()) {
-                                            Text("kgs", color = secondaryText.copy(alpha = 0.5f), fontSize = 12.sp)
+                                            Text(if (currentLang == "fa") "کیلوگرم" else "kgs", color = secondaryText.copy(alpha = 0.5f), fontSize = 12.sp)
                                         }
                                         innerTextField()
                                     }
@@ -232,7 +237,7 @@ fun TraumaTriageView() {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "Select Species",
+                                text = if (currentLang == "fa") "انتخاب گونه" else "Select Species",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = secondaryText
@@ -276,25 +281,25 @@ fun TraumaTriageView() {
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Text(
-                    text = "ATT: Animal Trauma Triage",
+                    text = if (currentLang == "fa") "ATT: تریاژ تروما حیوانات (Animal Trauma Triage)" else "ATT: Animal Trauma Triage",
                     fontSize = 12.sp,
                     color = primaryText,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "SPI: Survival Prediction Index",
+                    text = if (currentLang == "fa") "SPI: شاخص پیش‌بینی بقا (Survival Prediction Index)" else "SPI: Survival Prediction Index",
                     fontSize = 12.sp,
                     color = primaryText,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Applefast: Acute Patient Physiologic and Laboratory Evaluation",
+                    text = if (currentLang == "fa") "Applefast: ارزیابی فیزیولوژیک و آزمایشگاهی حاد بیمار" else "Applefast: Acute Patient Physiologic and Laboratory Evaluation",
                     fontSize = 12.sp,
                     color = primaryText,
                     fontWeight = FontWeight.Bold
                 )
             }
- 
+
             // Slider / Tab Bar Selector
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -302,6 +307,11 @@ fun TraumaTriageView() {
             ) {
                 listOf("ATT", "SPI", "Applefast").forEach { tab ->
                     val isSelected = activeTab == tab
+                    val tabLabel = when (tab) {
+                        "ATT" -> if (currentLang == "fa") "ATT (تریاژ)" else "ATT"
+                        "SPI" -> if (currentLang == "fa") "SPI (بقا)" else "SPI"
+                        else -> if (currentLang == "fa") "APPLEfast (سریع)" else "Applefast"
+                    }
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -313,7 +323,7 @@ fun TraumaTriageView() {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = tab,
+                            text = tabLabel,
                             color = if (isSelected) onHighlightColor else primaryText,
                             fontWeight = FontWeight.Bold,
                             fontSize = 13.sp
@@ -321,8 +331,7 @@ fun TraumaTriageView() {
                     }
                 }
             }
- 
-            // TAB 1: ATT (Animal Trauma Triage Score)
+
             if (activeTab == "ATT") {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = surfaceColor),
@@ -337,33 +346,33 @@ fun TraumaTriageView() {
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                             Text(
-                                text = "Animal Trauma Triage (ATT) Score",
+                                text = if (currentLang == "fa") "امتیاز تریاژ تروما حیوانات (ATT)" else "Animal Trauma Triage (ATT) Score",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = primaryText
                             )
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
-                                text = "ATT Result is Calculated after Scores are entered",
+                                text = if (currentLang == "fa") "نتیجه ATT پس از وارد کردن امتیازها محاسبه می‌شود" else "ATT Result is Calculated after Scores are entered",
                                 fontSize = 11.sp,
                                 color = secondaryText
                             )
                         }
- 
+
                         HorizontalDivider(color = strokeColor)
- 
+
                         // 1. Perfusion Score Category
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text("🩺", fontSize = 14.sp)
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Perfusion Score", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = primaryText)
+                                Text(if (currentLang == "fa") "امتیاز پرفیوژن (گردش خون)" else "Perfusion Score", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = primaryText)
                             }
                             listOf(
-                                "MM pink/moist, CRT 2 sec, T = 37.8 °C (100 °F), strong or bounding femoral pulse quality" to 0,
-                                "MM hyperemic or pale pink, MM tacky, T = 37.8 °C (100 °F), CRT 0-2 sec, fair femoral pulses" to 1,
-                                "MM very pale pink & tacky, CRT 2-3 sec, T < 37.8 °C (100 °F), detectable but poor pulses" to 2,
-                                "MM gray/blue/white, CRT > 3 sec, T < 37.8 °C (100 °F), non-palpable femoral pulses" to 3
+                                (if (currentLang == "fa") "مخاط صورتی/مرطوب، CRT ۲ ثانیه، دمای ۳۷.۸ درجه سانتی‌گراد، نبض فمورال قوی یا جهنده" else "MM pink/moist, CRT 2 sec, T = 37.8 °C (100 °F), strong or bounding femoral pulse quality") to 0,
+                                (if (currentLang == "fa") "مخاط پرخون یا صورتی رنگ‌پریده، مخاط چسبناک، دمای ۳۷.۸ درجه، CRT ۰-۲ ثانیه، نبض فمورال متوسط" else "MM hyperemic or pale pink, MM tacky, T = 37.8 °C (100 °F), CRT 0-2 sec, fair femoral pulses") to 1,
+                                (if (currentLang == "fa") "مخاط بسیار رنگ‌پریده و چسبناک، CRT ۲-۳ ثانیه، دمای کمتر از ۳۷.۸ درجه، نبض ضعیف اما قابل لمس" else "MM very pale pink & tacky, CRT 2-3 sec, T < 37.8 °C (100 °F), detectable but poor pulses") to 2,
+                                (if (currentLang == "fa") "مخاط خاکستری/آبی/سفید، CRT بیشتر از ۳ ثانیه، دمای کمتر از ۳۷.۸ درجه، نبض فمورال غیرقابل لمس" else "MM gray/blue/white, CRT > 3 sec, T < 37.8 °C (100 °F), non-palpable femoral pulses") to 3
                             ).forEach { (description, valScore) ->
                                 Row(
                                     modifier = Modifier
@@ -398,21 +407,19 @@ fun TraumaTriageView() {
                                 }
                             }
                         }
- 
+
                         HorizontalDivider(color = strokeColor)
- 
-                        // 2. Cardiac Score Category
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text("💖", fontSize = 14.sp)
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Cardiac Score", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = primaryText)
+                                Text(if (currentLang == "fa") "امتیاز قلبی" else "Cardiac Score", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = primaryText)
                             }
                             listOf(
-                                "HR canine: 60-140 BPM feline: 120-200 BPM, normal sinus rhythm" to 0,
-                                "HR canine: 140-180 BPM feline: 200-260 BPM, NSR or VPC < 20/min" to 1,
-                                "HR canine: > 180 BPM feline: > 260 BPM, consistent arrhythmia" to 2,
-                                "HR canine: < 60 BPM feline: ≤ 120 BPM, erratic arrhythmia" to 3
+                                (if (currentLang == "fa") "ضربان سگ: ۶۰-۱۴۰، گربه: ۱۲۰-۲۰۰ در دقیقه، ریتم سینوسی نرمال" else "HR canine: 60-140 BPM feline: 120-200 BPM, normal sinus rhythm") to 0,
+                                (if (currentLang == "fa") "ضربان سگ: ۱۴۰-۱۸۰، گربه: ۲۰۰-۲۶۰ در دقیقه، NSR یا VPC کمتر از ۲۰ در دقیقه" else "HR canine: 140-180 BPM feline: 200-260 BPM, NSR or VPC < 20/min") to 1,
+                                (if (currentLang == "fa") "ضربان سگ: بیشتر از ۱۸۰، گربه: بیشتر از ۲۶۰ در دقیقه، آریتمی مداوم" else "HR canine: > 180 BPM feline: > 260 BPM, consistent arrhythmia") to 2,
+                                (if (currentLang == "fa") "ضربان سگ: کمتر از ۶۰، گربه: ۱۲۰ یا کمتر در دقیقه، آریتمی نامنظم شدید" else "HR canine: < 60 BPM feline: ≤ 120 BPM, erratic arrhythmia") to 3
                             ).forEach { (description, valScore) ->
                                 Row(
                                     modifier = Modifier
@@ -447,21 +454,21 @@ fun TraumaTriageView() {
                                 }
                             }
                         }
- 
+
                         HorizontalDivider(color = strokeColor)
- 
+
                         // 3. Respiratory Score Category
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text("🫁", fontSize = 14.sp)
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Respiratory Score", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = primaryText)
+                                Text(if (currentLang == "fa") "امتیاز تنفسی" else "Respiratory Score", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = primaryText)
                             }
                             listOf(
-                                "Regular respiratory rate with no stridor, no abdominal component to respiration" to 0,
-                                "Mild increased respiratory rate and effort, ± abd component, mild upper airway sounds" to 1,
-                                "Mod increased respiratory rate and effort, some abd component, elbow abduct, moderate increased upper airway sounds" to 2,
-                                "Marked respiratory effort or gasping/agonal respiration, little/no air passage" to 3
+                                (if (currentLang == "fa") "تعداد تنفس منظم بدون استریدور (صداهای تنفسی)، بدون مداخله عضلات شکمی" else "Regular respiratory rate with no stridor, no abdominal component to respiration") to 0,
+                                (if (currentLang == "fa") "افزایش خفیف تعداد تنفس و تلاش تنفسی، همراه با یا بدون مداخله عضلات شکمی، صدای خفیف مجرای تنفسی فوقانی" else "Mild increased respiratory rate and effort, ± abd component, mild upper airway sounds") to 1,
+                                (if (currentLang == "fa") "افزایش متوسط تعداد تنفس و تلاش تنفسی، مداخله شکمی متوسط، دور کردن آرنج‌ها، صدای متوسط مجرای تنفسی فوقانی" else "Mod increased respiratory rate and effort, some abd component, elbow abduct, moderate increased upper airway sounds") to 2,
+                                (if (currentLang == "fa") "تلاش تنفسی بسیار شدید یا تنفس گسپینگ (نزعی)، عبور هوای بسیار کم یا بدون عبور هوا" else "Marked respiratory effort or gasping/agonal respiration, little/no air passage") to 3
                             ).forEach { (description, valScore) ->
                                 Row(
                                     modifier = Modifier
@@ -496,21 +503,21 @@ fun TraumaTriageView() {
                                 }
                             }
                         }
- 
+
                         HorizontalDivider(color = strokeColor)
- 
+
                         // 4. Eye/Muscle/Integument Score Category
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text("🐶", fontSize = 14.sp)
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Eye/Muscle/Integument Score", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = primaryText)
+                                Text(if (currentLang == "fa") "امتیاز چشم/عضله/پوست" else "Eye/Muscle/Integument Score", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = primaryText)
                             }
                             listOf(
-                                "Abrasion/laceration - none or partial thickness. Eye: no fluorescein uptake." to 0,
-                                "Abrasion/laceration - full thickness. No deep tissue involved. Eye - corneal laceration not perforated." to 1,
-                                "Abrasion/laceration - full thickness, deep tissue involved, art/nerve/muscle intact. Eye: corneal perforation, punctured globe or proptosis." to 2,
-                                "Penetration of abdomen/thorax. Abrasion/laceration full thickness, deep tissue involvement, artery/nerve/muscle compromised." to 3
+                                (if (currentLang == "fa") "خراش/پارگی - وجود ندارد یا دارای ضخامت نسبی است. چشم: عدم جذب رنگ فلورسین." else "Abrasion/laceration - none or partial thickness. Eye: no fluorescein uptake.") to 0,
+                                (if (currentLang == "fa") "خراش/پارگی - ضخامت کامل بدون درگیری بافت‌های عمیق. چشم: پارگی قرنیه بدون سوراخ شدن." else "Abrasion/laceration - full thickness. No deep tissue involved. Eye - corneal laceration not perforated.") to 1,
+                                (if (currentLang == "fa") "خراش/پارگی - ضخامت کامل با درگیری بافت‌های عمیق، شریان/عصب/عضله سالم. چشم: سوراخ شدن قرنیه یا بیرون‌زدگی چشم." else "Abrasion/laceration - full thickness, deep tissue involved, art/nerve/muscle intact. Eye: corneal perforation, punctured globe or proptosis.") to 2,
+                                (if (currentLang == "fa") "نفوذ به ناحیه شکم یا قفسه سینه. خراش/پارگی ضخامت کامل همراه با درگیری بافت عمیق، شریان/عصب/عضله آسیب دیده است." else "Penetration of abdomen/thorax. Abrasion/laceration full thickness, deep tissue involvement, artery/nerve/muscle compromised.") to 3
                             ).forEach { (description, valScore) ->
                                 Row(
                                     modifier = Modifier
@@ -545,21 +552,21 @@ fun TraumaTriageView() {
                                 }
                             }
                         }
- 
+
                         HorizontalDivider(color = strokeColor)
- 
+
                         // 5. Skeletal Score Category
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("Bone Icon", fontSize = 14.sp)
+                                Text("🦴", fontSize = 14.sp)
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Skeletal Score", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = primaryText)
+                                Text(if (currentLang == "fa") "امتیاز اسکلتی" else "Skeletal Score", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = primaryText)
                             }
                             listOf(
-                                "Weight bearing 3 or 4 limbs. No palpable fracture/joint laxity." to 0,
-                                "Closed limb fracture/rib fracture or any mandibular fracture. Single joint laxity/luxation (including SI). Pelvic fracture with unilateral intact SI -ilium-acetabulum. Single limb open/closed fracture at or below carpus/tarsus." to 1,
-                                "Multiple grade 1 conditions, single long bone open fracture above carpus/tarsus with cortical bone preserved. Non-mandibular skull fracture." to 2,
-                                "Vertebral body fx/luxation except coccygeal, multiple long bone open fracture above tarsus/carpus, single long bone open fracture above tarsus/carpus with loss of cortical bone." to 3
+                                (if (currentLang == "fa") "تحمل وزن روی ۳ یا ۴ اندام حرکتی. بدون شکستگی قابل لمس یا سستی مفصل." else "Weight bearing 3 or 4 limbs. No palpable fracture/joint laxity.") to 0,
+                                (if (currentLang == "fa") "شکستگی بسته اندام حرکتی/شکستگی دنده یا فک. دررفتگی یا سستی تک‌مفصلی. شکستگی لگن یک‌طرفه سالم. شکستگی باز یا بسته زیر مچ دست/پا." else "Closed limb fracture/rib fracture or any mandibular fracture. Single joint laxity/luxation (including SI). Pelvic fracture with unilateral intact SI -ilium-acetabulum. Single limb open/closed fracture at or below carpus/tarsus.") to 1,
+                                (if (currentLang == "fa") "چندین شرایط درجه ۱، شکستگی باز تک‌استخوان بلند بالای مچ با حفظ استخوان کورتیکال. شکستگی جمجمه غیرفکی." else "Multiple grade 1 conditions, single long bone open fracture above carpus/tarsus with cortical bone preserved. Non-mandibular skull fracture.") to 2,
+                                (if (currentLang == "fa") "شکستگی یا دررفتگی مهره‌های ستون فقرات (به‌جز دم)، شکستگی باز متعدد استخوان‌های بلند بالای مچ، یا شکستگی باز تک‌استخوان بلند با از دست رفتن استخوان کورتیکال." else "Vertebral body fx/luxation except coccygeal, multiple long bone open fracture above tarsus/carpus, single long bone open fracture above tarsus/carpus with loss of cortical bone.") to 3
                             ).forEach { (description, valScore) ->
                                 Row(
                                     modifier = Modifier
@@ -594,21 +601,21 @@ fun TraumaTriageView() {
                                 }
                             }
                         }
- 
+
                         HorizontalDivider(color = strokeColor)
- 
+
                         // 6. Neurologic Score Category
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text("🧠", fontSize = 14.sp)
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Neurologic Score", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = primaryText)
+                                Text(if (currentLang == "fa") "امتیاز عصبی" else "Neurologic Score", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = primaryText)
                             }
                             listOf(
-                                "Central: consciousness: alert to slightly dull, interest in surrounding. Peripheral: normal spinal reflexes; purposeful movement and nociception in all limbs." to 0,
-                                "Central: dull/depressed/withdrawn. Peripheral: abnormal spinal reflexes with purposeful movement and nociception intact in all 4 limbs." to 1,
-                                "Central: unconscious, responds to noxious stimuli. Periph: absent purposeful movement with intact nociception in 2 or more limbs or nociception absent in 1 limb, decreased anal or tail tone." to 2,
-                                "Central: nonresponsive to all stimuli, refractory seizures. Peripheral: absent nociception in 2 or more limbs, absent tail or perianal nociception." to 3
+                                (if (currentLang == "fa") "مرکزی: سطح هوشیاری کامل یا کمی بی‌حال، علاقه‌مند به محیط اطراف. محیطی: رفلکس‌های نخاعی نرمال، حرکت هدفمند و حس درد در تمامی اندام‌ها." else "Central: consciousness: alert to slightly dull, interest in surrounding. Peripheral: normal spinal reflexes; purposeful movement and nociception in all limbs.") to 0,
+                                (if (currentLang == "fa") "مرکزی: بی‌حال/افسرده/گوشه‌گیر. محیطی: رفلکس‌های نخاعی غیرنرمال با حفظ حرکت هدفمند و حس درد در تمام ۴ اندام." else "Central: dull/depressed/withdrawn. Peripheral: abnormal spinal reflexes with purposeful movement and nociception intact in all 4 limbs.") to 1,
+                                (if (currentLang == "fa") "مرکزی: بیهوش، پاسخ به محرک‌های دردناک. محیطی: عدم حرکت هدفمند با حس درد سالم در ۲ اندام یا بیشتر، یا عدم حس درد در ۱ اندام، کاهش تن عضلانی مخرج یا دم." else "Central: unconscious, responds to noxious stimuli. Periph: absent purposeful movement with intact nociception in 2 or more limbs or nociception absent in 1 limb, decreased anal or tail tone.") to 2,
+                                (if (currentLang == "fa") "مرکزی: عدم پاسخ به تمام محرک‌ها، تشنج‌های مقاوم به درمان. محیطی: عدم حس درد در ۲ اندام یا بیشتر، عدم حس درد مخرجی یا دم." else "Central: nonresponsive to all stimuli, refractory seizures. Peripheral: absent nociception in 2 or more limbs, absent tail or perianal nociception.") to 3
                             ).forEach { (description, valScore) ->
                                 Row(
                                     modifier = Modifier
@@ -643,9 +650,9 @@ fun TraumaTriageView() {
                                 }
                             }
                         }
- 
+
                         HorizontalDivider(color = strokeColor)
- 
+
                         // Calculated Score block
                         Box(
                             modifier = Modifier
@@ -656,18 +663,18 @@ fun TraumaTriageView() {
                         ) {
                             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(
-                                    text = "Total ATT Score: $totalAtt / 18",
+                                    text = if (currentLang == "fa") "مجموع امتیاز ATT: $totalAtt / ۱۸" else "Total ATT Score: $totalAtt / 18",
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = highlightColor
                                 )
                                 val attStatus = when {
-                                    totalAtt <= 3 -> "Mild Trauma (excellent prognosis)"
-                                    totalAtt <= 6 -> "Moderate Trauma (guarded prognosis)"
-                                    else -> "Severe Trauma (extremely critical, immediate intensive support required)"
+                                    totalAtt <= 3 -> if (currentLang == "fa") "ترومای خفیف (پیش‌آگهی عالی)" else "Mild Trauma (excellent prognosis)"
+                                    totalAtt <= 6 -> if (currentLang == "fa") "ترومای متوسط (پیش‌آگهی محتاطانه)" else "Moderate Trauma (guarded prognosis)"
+                                    else -> if (currentLang == "fa") "ترومای شدید (بسیار بحرانی، نیازمند پشتیبانی فشرده فوری)" else "Severe Trauma (extremely critical, immediate intensive support required)"
                                 }
                                 Text(
-                                    text = "Triage Category: $attStatus",
+                                    text = if (currentLang == "fa") "رده تریاژ: $attStatus" else "Triage Category: $attStatus",
                                     fontSize = 12.sp,
                                     color = secondaryText,
                                     fontWeight = FontWeight.SemiBold
@@ -719,8 +726,8 @@ fun TraumaTriageView() {
                                 Text("🩺", fontSize = 14.sp)
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Column {
-                                    Text("MAP", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
-                                    Text("in mmHg", fontSize = 9.sp, color = secondaryText)
+                                    Text(if (currentLang == "fa") "MAP (فشار متوسط شریانی)" else "MAP", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
+                                    Text(if (currentLang == "fa") "به mmHg" else "in mmHg", fontSize = 9.sp, color = secondaryText)
                                 }
                             }
                             androidx.compose.foundation.text.BasicTextField(
@@ -738,7 +745,7 @@ fun TraumaTriageView() {
                                             .padding(horizontal = 10.dp, vertical = 10.dp),
                                         contentAlignment = Alignment.CenterStart
                                     ) {
-                                        if (spiMap.isEmpty()) Text("MAP", color = secondaryText.copy(alpha = 0.4f), fontSize = 12.sp)
+                                        if (spiMap.isEmpty()) Text(if (currentLang == "fa") "MAP (فشار)" else "MAP", color = secondaryText.copy(alpha = 0.4f), fontSize = 12.sp)
                                         innerTextField()
                                     }
                                 }
@@ -755,8 +762,8 @@ fun TraumaTriageView() {
                                 Text("🫁", fontSize = 14.sp)
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Column {
-                                    Text("Respiration", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
-                                    Text("Respiratory Rate per min", fontSize = 9.sp, color = secondaryText)
+                                    Text(if (currentLang == "fa") "تنفس" else "Respiration", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
+                                    Text(if (currentLang == "fa") "تعداد تنفس در دقیقه" else "Respiratory Rate per min", fontSize = 9.sp, color = secondaryText)
                                 }
                             }
                             androidx.compose.foundation.text.BasicTextField(
@@ -774,7 +781,7 @@ fun TraumaTriageView() {
                                             .padding(horizontal = 10.dp, vertical = 10.dp),
                                         contentAlignment = Alignment.CenterStart
                                     ) {
-                                        if (spiRespiration.isEmpty()) Text("Respiration", color = secondaryText.copy(alpha = 0.4f), fontSize = 12.sp)
+                                        if (spiRespiration.isEmpty()) Text(if (currentLang == "fa") "تنفس" else "Respiration", color = secondaryText.copy(alpha = 0.4f), fontSize = 12.sp)
                                         innerTextField()
                                     }
                                 }
@@ -791,8 +798,8 @@ fun TraumaTriageView() {
                                 Text("🧪", fontSize = 14.sp)
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Column {
-                                    Text("Creatinine", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
-                                    Text("in mg/dL", fontSize = 9.sp, color = secondaryText)
+                                    Text(if (currentLang == "fa") "کراتینین" else "Creatinine", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
+                                    Text(if (currentLang == "fa") "به mg/dL" else "in mg/dL", fontSize = 9.sp, color = secondaryText)
                                 }
                             }
                             androidx.compose.foundation.text.BasicTextField(
@@ -810,7 +817,7 @@ fun TraumaTriageView() {
                                             .padding(horizontal = 10.dp, vertical = 10.dp),
                                         contentAlignment = Alignment.CenterStart
                                     ) {
-                                        if (spiCreatinine.isEmpty()) Text("Creatinine", color = secondaryText.copy(alpha = 0.4f), fontSize = 12.sp)
+                                        if (spiCreatinine.isEmpty()) Text(if (currentLang == "fa") "کراتینین" else "Creatinine", color = secondaryText.copy(alpha = 0.4f), fontSize = 12.sp)
                                         innerTextField()
                                     }
                                 }
@@ -827,8 +834,8 @@ fun TraumaTriageView() {
                                 Text("💉", fontSize = 14.sp)
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Column {
-                                    Text("PCV", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
-                                    Text("in %", fontSize = 9.sp, color = secondaryText)
+                                    Text(if (currentLang == "fa") "PCV (حجم سلول متراکم)" else "PCV", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
+                                    Text(if (currentLang == "fa") "به درصد %" else "in %", fontSize = 9.sp, color = secondaryText)
                                 }
                             }
                             androidx.compose.foundation.text.BasicTextField(
@@ -846,7 +853,7 @@ fun TraumaTriageView() {
                                             .padding(horizontal = 10.dp, vertical = 10.dp),
                                         contentAlignment = Alignment.CenterStart
                                     ) {
-                                        if (spiPcv.isEmpty()) Text("PCV", color = secondaryText.copy(alpha = 0.4f), fontSize = 12.sp)
+                                        if (spiPcv.isEmpty()) Text(if (currentLang == "fa") "درصد PCV" else "PCV", color = secondaryText.copy(alpha = 0.4f), fontSize = 12.sp)
                                         innerTextField()
                                     }
                                 }
@@ -863,8 +870,8 @@ fun TraumaTriageView() {
                                 Text("🧪", fontSize = 14.sp)
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Column {
-                                    Text("Albumin", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
-                                    Text("in g/dL", fontSize = 9.sp, color = secondaryText)
+                                    Text(if (currentLang == "fa") "آلبومین" else "Albumin", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
+                                    Text(if (currentLang == "fa") "به g/dL" else "in g/dL", fontSize = 9.sp, color = secondaryText)
                                 }
                             }
                             androidx.compose.foundation.text.BasicTextField(
@@ -882,7 +889,7 @@ fun TraumaTriageView() {
                                             .padding(horizontal = 10.dp, vertical = 10.dp),
                                         contentAlignment = Alignment.CenterStart
                                     ) {
-                                        if (spiAlbumin.isEmpty()) Text("Albumin", color = secondaryText.copy(alpha = 0.4f), fontSize = 12.sp)
+                                        if (spiAlbumin.isEmpty()) Text(if (currentLang == "fa") "آلبومین" else "Albumin", color = secondaryText.copy(alpha = 0.4f), fontSize = 12.sp)
                                         innerTextField()
                                     }
                                 }
@@ -899,8 +906,8 @@ fun TraumaTriageView() {
                                 Text("📅", fontSize = 14.sp)
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Column {
-                                    Text("Age", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
-                                    Text("in years", fontSize = 9.sp, color = secondaryText)
+                                    Text(if (currentLang == "fa") "سن" else "Age", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
+                                    Text(if (currentLang == "fa") "به سال" else "in years", fontSize = 9.sp, color = secondaryText)
                                 }
                             }
                             androidx.compose.foundation.text.BasicTextField(
@@ -918,7 +925,7 @@ fun TraumaTriageView() {
                                             .padding(horizontal = 10.dp, vertical = 10.dp),
                                         contentAlignment = Alignment.CenterStart
                                     ) {
-                                        if (spiAge.isEmpty()) Text("Age", color = secondaryText.copy(alpha = 0.4f), fontSize = 12.sp)
+                                        if (spiAge.isEmpty()) Text(if (currentLang == "fa") "سن" else "Age", color = secondaryText.copy(alpha = 0.4f), fontSize = 12.sp)
                                         innerTextField()
                                     }
                                 }
@@ -935,8 +942,8 @@ fun TraumaTriageView() {
                                 Text("🏥", fontSize = 14.sp)
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Column {
-                                    Text("Medical/Surgical", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
-                                    Text("Patient Type", fontSize = 9.sp, color = secondaryText)
+                                    Text(if (currentLang == "fa") "درمانی / جراحی" else "Medical/Surgical", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = primaryText)
+                                    Text(if (currentLang == "fa") "نوع بیمار" else "Patient Type", fontSize = 9.sp, color = secondaryText)
                                 }
                             }
                             Row(
@@ -952,7 +959,11 @@ fun TraumaTriageView() {
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = spiPatientType,
+                                    text = if (currentLang == "fa") {
+                                        if (spiPatientType == "Medical") "داخلی (درمانی)" else "جراحی"
+                                    } else {
+                                        spiPatientType
+                                    },
                                     fontSize = 12.sp,
                                     color = primaryText,
                                     fontWeight = FontWeight.Medium
@@ -980,16 +991,20 @@ fun TraumaTriageView() {
                         ) {
                             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(
-                                    text = "SPI Score",
+                                    text = if (currentLang == "fa") "امتیاز SPI" else "SPI Score",
                                     fontSize = 15.sp,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = highlightColor
                                 )
                                 Text(
                                     text = if (spiSurvivalProbability != null) {
-                                        String.format(java.util.Locale.US, "%.1f%% Survival Probability", spiSurvivalProbability)
+                                        if (currentLang == "fa") {
+                                            String.format(java.util.Locale.US, "احتمال بقا: %.1f%%", spiSurvivalProbability)
+                                        } else {
+                                            String.format(java.util.Locale.US, "%.1f%% Survival Probability", spiSurvivalProbability)
+                                        }
                                     } else {
-                                        "% Survival Probability"
+                                        if (currentLang == "fa") "احتمال بقا (درصد)" else "% Survival Probability"
                                     },
                                     fontSize = 12.sp,
                                     color = secondaryText,
@@ -1521,7 +1536,7 @@ fun TraumaTriageView() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Animal Trauma Triage (ATT) Info",
+                            text = if (currentLang == "fa") "اطلاعات تریاژ تروما (ATT)" else "Animal Trauma Triage (ATT) Info",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = primaryText
@@ -1560,7 +1575,7 @@ fun TraumaTriageView() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Survival Prediction Index (SPI 2) Info",
+                            text = if (currentLang == "fa") "اطلاعات شاخص پیش‌بینی بقا (SPI 2)" else "Survival Prediction Index (SPI 2) Info",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = primaryText
