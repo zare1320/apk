@@ -30,6 +30,18 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
 
     var activeCalculator by remember(currentLang) { mutableStateOf<String?>(null) }
 
+    val standardCalName = activeCalculator?.let {
+        when (it) {
+            "Fluid Therapy", "مایع‌درمانی" -> "مایع‌درمانی"
+            "Blood Transfusion", "انتقال خون" -> "انتقال خون"
+            "Calorie Calculator", "محاسبه کالری غذا" -> "محاسبه کالری غذا"
+            "Gestation Calendar", "زمان زایمان" -> "زمان زایمان"
+            "Human Age Equiv.", "سن معادل انسان" -> "سن معادل انسان"
+            "Trauma Triage", "تریاژ تروما" -> "تریاژ تروما"
+            else -> it
+        }
+    }
+
     // Forms States
     var weightInput by remember { mutableStateOf("") }
 
@@ -90,7 +102,7 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
                 }
             }
 
-            if (activeExaminedPet == null) {
+            if (activeExaminedPet == null && standardCalName != "انتقال خون") {
                 Spacer(modifier = Modifier.height(12.dp))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -125,18 +137,6 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Interactive Display
-            val standardCalName = activeCalculator?.let {
-                when (it) {
-                    "Fluid Therapy", "مایع‌درمانی" -> "مایع‌درمانی"
-                    "Blood Transfusion", "انتقال خون" -> "انتقال خون"
-                    "Calorie Calculator", "محاسبه کالری غذا" -> "محاسبه کالری غذا"
-                    "Gestation Calendar", "زمان زایمان" -> "زمان زایمان"
-                    "Human Age Equiv.", "سن معادل انسان" -> "سن معادل انسان"
-                    "Trauma Triage", "تریاژ تروما" -> "تریاژ تروما"
-                    else -> it
-                }
-            }
-
             if (standardCalName != null) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
@@ -164,10 +164,10 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
                         FluidTherapyCalculator(activePet = activeExaminedPet, selectedSpecies = selectedSpecies, currentLang = currentLang)
                     }
                     "انتقال خون" -> {
-                        BloodTransfusionCalculator(activePet = activeExaminedPet, initWeight = weightInput, selectedSpecies = selectedSpecies)
+                        BloodTransfusionCalculator(activePet = activeExaminedPet, initWeight = weightInput, selectedSpecies = selectedSpecies, currentLang = currentLang)
                     }
                     "محاسبه کالری غذا" -> {
-                        CalorieCalculatorView(activePet = activeExaminedPet, initWeight = weightInput, selectedSpecies = selectedSpecies)
+                        CalorieCalculatorView(activePet = activeExaminedPet, initWeight = weightInput, selectedSpecies = selectedSpecies, currentLang = currentLang)
                     }
                     "زمان زایمان" -> {
                         GestationCalculatorView(viewModel)
