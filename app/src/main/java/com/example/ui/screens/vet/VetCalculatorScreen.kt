@@ -102,7 +102,7 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
                 }
             }
 
-            if (activeExaminedPet == null && standardCalName != "انتقال خون") {
+            if (activeExaminedPet == null && standardCalName != "انتقال خون" && standardCalName != "زمان زایمان") {
                 Spacer(modifier = Modifier.height(12.dp))
                 Card(
                     modifier = Modifier.fillMaxWidth(),

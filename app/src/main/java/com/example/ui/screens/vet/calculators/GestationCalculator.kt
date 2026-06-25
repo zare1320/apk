@@ -31,11 +31,16 @@ data class LocalPatient(
     val notes: String
 )
 
-fun getFormattedDateWithOffset(baseDate: java.util.Date?, daysSelected: Int): String {
+fun getFormattedDateWithOffset(baseDate: java.util.Date?, daysSelected: Int, currentLang: String = "en"): String {
     if (baseDate == null) return "-"
     val cal = java.util.Calendar.getInstance()
     cal.time = baseDate
     cal.add(java.util.Calendar.DAY_OF_YEAR, daysSelected)
+    
+    if (currentLang == "fa") {
+        val sdf = java.text.SimpleDateFormat("yyyy/MM/dd", java.util.Locale.ENGLISH)
+        return sdf.format(cal.time)
+    }
     
     val day = cal.get(java.util.Calendar.DAY_OF_MONTH)
     val suffix = getDayOfMonthSuffix(day)
@@ -262,7 +267,14 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
     val yearFormat = java.text.SimpleDateFormat("yyyy", java.util.Locale.ENGLISH)
     val todayDay = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_MONTH)
     val todaySuffix = getDayOfMonthSuffix(todayDay)
-    val formattedToday = "Today's Date: ${todayFormat.format(today)}$todaySuffix ${yearFormat.format(today)}"
+    
+    val currentLang by viewModel.currentLanguage.collectAsState()
+    
+    val formattedToday = if (currentLang == "en") {
+        "Today's Date: ${todayFormat.format(today)}$todaySuffix ${yearFormat.format(today)}"
+    } else {
+        "تاریخ امروز: ${todayFormat.format(today)}$todaySuffix ${yearFormat.format(today)}"
+    }
 
     val isDark = MaterialTheme.colorScheme.background.red < 0.3f
     val bgColor = MaterialTheme.colorScheme.background
@@ -274,24 +286,14 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
     val onHighlightColor = MaterialTheme.colorScheme.onPrimary
     val linkColor = MaterialTheme.colorScheme.primary
 
-    CompositionLocalProvider(LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr) {
+    val layoutDirection = if (currentLang == "en") androidx.compose.ui.unit.LayoutDirection.Ltr else androidx.compose.ui.unit.LayoutDirection.Rtl
+
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 24.dp)
         ) {
-            // Persian Header
-            Text(
-                text = "🤰 ابزار محاسبه‌گر زمان زایمان حیوانات (Gestation & Pregnancy)",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = primaryText,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 12.dp),
-                textAlign = TextAlign.Right
-            )
-
             // Patients Card
             Card(
                 colors = CardDefaults.cardColors(containerColor = surfaceColor),
@@ -310,7 +312,7 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Patients / مشخصات بیمار",
+                            text = if (currentLang == "en") "Patients / Patient Info" else "مشخصات بیمار",
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                             color = primaryText
@@ -338,7 +340,12 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                                         checkmarkColor = onHighlightColor
                                     )
                                 )
-                                Text("View Patients", fontSize = 11.sp, color = primaryText, fontWeight = FontWeight.SemiBold)
+                                Text(
+                                    text = if (currentLang == "en") "View Patients" else "مشاهده بیماران",
+                                    fontSize = 11.sp,
+                                    color = primaryText,
+                                    fontWeight = FontWeight.SemiBold
+                                )
                             }
                             
                             OutlinedButton(
@@ -389,7 +396,11 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                                 border = androidx.compose.foundation.BorderStroke(1.dp, strokeColor),
                                 contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
                             ) {
-                                Text("Save New", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text(
+                                    text = if (currentLang == "en") "Save New" else "ذخیره جدید",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
                         }
                         
@@ -401,24 +412,24 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             CustomField(
-                                label = "ID #",
+                                label = if (currentLang == "en") "ID #" else "شناسه #",
                                 value = patientId,
                                 onValueChange = { patientId = it },
-                                placeholder = "ID",
+                                placeholder = if (currentLang == "en") "ID" else "شناسه",
                                 modifier = Modifier.weight(1f)
                             )
                             CustomField(
-                                label = "Pet Name",
+                                label = if (currentLang == "en") "Pet Name" else "نام پت",
                                 value = petName,
                                 onValueChange = { petName = it },
-                                placeholder = "Pet Name",
+                                placeholder = if (currentLang == "en") "Pet Name" else "نام پت",
                                 modifier = Modifier.weight(1f)
                             )
                             CustomField(
-                                label = "Owner",
+                                label = if (currentLang == "en") "Owner" else "صاحب حیوان",
                                 value = ownerName,
                                 onValueChange = { ownerName = it },
-                                placeholder = "Owner Name",
+                                placeholder = if (currentLang == "en") "Owner Name" else "نام صاحب",
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -431,27 +442,46 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             CustomField(
-                                label = "Age",
+                                label = if (currentLang == "en") "Age" else "سن",
                                 value = age,
                                 onValueChange = { age = it },
-                                placeholder = "Age",
+                                placeholder = if (currentLang == "en") "Age" else "سن",
                                 modifier = Modifier.weight(1f)
                             )
+                            
+                            val displaySpecies = if (species == "Canine") {
+                                if (currentLang == "en") "Canine" else "سگ (Canine)"
+                            } else {
+                                if (currentLang == "en") "Feline" else "گربه (Feline)"
+                            }
+                            val speciesOptions = if (currentLang == "en") listOf("Canine", "Feline") else listOf("سگ (Canine)", "گربه (Feline)")
+                            
                             CustomDropdownField(
-                                label = "Species",
-                                selectedValue = species,
-                                options = listOf("Canine", "Feline"),
-                                onSelect = {
-                                    species = it
-                                    isCanine = (it == "Canine")
+                                label = if (currentLang == "en") "Species" else "گونه",
+                                selectedValue = displaySpecies,
+                                options = speciesOptions,
+                                onSelect = { selectedDisplay ->
+                                    val actualSpec = if (selectedDisplay == "سگ (Canine)" || selectedDisplay == "Canine") "Canine" else "Feline"
+                                    species = actualSpec
+                                    isCanine = (actualSpec == "Canine")
                                 },
                                 modifier = Modifier.weight(1.2f)
                             )
+                            
+                            val displaySex = if (sex == "Male") {
+                                if (currentLang == "en") "Male" else "نر (Male)"
+                            } else {
+                                if (currentLang == "en") "Female" else "ماده (Female)"
+                            }
+                            val sexOptions = if (currentLang == "en") listOf("Male", "Female") else listOf("نر (Male)", "ماده (Female)")
+                            
                             CustomDropdownField(
-                                label = "Sex",
-                                selectedValue = sex,
-                                options = listOf("Male", "Female"),
-                                onSelect = { sex = it },
+                                label = if (currentLang == "en") "Sex" else "جنسیت",
+                                selectedValue = displaySex,
+                                options = sexOptions,
+                                onSelect = { selectedDisplay ->
+                                    sex = if (selectedDisplay == "نر (Male)" || selectedDisplay == "Male") "Male" else "Female"
+                                },
                                 modifier = Modifier.weight(1.2f)
                             )
                         }
@@ -473,7 +503,12 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                                     checkmarkColor = onHighlightColor
                                 )
                             )
-                            Text("Add Patient Notes", fontSize = 11.sp, color = primaryText, fontWeight = FontWeight.Medium)
+                            Text(
+                                text = if (currentLang == "en") "Add Patient Notes" else "افزودن یادداشت بیمار",
+                                fontSize = 11.sp,
+                                color = primaryText,
+                                fontWeight = FontWeight.Medium
+                            )
                         }
                         
                         if (addPatientNotes) {
@@ -495,7 +530,11 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                                         contentAlignment = Alignment.CenterStart
                                     ) {
                                         if (patientNotes.isEmpty()) {
-                                            Text("Enter patient notes here...", color = secondaryText.copy(alpha = 0.5f), fontSize = 11.sp)
+                                            Text(
+                                                text = if (currentLang == "en") "Enter patient notes here..." else "یادداشت‌های بیمار را اینجا وارد کنید...",
+                                                color = secondaryText.copy(alpha = 0.5f),
+                                                fontSize = 11.sp
+                                            )
                                         }
                                         innerTextField()
                                     }
@@ -508,7 +547,12 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                             Spacer(modifier = Modifier.height(12.dp))
                             Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(strokeColor))
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text("Patient Records / سوابق بیماران ثبت شده:", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = primaryText)
+                            Text(
+                                text = if (currentLang == "en") "Patient Records:" else "سوابق بیماران ثبت شده:",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = primaryText
+                            )
                             Spacer(modifier = Modifier.height(6.dp))
                             combinedPatients.forEach { record ->
                                 Row(
@@ -522,10 +566,29 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Column(modifier = Modifier.weight(1f)) {
-                                        Text("${record.petName} (${record.species}) - ID: ${record.id}", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = primaryText)
-                                        Text("Owner: ${record.ownerName} | Age: ${record.age} | Sex: ${record.sex}", fontSize = 10.sp, color = secondaryText)
+                                        val recSpec = if (record.species == "Canine") (if (currentLang == "en") "Canine" else "سگ") else (if (currentLang == "en") "Feline" else "گربه")
+                                        Text(
+                                            text = "${record.petName} ($recSpec) - ID: ${record.id}",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = primaryText
+                                        )
+                                        val lblOwner = if (currentLang == "en") "Owner" else "صاحب"
+                                        val lblAge = if (currentLang == "en") "Age" else "سن"
+                                        val lblSex = if (currentLang == "en") "Sex" else "جنسیت"
+                                        val valSex = if (record.sex == "Male") (if (currentLang == "en") "Male" else "نر") else (if (currentLang == "en") "Female" else "ماده")
+                                        Text(
+                                            text = "$lblOwner: ${record.ownerName} | $lblAge: ${record.age} | $lblSex: $valSex",
+                                            fontSize = 10.sp,
+                                            color = secondaryText
+                                        )
                                         if (record.notes.isNotEmpty()) {
-                                            Text("Notes: ${record.notes}", fontSize = 10.sp, color = secondaryText)
+                                            val lblNotes = if (currentLang == "en") "Notes" else "یادداشت‌ها"
+                                            Text(
+                                                text = "$lblNotes: ${record.notes}",
+                                                fontSize = 10.sp,
+                                                color = secondaryText
+                                            )
                                         }
                                     }
                                     Text(
@@ -574,8 +637,13 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text("📅", fontSize = 18.sp)
                             Spacer(modifier = Modifier.width(6.dp))
+                            val cardTitleText = if (currentLang == "en") {
+                                if (petName.isNotEmpty()) "Due Date for $petName" else "Due Date"
+                            } else {
+                                if (petName.isNotEmpty()) "تاریخ احتمالی زایمان برای $petName" else "تاریخ احتمالی زایمان"
+                            }
                             Text(
-                                    text = if (petName.isNotEmpty()) "Due Date for $petName" else "Due Date",
+                                text = cardTitleText,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = primaryText
@@ -599,8 +667,13 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                     
                     Spacer(modifier = Modifier.height(14.dp))
                     
+                    val chooseDateLabel = if (currentLang == "en") {
+                        if (petName.isNotEmpty()) "Choose Conception Date for $petName - ${if (isCanine) "Canine" else "Feline"}" else "Choose Conception Date - ${if (isCanine) "Canine" else "Feline"}"
+                    } else {
+                        if (petName.isNotEmpty()) "انتخاب تاریخ جفت‌گیری (لقاح) برای $petName - ${if (isCanine) "سگ" else "گربه"}" else "انتخاب تاریخ جفت‌گیری (لقاح) - ${if (isCanine) "سگ" else "گربه"}"
+                    }
                     Text(
-                        text = if (petName.isNotEmpty()) "Choose Conception Date for $petName - ${if (isCanine) "Canine" else "Feline"}" else "Choose Conception Date - ${if (isCanine) "Canine" else "Feline"}",
+                        text = chooseDateLabel,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = secondaryText
@@ -615,7 +688,11 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                     ) {
                         val context = androidx.compose.ui.platform.LocalContext.current
                         val sdfDisplay = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.ENGLISH)
-                        val dateBtnText = if (conceptionDate == null) "Select date" else sdfDisplay.format(conceptionDate!!)
+                        val dateBtnText = if (conceptionDate == null) {
+                            if (currentLang == "en") "Select date" else "انتخاب تاریخ"
+                        } else {
+                            sdfDisplay.format(conceptionDate!!)
+                        }
                         
                         Box(
                             modifier = Modifier
@@ -658,7 +735,11 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                             modifier = Modifier.weight(1.7f),
                             horizontalArrangement = Arrangement.End
                         ) {
-                            Text("Days since Conception: ", fontSize = 11.sp, color = secondaryText)
+                            Text(
+                                text = if (currentLang == "en") "Days since Conception: " else "روزهای سپری شده از لقاح: ",
+                                fontSize = 11.sp,
+                                color = secondaryText
+                            )
                             Spacer(modifier = Modifier.width(6.dp))
                             
                             val daysValueString = if (conceptionDate == null) "" else {
@@ -687,14 +768,14 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                     Spacer(modifier = Modifier.height(14.dp))
                     
                     Text(
-                        text = "Canine: Gestation range: 57-65 days, Average: 63 days.",
+                        text = if (currentLang == "en") "Canine: Gestation range: 57-65 days, Average: 63 days." else "سگ: محدوده بارداری: ۵۷ تا ۶۵ روز، میانگین: ۶۳ روز.",
                         fontSize = 11.sp,
                         color = secondaryText,
                         fontWeight = FontWeight.Medium
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Feline: Gestation range: 60-67 days, Average: 63-65 days.",
+                        text = if (currentLang == "en") "Feline: Gestation range: 60-67 days, Average: 63-65 days." else "گربه: محدوده بارداری: ۶۰ تا ۶۷ روز، میانگین: ۶۳-۶۵ روز.",
                         fontSize = 11.sp,
                         color = secondaryText,
                         fontWeight = FontWeight.Medium
@@ -709,8 +790,13 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        val likelyDueDateLabel = if (currentLang == "en") {
+                            if (petName.isNotEmpty()) "Likely Due Date for $petName" else "Likely Due Date"
+                        } else {
+                            if (petName.isNotEmpty()) "تاریخ تخمینی زایمان برای $petName" else "تاریخ تخمینی زایمان"
+                        }
                         Text(
-                            text = if (petName.isNotEmpty()) "Likely Due Date for $petName" else "Likely Due Date",
+                            text = likelyDueDateLabel,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             color = secondaryText
@@ -718,7 +804,7 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                         Spacer(modifier = Modifier.height(6.dp))
                         
                         val avgGestation = if (isCanine) 63 else 64
-                        val likelyDueDateText = getFormattedDateWithOffset(conceptionDate, avgGestation)
+                        val likelyDueDateText = getFormattedDateWithOffset(conceptionDate, avgGestation, currentLang)
                         
                         Box(
                             modifier = Modifier
@@ -748,8 +834,13 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                             modifier = Modifier.weight(1f),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+                            val earlyDueDateLabel = if (currentLang == "en") {
+                                if (petName.isNotEmpty()) "Early Due Date ($petName)" else "Early Due Date"
+                            } else {
+                                if (petName.isNotEmpty()) "حداقل زمان بارداری ($petName)" else "حداقل زمان بارداری"
+                            }
                             Text(
-                                text = if (petName.isNotEmpty()) "Early Due Date ($petName)" else "Early Due Date",
+                                text = earlyDueDateLabel,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = secondaryText
@@ -757,7 +848,7 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                             Spacer(modifier = Modifier.height(6.dp))
                             
                             val earlyOffset = if (isCanine) 57 else 60
-                            val earlyDateText = getFormattedDateWithOffset(conceptionDate, earlyOffset)
+                            val earlyDateText = getFormattedDateWithOffset(conceptionDate, earlyOffset, currentLang)
                             
                             Box(
                                 modifier = Modifier
@@ -780,8 +871,13 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                             modifier = Modifier.weight(1f),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+                            val lateDueDateLabel = if (currentLang == "en") {
+                                if (petName.isNotEmpty()) "Late Due Date ($petName)" else "Late Due Date"
+                            } else {
+                                if (petName.isNotEmpty()) "حداکثر زمان بارداری ($petName)" else "حداکثر زمان بارداری"
+                            }
                             Text(
-                                text = if (petName.isNotEmpty()) "Late Due Date ($petName)" else "Late Due Date",
+                                text = lateDueDateLabel,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = secondaryText
@@ -789,7 +885,7 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                             Spacer(modifier = Modifier.height(6.dp))
                             
                             val lateOffset = if (isCanine) 65 else 67
-                            val lateDateText = getFormattedDateWithOffset(conceptionDate, lateOffset)
+                            val lateDateText = getFormattedDateWithOffset(conceptionDate, lateOffset, currentLang)
                             
                             Box(
                                 modifier = Modifier
@@ -833,24 +929,35 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                             Text("🐾", fontSize = 16.sp)
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                    text = "Pregnancy Info / دانستنی‌های دوران باروری",
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = primaryText
+                                text = if (currentLang == "en") "Pregnancy Info" else "دانستنی‌های دوران بارداری",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = primaryText
                             )
                         }
                     }
                     
                     Spacer(modifier = Modifier.height(12.dp))
                     
-                    val bulletPoints = listOf(
-                        "لقاح در لوله‌های رحم هر دو حیوان سگ و گربه رخ می‌دهد. لانه‌گزینی رویان در رحم حدوداً در روز ۱۸ در سگ‌ها و روز ۱۴ در گربه‌ها انجام می‌پذیرد.",
-                        "جنین در روز ۲۱ قابل لمس است و قطر توده‌ها تقریباً هر ۷ روز دو برابر می‌شود. پس از روز ۳۵ الی ۳۸، توده‌ها غیر قابل تشخیص و نامشخص می‌شوند و معاینه تا روزهای پایانی بارداری دشوار خواهد بود.",
-                        "استخوان‌بندی جنین از روز ۲۸ شروع به کلسیمی شدن می‌کند ولی توسط رادیوگرافی استاندارد قبل از روزهای ۴۲-۴۵ شناسایی نمی‌شود. روتین‌ترین روش شمارش تعداد توله‌ها رادیوگرافی بعد از روز ۵۵ بارداری است (طی این دوره بی‌خطر است).",
-                        "سونوگرافی در ۲۵ الی ۳۵ روز اول دقیق‌ترین زمان برای تشخیص اولیه می‌باشد. قبل از آن به دلیل نبود تمایز کافی ممکن است نتایج منفی کاذب نمایان شود.",
-                        "دستگاه‌های نوع داپلر اجازه شنیدن ضربان قلب جنینی را برای تایید حیات فراهم می‌کنند که با سرعتی ۲ تا ۳ برابر سریع‌تر از ضربان مادر می‌زند.",
-                        "انجام سونوگرافی خصوصاً جهت افتراق بارداری طبیعی از سایر علل بزرگی مرضی یا آب دور زهدان (مانند پیرومتر عفونی یا هیدرومتر مایع) تجویز می‌گردد."
-                    )
+                    val bulletPoints = if (currentLang == "en") {
+                        listOf(
+                            "Fertilization occurs in the oviducts of both dogs and cats. Embryo implantation in the uterus happens around day 18 in dogs and day 14 in cats.",
+                            "Embryos are palpable around day 21, and the diameter of the uterine swellings roughly doubles every 7 days. After days 35 to 38, the swellings become indistinct, making palpation difficult until late pregnancy.",
+                            "The fetal skeleton starts to calcify around day 28 but is not detectable by standard radiography before days 42-45. The most routine method to count puppies/kittens is radiography after day 55 of gestation (which is safe during this period).",
+                            "Ultrasonography is most accurate for initial diagnosis during the first 25 to 35 days. Prior to this, lacks of differentiation may lead to false-negative results.",
+                            "Doppler-type devices allow hearing fetal heartbeats to confirm viability, which beat 2 to 3 times faster than the mother's heart rate.",
+                            "Ultrasonography is especially indicated to differentiate normal pregnancy from other causes of uterine enlargement (such as pyometra or hydrometra)."
+                        )
+                    } else {
+                        listOf(
+                            "لقاح در لوله‌های رحم هر دو حیوان سگ و گربه رخ می‌دهد. لانه‌گزینی رویان در رحم حدوداً در روز ۱۸ در سگ‌ها و روز ۱۴ در گربه‌ها انجام می‌پذیرد.",
+                            "جنین در روز ۲۱ قابل لمس است و قطر توده‌ها تقریباً هر ۷ روز دو برابر می‌شود. پس از روز ۳۵ الی ۳۸، توده‌ها غیر قابل تشخیص و نامشخص می‌شوند و معاینه تا روزهای پایانی بارداری دشوار خواهد بود.",
+                            "استخوان‌بندی جنین از روز ۲۸ شروع به کلسیمی شدن می‌کند ولی توسط رادیوگرافی استاندارد قبل از روزهای ۴۲-۴۵ شناسایی نمی‌شود. روتین‌ترین روش شمارش تعداد توله‌ها رادیوگرافی بعد از روز ۵۵ بارداری است (طی این دوره بی‌خطر است).",
+                            "سونوگرافی در ۲۵ الی ۳۵ روز اول دقیق‌ترین زمان برای تشخیص اولیه می‌باشد. قبل از آن به دلیل نبود تمایز کافی ممکن است نتایج منفی کاذب نمایان شود.",
+                            "دستگاه‌های نوع داپلر اجازه شنیدن ضربان قلب جنینی را برای تایید حیات فراهم می‌کنند که با سرعتی ۲ تا ۳ برابر سریع‌تر از ضربان مادر می‌زند.",
+                            "انجام سونوگرافی خصوصاً جهت افتراق بارداری طبیعی از سایر علل بزرگی مرضی یا آب دور زهدان (مانند پیرومتر عفونی یا هیدرومتر مایع) تجویز می‌گردد."
+                        )
+                    }
                     
                     bulletPoints.forEach { point ->
                         Row(modifier = Modifier.padding(vertical = 4.dp)) {
@@ -862,7 +969,7 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                                 fontWeight = FontWeight.Medium,
                                 color = secondaryText,
                                 lineHeight = 20.sp,
-                                textAlign = TextAlign.Right,
+                                textAlign = if (currentLang == "en") TextAlign.Left else TextAlign.Right,
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
@@ -872,7 +979,7 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                     
                     val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
                     Text(
-                        text = "*Source: Merck Veterinary Manual (مرجع پزشکی حیوانات مرک)",
+                        text = if (currentLang == "en") "*Source: Merck Veterinary Manual" else "*منبع: مرجع دامپزشکی مرک (Merck Veterinary Manual)",
                         fontSize = 11.sp,
                         color = linkColor,
                         fontWeight = FontWeight.Bold,
