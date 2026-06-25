@@ -138,8 +138,8 @@ fun CalorieCalculatorView(
 
     // Canned and Dry Food Calorie Data Database setup
     var activeClassTab by remember { mutableStateOf("Dry Food") } // "Dry Food" or "Canned Food"
-    var selectedFoodCategory by remember(isCanineTab) {
-        mutableStateOf(if (isCanineTab) "Dog Dry" else "Cat Dry")
+    var selectedFoodCategory by remember {
+        mutableStateOf<String?>(null)
     }
 
     val isDark = MaterialTheme.colorScheme.background.red < 0.3f
@@ -337,7 +337,10 @@ fun CalorieCalculatorView(
                     modifier = Modifier
                         .weight(1f)
                         .background(if (isCanineTab) MaterialTheme.colorScheme.primaryContainer else if (isDark) Color.Transparent else Color.White)
-                        .clickable { isCanineTab = true }
+                        .clickable { 
+                            isCanineTab = true 
+                            selectedFoodCategory = null
+                        }
                         .padding(vertical = 14.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -360,7 +363,10 @@ fun CalorieCalculatorView(
                     modifier = Modifier
                         .weight(1f)
                         .background(if (!isCanineTab) MaterialTheme.colorScheme.primaryContainer else if (isDark) Color.Transparent else Color.White)
-                        .clickable { isCanineTab = false }
+                        .clickable { 
+                            isCanineTab = false 
+                            selectedFoodCategory = null
+                        }
                         .padding(vertical = 14.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -953,6 +959,7 @@ fun CalorieCalculatorView(
                             .height(52.dp)
                             .border(1.dp, btnBorderColor, RoundedCornerShape(12.dp))
                             .clickable { 
+                                isCanineTab = true
                                 selectedFoodCategory = "Dog Dry" 
                                 activeClassTab = "Dry Food"
                             }
@@ -994,6 +1001,7 @@ fun CalorieCalculatorView(
                             .height(52.dp)
                             .border(1.dp, btnBorderColorCanned, RoundedCornerShape(12.dp))
                             .clickable { 
+                                isCanineTab = true
                                 selectedFoodCategory = "Dog Canned" 
                                 activeClassTab = "Canned Food"
                             }
@@ -1041,6 +1049,7 @@ fun CalorieCalculatorView(
                             .height(52.dp)
                             .border(1.dp, btnBorderColorCatDry, RoundedCornerShape(12.dp))
                             .clickable { 
+                                isCanineTab = false
                                 selectedFoodCategory = "Cat Dry" 
                                 activeClassTab = "Dry Food"
                             }
@@ -1082,6 +1091,7 @@ fun CalorieCalculatorView(
                             .height(52.dp)
                             .border(1.dp, btnBorderColorCatCanned, RoundedCornerShape(12.dp))
                             .clickable { 
+                                isCanineTab = false
                                 selectedFoodCategory = "Cat Canned" 
                                 activeClassTab = "Canned Food"
                             }
@@ -1109,69 +1119,71 @@ fun CalorieCalculatorView(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            if (selectedFoodCategory != null) {
+                Spacer(modifier = Modifier.height(10.dp))
 
-            // Food Data items list
-            val foodIsCanine = when (selectedFoodCategory) {
-                "Dog Dry", "Dog Canned" -> true
-                else -> false
-            }
-            val foodIsDry = when (selectedFoodCategory) {
-                "Dog Dry", "Cat Dry" -> true
-                else -> false
-            }
-            val recommendedFoodsList = getRecommendedFoods(isCanine = foodIsCanine, isDry = foodIsDry)
+                // Food Data items list
+                val foodIsCanine = when (selectedFoodCategory) {
+                    "Dog Dry", "Dog Canned" -> true
+                    else -> false
+                }
+                val foodIsDry = when (selectedFoodCategory) {
+                    "Dog Dry", "Cat Dry" -> true
+                    else -> false
+                }
+                val recommendedFoodsList = getRecommendedFoods(isCanine = foodIsCanine, isDry = foodIsDry)
 
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                recommendedFoodsList.forEach { food ->
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(1.dp, borderStrokeColor.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
-                            .clickable {
-                                enterCaloriesStr = food.calories.toString()
-                            }
-                    ) {
-                        Row(
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    recommendedFoodsList.forEach { food ->
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = food.brand,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 12.sp,
-                                    color = textPrimary
-                                )
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = if (currentLang == "fa") food.descriptionFa else food.description,
-                                    fontSize = 11.sp,
-                                    color = textSecondary
-                                )
-                            }
-
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(MaterialTheme.colorScheme.primaryContainer)
-                                    .padding(horizontal = 10.dp, vertical = 4.dp)
-                            ) {
-                                val unitLabel = if (foodIsDry) {
-                                    if (currentLang == "fa") "پیمانه" else "cup"
-                                } else {
-                                    if (currentLang == "fa") "قوطی" else "can"
+                                .border(1.dp, borderStrokeColor.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+                                .clickable {
+                                    enterCaloriesStr = food.calories.toString()
                                 }
-                                Text(
-                                    text = if (currentLang == "fa") "${food.calories} کیلوکالری/$unitLabel" else "${food.calories} kcal/$unitLabel",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 11.sp,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = food.brand,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp,
+                                        color = textPrimary
+                                    )
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = if (currentLang == "fa") food.descriptionFa else food.description,
+                                        fontSize = 11.sp,
+                                        color = textSecondary
+                                    )
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(MaterialTheme.colorScheme.primaryContainer)
+                                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                                ) {
+                                    val unitLabel = if (foodIsDry) {
+                                        if (currentLang == "fa") "پیمانه" else "cup"
+                                    } else {
+                                        if (currentLang == "fa") "قوطی" else "can"
+                                    }
+                                    Text(
+                                        text = if (currentLang == "fa") "${food.calories} کیلوکالری/$unitLabel" else "${food.calories} kcal/$unitLabel",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                }
                             }
                         }
                     }
