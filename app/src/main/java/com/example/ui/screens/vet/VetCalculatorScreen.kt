@@ -167,7 +167,7 @@ fun VetCalculatorScreen(viewModel: MainViewModel) {
                         BloodTransfusionCalculator(activePet = activeExaminedPet, initWeight = weightInput, selectedSpecies = selectedSpecies, currentLang = currentLang)
                     }
                     "محاسبه کالری غذا" -> {
-                        CalorieCalculatorView(activePet = activeExaminedPet, initWeight = weightInput, selectedSpecies = selectedSpecies, currentLang = currentLang)
+                        CalorieCalculatorView(viewModel = viewModel, activePet = activeExaminedPet, initWeight = weightInput, selectedSpecies = selectedSpecies, currentLang = currentLang)
                     }
                     "زمان زایمان" -> {
                         GestationCalculatorView(viewModel)

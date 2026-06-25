@@ -66,6 +66,10 @@ class MainViewModel(
     val allGuidelines: StateFlow<List<TreatmentGuideline>> = repository.allGuidelines
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    // --- Food Database Store (Room database-backed) ---
+    val allFoods: StateFlow<List<FoodItem>> = repository.allFoods
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     init {
         // Seed database with default drug catalog if empty
         viewModelScope.launch {
@@ -75,6 +79,11 @@ class MainViewModel(
         // Seed database with default treatment guidelines if empty
         viewModelScope.launch {
             repository.seedGuidelines(staticGuidelinesCatalog)
+        }
+
+        // Seed database with default recommended foods if empty
+        viewModelScope.launch {
+            repository.seedFoods(staticFoodCatalog)
         }
 
         // Pre-create a default vet session so the user starts with something if they haven't registered
@@ -556,3 +565,302 @@ val staticGuidelinesCatalog = listOf(
         protocol = "مایع‌درمانی زیرپوستی گرم، داکسی‌سایکلین مناسب جوندگان."
     )
 )
+
+val staticFoodCatalog = listOf(
+    // Dog Dry (🐕 Dry)
+    FoodItem(
+        brand = "Royal Canin Mini Adult (🐕 Dry)",
+        description = "Balanced food for small breed adult dogs - 373 kcal/cup",
+        descriptionFa = "غذای متوازن برای سگ‌های بالغ نژاد کوچک - ۳۷۳ کیلوکالری/پیمانه",
+        calories = 373.0,
+        isCanine = true,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Royal Canin Puppy Maxi Dry (🐕 Dry)",
+        description = "Growth Support for Large Breed puppies - 343 kcal/cup",
+        descriptionFa = "پشتیبانی از رشد توله سگ‌های نژاد بزرگ - ۳۴۳ کیلوکالری/پیمانه",
+        calories = 343.0,
+        isCanine = true,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Hill's Science Diet Adult Dry (🐕 Dry)",
+        description = "Chicken & Barley Formula for optimal health - 363 kcal/cup",
+        descriptionFa = "فرمول مرغ و جو برای سلامت بهینه - ۳۶۳ کیلوکالری/پیمانه",
+        calories = 363.0,
+        isCanine = true,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Purina Pro Plan Shredded Chicken (🐕 Dry)",
+        description = "High Protein chicken & rice formula - 387 kcal/cup",
+        descriptionFa = "فرمول پر پروتئین مرغ و برنج - ۳۸۷ کیلوکالری/پیمانه",
+        calories = 387.0,
+        isCanine = true,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Reflex Plus Adult Dog Salmon (🐕 Dry)",
+        description = "Super Premium formula with Salmon for adult dogs - 395 kcal/cup",
+        descriptionFa = "فرمول سوپر پرمیوم با ماهی سالمون برای سگ‌های بالغ - ۳۹۵ کیلوکالری/پیمانه",
+        calories = 395.0,
+        isCanine = true,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Nutri Pet Dry Dog Premium (نوتری پت 🐕)",
+        description = "Iranian premium dry food with 29% protein - 355 kcal/cup",
+        descriptionFa = "غذای خشک پرمیوم ایرانی با ۲۹٪ پروتئین - ۳۵۵ کیلوکالری/پیمانه",
+        calories = 355.0,
+        isCanine = true,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Josera Kids Puppy Dry (🐕 Dry)",
+        description = "Premium German growth formula for medium/large puppies - 380 kcal/cup",
+        descriptionFa = "فرمول پرمیوم آلمانی رشد توله سگ بزرگ - ۳۸۰ کیلوکالری/پیمانه",
+        calories = 380.0,
+        isCanine = true,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Celeb Dog Premium Dry (سلب پت 🐕)",
+        description = "Premium local dry food with prebiotics - 360 kcal/cup",
+        descriptionFa = "غذای خشک پرمیوم ایرانی حاوی پربیوتیک - ۳۶۰ کیلوکالری/پیمانه",
+        calories = 360.0,
+        isCanine = true,
+        isDry = true
+    ),
+
+    // Dog Canned (🐕 Wet)
+    FoodItem(
+        brand = "Royal Canin Puppy Canned Can (🐕 Wet)",
+        description = "Moist recipe for active puppy development - 335 kcal/can",
+        descriptionFa = "فرمول مرطوب برای رشد توله سگ‌های فعال - ۳۳۵ کیلوکالری/کنسرو",
+        calories = 335.0,
+        isCanine = true,
+        isDry = false
+    ),
+    FoodItem(
+        brand = "Hill's Science Diet Chicken Can (🐕 Wet)",
+        description = "Savoury stew with barley and meat veggies - 370 kcal/can",
+        descriptionFa = "خوراک لذیذ با جو، گوشت و سبزیجات - ۳۷۰ کیلوکالری/کنسرو",
+        calories = 370.0,
+        isCanine = true,
+        isDry = false
+    ),
+    FoodItem(
+        brand = "Purina Pro Plan Beef & Rice Can (🐕 Wet)",
+        description = "Classic wet high energy dog food - 408 kcal/can",
+        descriptionFa = "غذای مرطوب کلاسیک پر انرژی سگ - ۴۰۸ کیلوکالری/کنسرو",
+        calories = 408.0,
+        isCanine = true,
+        isDry = false
+    ),
+    FoodItem(
+        brand = "Shayer Beef & Chicken Can (کنسرو شایر 🐕)",
+        description = "100% natural meat pate for dogs, no preservatives - 310 kcal/can",
+        descriptionFa = "پاته گوشت صد درصد طبیعی سگ بدون مواد نگهدارنده - ۳۱۰ کیلوکالری/کنسرو",
+        calories = 310.0,
+        isCanine = true,
+        isDry = false
+    ),
+    FoodItem(
+        brand = "Animonda GranCarno Adult Can (🐕 Wet)",
+        description = "Pure beef and chicken chunks canned dog food - 390 kcal/can",
+        descriptionFa = "کنسرو سگ حاوی تکه‌های گوشت گاو و مرغ خالص - ۳۹۰ کیلوکالری/کنسرو",
+        calories = 390.0,
+        isCanine = true,
+        isDry = false
+    ),
+    FoodItem(
+        brand = "Blue Buffalo Homestyle Beef Canned (🐕 Wet)",
+        description = "Premium canned beef with garden veggies - 392 kcal/can",
+        descriptionFa = "گوشت گاو کنسرو شده پرمیوم با سبزیجات - ۳۹۲ کیلوکالری/کنسرو",
+        calories = 392.0,
+        isCanine = true,
+        isDry = false
+    ),
+
+    // Cat Dry (🐈 Dry)
+    FoodItem(
+        brand = "Royal Canin Feline Fit 32 (🐈 Dry)",
+        description = "Balanced nutrition for moderately active cats - 315 kcal/cup",
+        descriptionFa = "تغذیه متوازن برای گربه‌های با فعالیت متوسط - ۳۱۵ کیلوکالری/پیمانه",
+        calories = 315.0,
+        isCanine = false,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Royal Canin Kitten Dry (🐈 Dry)",
+        description = "High energy kibble for growth phase up to 12 months - 395 kcal/cup",
+        descriptionFa = "غذای خشک پر انرژی برای دوره رشد تا ۱۲ ماهگی - ۳۹۵ کیلوکالری/پیمانه",
+        calories = 395.0,
+        isCanine = false,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Royal Canin Hairball Care (🐈 Dry)",
+        description = "Special dietary fiber formula to eliminate hairballs - 340.0 kcal/cup",
+        descriptionFa = "فرمول فیبر رژیمی مخصوص برای حذف گلوله مویی - ۳۴۰ کیلوکالری/پیمانه",
+        calories = 340.0,
+        isCanine = false,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Hill's Science Diet Adult Cat Optimal (🐈 Dry)",
+        description = "Excellent dry food for digestion and urinary tract - 502 kcal/cup",
+        descriptionFa = "غذای خشک عالی برای هضم و مجاری ادراری - ۵۰۲ کیلوکالری/پیمانه",
+        calories = 502.0,
+        isCanine = false,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Purina Pro Plan Savor Salmon (🐈 Dry)",
+        description = "Delicious dry cat salmon & rice formulation - 437 kcal/cup",
+        descriptionFa = "فرمول لذیذ خشک سالمون و برنج گربه - ۴۳۷ کیلوکالری/پیمانه",
+        calories = 437.0,
+        isCanine = false,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Reflex Plus Kitten Chicken (🐈 Dry)",
+        description = "Super premium dry food for growing kittens - 385 kcal/cup",
+        descriptionFa = "غذای خشک سوپر پرمیوم برای بچه گربه‌های در حال رشد - ۳۸۵ کیلوکالری/پیمانه",
+        calories = 385.0,
+        isCanine = false,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Reflex Plus Adult Salmon (🐈 Dry)",
+        description = "Super premium Omega-3 rich dry food for adult cats - 375 kcal/cup",
+        descriptionFa = "غذای خشک غنی از امگا ۳ برای گربه‌های بالغ - ۳۷۵ کیلوکالری/پیمانه",
+        calories = 375.0,
+        isCanine = false,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Nutri Pet Cat Premium Dry (نوتری پت 🐈)",
+        description = "Iranian premium dry cat food, balanced minerals - 340 kcal/cup",
+        descriptionFa = "غذای خشک پرمیوم ایرانی با مواد معدنی متوازن - ۳۴۰ کیلوکالری/پیمانه",
+        calories = 340.0,
+        isCanine = false,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Josera Catelux Duck & Potato (🐈 Dry)",
+        description = "German premium grain-free hairball controller - 410 kcal/cup",
+        descriptionFa = "غذای کنترل‌کننده هربال بدون غلات آلمانی - ۴۱۰ کیلوکالری/پیمانه",
+        calories = 410.0,
+        isCanine = false,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Shoodo Cat Dry Salmon (شیدو 🐈)",
+        description = "LID premium Persian formulation with salmon - 365 kcal/cup",
+        descriptionFa = "فرمولاسیون پرمیوم ایرانی شیدو با ماهی سالمون - ۳۶۵ کیلوکالری/پیمانه",
+        calories = 365.0,
+        isCanine = false,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Celeb Cat Chicken & Turkey (سلب پت 🐈)",
+        description = "Premium hypoallergenic turkey/poultry recipe - 360 kcal/cup",
+        descriptionFa = "دستور غذایی بوقلمون و مرغ ضد حساسیت - ۳۶۰ کیلوکالری/پیمانه",
+        calories = 360.0,
+        isCanine = false,
+        isDry = true
+    ),
+    FoodItem(
+        brand = "Blue Buffalo Wilderness Cat Salmon (🐈 Dry)",
+        description = "Grain-free high protein wild salmon kibbles - 443 kcal/cup",
+        descriptionFa = "غذای خشک پر پروتئین بدون غلات سالمون وحشی - ۴۴۳ کیلوکالری/پیمانه",
+        calories = 443.0,
+        isCanine = false,
+        isDry = true
+    ),
+
+    // Cat Canned (🐈 Wet)
+    FoodItem(
+        brand = "Royal Canin Intense Beauty In Gravy (🐈 Wet)",
+        description = "Moist pouch with omega-3 for skin and coat beauty - 85 kcal/can",
+        descriptionFa = "پوچ مرطوب با امگا ۳ برای زیبایی پوست و مو - ۸۵ کیلوکالری/کنسرو",
+        calories = 85.0,
+        isCanine = false,
+        isDry = false
+    ),
+    FoodItem(
+        brand = "Royal Canin Kitten Instinctive Gravy (🐈 Wet)",
+        description = "Thin slices in gravy for baby teeth and immunity - 90 kcal/can",
+        descriptionFa = "برش‌های نازک در سس برای دندان‌ها و ایمنی بچه گربه - ۹۰ کیلوکالری/کنسرو",
+        calories = 90.0,
+        isCanine = false,
+        isDry = false
+    ),
+    FoodItem(
+        brand = "Hill's Science Diet Wet Salmon (🐈 Wet)",
+        description = "Seared salmon chunks in a rich wet savory glaze - 75 kcal/can",
+        descriptionFa = "تکه‌های ماهی سالمون تفت داده شده در سس لذیذ - ۷۵ کیلوکالری/کنسرو",
+        calories = 75.0,
+        isCanine = false,
+        isDry = false
+    ),
+    FoodItem(
+        brand = "Purina Pro Plan Savor Salmon Can (🐈 Wet)",
+        description = "Seafood delicious wet food paste for urinary tract - 95 kcal/can",
+        descriptionFa = "پاته غذای مرطوب لذیذ برای مجاری ادراری - ۹۵ کیلوکالری/کنسرو",
+        calories = 95.0,
+        isCanine = false,
+        isDry = false
+    ),
+    FoodItem(
+        brand = "Shayer Chicken & Beef Canned (کنسرو شایر 🐈)",
+        description = "High protein wet pate made entirely with chicken and beef - 92 kcal/can",
+        descriptionFa = "پاته مرطوب پر پروتئین ساخته شده از مرغ و گوساله - ۹۲ کیلوکالری/کنسرو",
+        calories = 92.0,
+        isCanine = false,
+        isDry = false
+    ),
+    FoodItem(
+        brand = "Shayer Gourmet Turkey & Duck Can (کنسرو شایر 🐈)",
+        description = "Succulent gourmet wet bits for picky adult cats - 98 kcal/can",
+        descriptionFa = "لقمه‌های لذیذ مرطوب بوقلمون و اردک برای گربه‌های بدغذا - ۹۸ کیلوکالری/کنسرو",
+        calories = 98.0,
+        isCanine = false,
+        isDry = false
+    ),
+    FoodItem(
+        brand = "GimCat ShinyCat Tuna & Chicken (🐈 Wet)",
+        description = "Slices of premium real tuna fillet and chicken breast - 80 kcal/can",
+        descriptionFa = "فیله تونا و سینه مرغ پرمیوم جی‌ام‌کت - ۸۰ کیلوکالری/کنسرو",
+        calories = 80.0,
+        isCanine = false,
+        isDry = false
+    ),
+    FoodItem(
+        brand = "Wanpy Chicken & Crab Pouch (پوچ وانپی 🐈)",
+        description = "Delicious wet jelly pouch for everyday hydration - 65 kcal/can",
+        descriptionFa = "پوچ ژله‌ای مرطوب و لذیذ وانپی برای هیدراتاسیون - ۶۵ کیلوکالری/کنسرو",
+        calories = 65.0,
+        isCanine = false,
+        isDry = false
+    ),
+    FoodItem(
+        brand = "Animonda Carny Adult Beef & Cod (🐈 Wet)",
+        description = "German holistic fresh meat canned pate - 110 kcal/can",
+        descriptionFa = "پاته گوشت تازه آلمانی آنیموندا کارنی - ۱۱۰ کیلوکالری/کنسرو",
+        calories = 110.0,
+        isCanine = false,
+        isDry = false
+    ),
+    FoodItem(
+        brand = "Blue Buffalo Wilderness Chicken Wet (🐈 Wet)",
+        description = "Pate grain-free wild chicken high protein wet meal - 120 kcal/can",
+        descriptionFa = "پاته بدون غلات مرغ وحشی پر پروتئین - ۱۲۰ کیلوکالری/کنسرو",
+        calories = 120.0,
+        isCanine = false,
+        isDry = false
+    )
+)
+

@@ -24,9 +24,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import com.example.data.database.Pet
+import com.example.data.database.FoodItem
+import com.example.viewmodel.MainViewModel
 
 @Composable
 fun CalorieCalculatorView(
+    viewModel: MainViewModel? = null,
     activePet: Pet? = null,
     initWeight: String = "",
     selectedSpecies: String? = null,
@@ -140,6 +143,12 @@ fun CalorieCalculatorView(
     var activeClassTab by remember { mutableStateOf("Dry Food") } // "Dry Food" or "Canned Food"
     var selectedFoodCategory by remember {
         mutableStateOf<String?>(null)
+    }
+
+    val allFoodsFromDb by if (viewModel != null) {
+        viewModel.allFoods.collectAsState()
+    } else {
+        remember { mutableStateOf(emptyList<FoodItem>()) }
     }
 
     val isDark = MaterialTheme.colorScheme.background.red < 0.3f
@@ -1131,7 +1140,13 @@ fun CalorieCalculatorView(
                     "Dog Dry", "Cat Dry" -> true
                     else -> false
                 }
-                val recommendedFoodsList = getRecommendedFoods(isCanine = foodIsCanine, isDry = foodIsDry)
+                val recommendedFoodsList = if (allFoodsFromDb.isNotEmpty()) {
+                    allFoodsFromDb.filter { it.isCanine == foodIsCanine && it.isDry == foodIsDry }
+                } else {
+                    getRecommendedFoods(isCanine = foodIsCanine, isDry = foodIsDry).map {
+                        FoodItem(brand = it.brand, description = it.description, descriptionFa = it.descriptionFa, calories = it.calories, isCanine = foodIsCanine, isDry = foodIsDry)
+                    }
+                }
 
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     recommendedFoodsList.forEach { food ->

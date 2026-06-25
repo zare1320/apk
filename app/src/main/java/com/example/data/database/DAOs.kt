@@ -120,3 +120,25 @@ interface TreatmentGuidelineDao {
     suspend fun getCount(): Int
 }
 
+@Dao
+interface FoodDao {
+    @Query("SELECT * FROM recommended_foods ORDER BY id ASC")
+    fun getAllFoods(): Flow<List<FoodItem>>
+
+    @Query("SELECT * FROM recommended_foods WHERE isCanine = :isCanine AND isDry = :isDry ORDER BY id ASC")
+    fun getFoodsFiltered(isCanine: Boolean, isDry: Boolean): Flow<List<FoodItem>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertFood(food: FoodItem)
+
+    @Delete
+    suspend fun deleteFood(food: FoodItem)
+
+    @Query("DELETE FROM recommended_foods")
+    suspend fun clearAll()
+
+    @Query("SELECT COUNT(*) FROM recommended_foods")
+    suspend fun getCount(): Int
+}
+
+

@@ -107,3 +107,16 @@ data class TreatmentGuideline(
     val protocol: String
 )
 
+@Entity(tableName = "recommended_foods")
+data class FoodItem(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val brand: String,
+    val description: String,
+    val descriptionFa: String,
+    val calories: Double,
+    val isCanine: Boolean,
+    val isDry: Boolean
+)
+
+

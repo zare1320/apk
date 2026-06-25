@@ -11,6 +11,7 @@ class VetRepository(private val db: AppDatabase) {
     private val calendarEventDao = db.calendarEventDao()
     private val drugDao = db.drugDao()
     private val treatmentGuidelineDao = db.treatmentGuidelineDao()
+    private val foodDao = db.foodDao()
 
     // --- Authentication / User Session ---
     val activeSession: Flow<UserSession?> = userSessionDao.getActiveSession()
@@ -131,6 +132,29 @@ class VetRepository(private val db: AppDatabase) {
     suspend fun seedGuidelines(guidelines: List<TreatmentGuideline>) {
         if (treatmentGuidelineDao.getCount() == 0) {
             guidelines.forEach { treatmentGuidelineDao.insertGuideline(it) }
+        }
+    }
+
+    // --- Food Database ---
+    val allFoods: Flow<List<FoodItem>> = foodDao.getAllFoods()
+
+    fun getFoodsFiltered(isCanine: Boolean, isDry: Boolean): Flow<List<FoodItem>> {
+        return foodDao.getFoodsFiltered(isCanine, isDry)
+    }
+
+    suspend fun insertFood(food: FoodItem) {
+        foodDao.insertFood(food)
+    }
+
+    suspend fun deleteFood(food: FoodItem) {
+        foodDao.deleteFood(food)
+    }
+
+    suspend fun getFoodCount(): Int = foodDao.getCount()
+
+    suspend fun seedFoods(foods: List<FoodItem>) {
+        if (foodDao.getCount() == 0) {
+            foods.forEach { foodDao.insertFood(it) }
         }
     }
 }
