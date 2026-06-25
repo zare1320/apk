@@ -320,6 +320,37 @@ fun GestationCalculatorView(viewModel: MainViewModel) {
                     }
                     
                     Column(modifier = Modifier.padding(14.dp)) {
+                        // Warning Box
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.9f)
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 12.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text("⚠️", fontSize = 16.sp)
+                                Text(
+                                    text = if (currentLang == "en") {
+                                        "To automatically populate the fields, please activate a patient's record in the Admissions tab. Otherwise, you can enter the details manually."
+                                    } else {
+                                        "کاربر گرامی، جهت تکمیل خودکار اطلاعات، لطفا ابتدا پرونده یک بیمار را در بخش پذیرش فعال کنید. در غیر این صورت، باید فیلدها را به صورت دستی پر نمایید."
+                                    },
+                                    fontSize = 11.sp,
+                                    color = MaterialTheme.colorScheme.onErrorContainer,
+                                    lineHeight = 16.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+
                         // View Toggle & Save New Button Row
                         Row(
                             modifier = Modifier.fillMaxWidth(),
